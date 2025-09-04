@@ -64,10 +64,10 @@ doc = ReadabilityAnalysis.from_text(
 
 #### Get LiNT scores
 
-If you only want the scores per sentence, use the `lint_scores` property:
+If you only want the scores per sentence, use the `lint_scores_per_sentence` property:
 
 ```python
-doc.lint_scores
+doc.lint_scores_per_sentence
 ```
 
 You will get a list of scores per sentence:
@@ -81,31 +81,42 @@ You will get a list of scores per sentence:
 For a detailed analysis, use the `get_detailed_analysis()` method:
 
 ```python
-doc.get_detailed_analysis()
+analysis = doc.get_detailed_analysis()
 ```
 
 You will get the mean LiNT score for the text, as well as scores and feature analysis per sentence:
 
 ```python
-{'document_stats': {'sentence_count': 3,
-  'mean_lint_score': 48.48971527777778,
-  'min_lint_score': 34.28665000000001,
-  'max_lint_score': 61.28863750000001},
-  'sentence_scores': [
-   {'text': 'De Oudegracht is het sfeervolle hart van de stad.',
-   'score': 34.28665000000001,
-   'level': 2,
-   'top_n_least_freq_words': [
-    ('sfeervolle', 3.21),
-    ('hart', 5.2),
-    ('stad', 5.68)
-    ],
-   'concrete_nouns': ['Oudegracht', 'stad'],
-   'max_sdl': 4,
-   'sdls': {...},
-   'content_words': ['Oudegracht', 'sfeervolle', 'hart', 'stad']},
-   {...}]
-}
+analysis['document_stats']
+
+{'sentence_count': 3,
+ 'mean_lint_score': 44.10298194444445,
+ 'min_lint_score': 32.955650000000006,
+ 'max_lint_score': 53.4096375}
+```
+
+```python
+analysis['sentence_stats'][0]
+
+{'text': 'De Oudegracht is het sfeervolle hart van de stad.',
+ 'score': 32.955650000000006,
+ 'level': 1,
+ 'top_n_least_freq_words': [('sfeervolle', 3.21),
+  ('hart', 5.2),
+  ('stad', 5.68)],
+ 'concrete_nouns': ['Oudegracht', 'stad'],
+ 'max_sdl': 3,
+ 'sdls': {'De': {'dep_length': 0, 'head': 'Oudegracht'},
+  'Oudegracht': {'dep_length': 3, 'head': 'hart'},
+  'is': {'dep_length': 2, 'head': 'hart'},
+  'het': {'dep_length': 1, 'head': 'hart'},
+  'sfeervolle': {'dep_length': 0, 'head': 'hart'},
+  'hart': {'dep_length': 0, 'head': 'hart'},
+  'van': {'dep_length': 1, 'head': 'stad'},
+  'de': {'dep_length': 0, 'head': 'stad'},
+  'stad': {'dep_length': 2, 'head': 'hart'},
+  '.': {'dep_length': 0, 'head': 'hart'}},
+ 'content_words': ['Oudegracht', 'sfeervolle', 'hart', 'stad']}
 ```
 
 ## What is LiNT-II?

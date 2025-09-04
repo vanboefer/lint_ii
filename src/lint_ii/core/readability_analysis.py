@@ -76,7 +76,7 @@ class ReadabilityAnalysis:
         """Get detailed readability analysis per sentence in the document."""
         return {
             'document_stats': self.calculate_document_stats(),
-            'sentence_scores': [
+            'sentence_stats': [
                 sent.get_detailed_analysis()
                 for sent in self.sentences
             ],
