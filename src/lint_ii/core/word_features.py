@@ -10,10 +10,10 @@ class WordFeatures:
     def __init__(
         self,
         token: Token,
-        abstract_nouns: list[str]|None = None,
+        abstract_nouns_list: list[str]|None = None,
     ) -> None:
         self.token = token
-        self.abstract_nouns = [] if abstract_nouns is None else abstract_nouns
+        self.abstract_nouns_list = [] if abstract_nouns_list is None else abstract_nouns_list
 
     @cached_property
     def word_frequency(self) -> float|None:
@@ -58,7 +58,7 @@ class WordFeatures:
     @property
     def is_abstract(self) -> bool:
         """Check if word is an abstract noun: either an abstract named entity or listed in the RBN list of abstract nouns."""
-        return self.is_abstract_entity or self.is_in_abstract_nouns
+        return self.is_abstract_entity or self.is_in_abstract_nouns_list
 
     @property
     def is_abstract_entity(self) -> bool:
@@ -66,6 +66,6 @@ class WordFeatures:
         return self.is_noun and self.token.ent_type_ in ["ORG", "LANGUAGE", "LAW", "NORP"]
 
     @property
-    def is_in_abstract_nouns(self) -> bool:
+    def is_in_abstract_nouns_list(self) -> bool:
         """Check if word is listed in the RBN list of abstract nouns."""
-        return self.is_noun and self.token.text in self.abstract_nouns
+        return self.is_noun and self.token.text in self.abstract_nouns_list

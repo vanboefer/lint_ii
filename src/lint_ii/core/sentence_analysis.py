@@ -17,25 +17,25 @@ class Sentence:
     def __init__(
         self,
         doc: Doc,
-        abstract_nouns: list[str]|None = None,
+        abstract_nouns_list: list[str]|None = None,
     ) -> None:
         self.doc = doc
-        self.abstract_nouns = [] if abstract_nouns is None else abstract_nouns
+        self.abstract_nouns_list = [] if abstract_nouns_list is None else abstract_nouns_list
 
     @classmethod
     def from_text(
         cls,
         text: str,
         nlp_model: Language,
-        abstract_nouns: list[str]|None = None,
+        abstract_nouns_list: list[str]|None = None,
     ) -> 'Sentence':
         doc = nlp_model(text)
-        return cls(doc, abstract_nouns)
+        return cls(doc, abstract_nouns_list)
 
     @cached_property
     def word_features(self) -> list[WordFeatures]:
         """Linguistic features for each token in the sentence."""
-        return [WordFeatures(token, self.abstract_nouns) for token in self.doc]
+        return [WordFeatures(token, self.abstract_nouns_list) for token in self.doc]
 
     @cached_property
     def sdls(self) -> dict[str, int]:
@@ -54,6 +54,14 @@ class Sentence:
         return [
             feat.token.text for feat in self.word_features
             if feat.is_noun and not feat.is_abstract
+        ]
+
+    @property
+    def abstract_nouns(self) -> list[str]:
+        """All abstract nouns in the sentence."""
+        return [
+            feat.token.text for feat in self.word_features
+            if feat.is_noun and feat.is_abstract
         ]
 
     @property
@@ -102,11 +110,11 @@ class Sentence:
     @cached_property
     def proportion_of_concrete_nouns(self) -> float:
         """Proportion of concrete nouns out of all nouns in the sentence."""
-        abstract_nouns = sum(feat.is_abstract for feat in self.word_features)
+        n_abstract_nouns = len(self.abstract_nouns)
         total_nouns = sum(feat.is_noun for feat in self.word_features)
         if total_nouns == 0:
             return 0
-        return (total_nouns - abstract_nouns) / total_nouns
+        return (total_nouns - n_abstract_nouns) / total_nouns
 
     def calculate_lint_score(self) -> float:
         """Calculate LiNT readability score for the sentence."""
@@ -138,6 +146,7 @@ class Sentence:
             'level': self.get_difficulty_level(),
             'top_n_least_freq_words': self.get_top_n_least_frequent(n=n),
             'concrete_nouns': self.concrete_nouns,
+            'abstract_nouns': self.abstract_nouns,
             'max_sdl': self.max_sdl,
             'sdls': self.sdls,
             'content_words': self.content_words,
