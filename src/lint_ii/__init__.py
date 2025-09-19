@@ -50,3 +50,5 @@ doc.get_detailed_analysis()
 """
 
 from lint_ii.core.readability_analysis import ReadabilityAnalysis
+from lint_ii.core.sentence_analysis import SentenceAnalysis
+from lint_ii.core.word_features import WordFeatures
