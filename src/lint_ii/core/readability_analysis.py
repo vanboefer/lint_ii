@@ -5,13 +5,13 @@ import statistics
 from spacy.language import Language
 
 from lint_ii.core.lint_scorer import LintScorer
-from lint_ii.core.sentence_analysis import Sentence
+from lint_ii.core.sentence_analysis import SentenceAnalysis
 
 
 class ReadabilityAnalysis:
     """Readability analysis for a given text."""
 
-    def __init__(self, sentences: list[Sentence]) -> None:
+    def __init__(self, sentences: list[SentenceAnalysis]) -> None:
         self.sentences = sentences
 
     def __repr__(self) -> str:
@@ -26,7 +26,7 @@ class ReadabilityAnalysis:
     ) -> 'ReadabilityAnalysis':
         doc = nlp_model(text)
         sentences = [
-            Sentence(sent, abstract_nouns_list)
+            SentenceAnalysis(sent, abstract_nouns_list)
             for sent in doc.sents
         ]
         return cls(sentences)
@@ -38,7 +38,7 @@ class ReadabilityAnalysis:
     @cached_property
     def mean_word_frequency_log(self) -> float:
         """Mean value of sentence-level word frequencies"""
-        return statistics.mean(s.word_frequency_log for s in self.sentences)
+        return statistics.mean(s.mean_log_word_frequency for s in self.sentences)
 
     @cached_property
     def mean_max_sdl(self) -> float:

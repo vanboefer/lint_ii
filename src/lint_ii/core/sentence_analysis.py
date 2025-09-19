@@ -11,7 +11,7 @@ from lint_ii.core.lint_scorer import LintScorer
 from lint_ii.core.word_features import WordFeatures
 
 
-class Sentence:
+class SentenceAnalysis:
     """Sentence-level readability analysis."""
 
     def __init__(
@@ -28,7 +28,7 @@ class Sentence:
         text: str,
         nlp_model: Language,
         abstract_nouns_list: list[str]|None = None,
-    ) -> 'Sentence':
+    ) -> 'SentenceAnalysis':
         doc = nlp_model(text)
         return cls(doc, abstract_nouns_list)
 
@@ -73,7 +73,7 @@ class Sentence:
         ]
 
     @cached_property
-    def word_frequency_log(self) -> float:
+    def mean_log_word_frequency(self) -> float:
         """Mean log word frequency for the sentence."""
         frequencies = [
             freq
@@ -119,7 +119,7 @@ class Sentence:
     def calculate_lint_score(self) -> float:
         """Calculate LiNT readability score for the sentence."""
         return LintScorer.calculate_lint_score(
-            freq_log = self.word_frequency_log,
+            freq_log = self.mean_log_word_frequency,
             max_sdl = self.max_sdl,
             content_words_per_clause = self.content_words_per_clause,
             proportion_concrete = self.proportion_of_concrete_nouns,
@@ -145,6 +145,7 @@ class Sentence:
             'score': self.calculate_lint_score(),
             'level': self.get_difficulty_level(),
             'top_n_least_freq_words': self.get_top_n_least_frequent(n=n),
+            'mean_log_word_frequency': self.mean_log_word_frequency,
             'concrete_nouns': self.concrete_nouns,
             'abstract_nouns': self.abstract_nouns,
             'max_sdl': self.max_sdl,
