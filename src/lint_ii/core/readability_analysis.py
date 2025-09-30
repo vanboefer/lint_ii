@@ -22,11 +22,10 @@ class ReadabilityAnalysis:
         cls,
         text: str,
         nlp_model: Language,
-        abstract_nouns_list: list[str]|None = None,
     ) -> 'ReadabilityAnalysis':
         doc = nlp_model(text)
         sentences = [
-            SentenceAnalysis(sent, abstract_nouns_list)
+            SentenceAnalysis(sent)
             for sent in doc.sents
         ]
         return cls(sentences)

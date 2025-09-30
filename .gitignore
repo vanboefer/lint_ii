@@ -139,9 +139,6 @@ ehthumbs.db
 Thumbs.db
 
 # project specific files
-abstract_nouns/*.txt
-abstract_nouns/*.xlsx
-abstract_nouns/*.ipynb
 documents/
 notebooks/
 output/

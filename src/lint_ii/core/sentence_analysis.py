@@ -17,31 +17,28 @@ class SentenceAnalysis:
     def __init__(
         self,
         doc: Doc,
-        abstract_nouns_list: list[str]|None = None,
     ) -> None:
         self.doc = doc
-        self.abstract_nouns_list = [] if abstract_nouns_list is None else abstract_nouns_list
 
     @classmethod
     def from_text(
         cls,
         text: str,
         nlp_model: Language,
-        abstract_nouns_list: list[str]|None = None,
     ) -> 'SentenceAnalysis':
         doc = nlp_model(text)
-        return cls(doc, abstract_nouns_list)
+        return cls(doc)
 
     @cached_property
     def word_features(self) -> list[WordFeatures]:
         """Linguistic features for each token in the sentence."""
-        return [WordFeatures(token, self.abstract_nouns_list) for token in self.doc]
+        return [WordFeatures(token) for token in self.doc]
 
     @cached_property
     def sdls(self) -> dict[str, int]:
         """The dependency length (number of intervening tokens) between a token and its syntactic head, for each token in the sentence."""
         return {
-            feat.token.text:{
+            feat.text:{
                 'dep_length': feat.dep_length,
                 'head': feat.token.head.text,
             }
@@ -52,23 +49,39 @@ class SentenceAnalysis:
     def concrete_nouns(self) -> list[str]:
         """All concrete nouns in the sentence."""
         return [
-            feat.token.text for feat in self.word_features
-            if feat.is_noun and not feat.is_abstract
+            feat.text for feat in self.word_features
+            if feat.is_concrete
         ]
 
     @property
     def abstract_nouns(self) -> list[str]:
         """All abstract nouns in the sentence."""
         return [
-            feat.token.text for feat in self.word_features
-            if feat.is_noun and feat.is_abstract
+            feat.text for feat in self.word_features
+            if feat.is_abstract
+        ]
+
+    @property
+    def undefined_nouns(self) -> list[str]:
+        """All undefined nouns in the sentence."""
+        return [
+            feat.text for feat in self.word_features
+            if feat.is_undefined
+        ]
+
+    @property
+    def undefined_nouns(self) -> list[str]:
+        """All unknown nouns in the sentence."""
+        return [
+            feat.text for feat in self.word_features
+            if feat.is_unknown
         ]
 
     @property
     def content_words(self) -> list[str]:
         """All content words (excluding adverbs) in the sentence."""
         return [
-            feat.token.text for feat in self.word_features
+            feat.text for feat in self.word_features
             if feat.is_content_word_excl_adv
         ]
 
@@ -110,11 +123,12 @@ class SentenceAnalysis:
     @cached_property
     def proportion_of_concrete_nouns(self) -> float:
         """Proportion of concrete nouns out of all nouns in the sentence."""
+        n_concrete_nouns = len(self.concrete_nouns)
         n_abstract_nouns = len(self.abstract_nouns)
-        total_nouns = sum(feat.is_noun for feat in self.word_features)
+        total_nouns = n_concrete_nouns + n_abstract_nouns
         if total_nouns == 0:
             return 0
-        return (total_nouns - n_abstract_nouns) / total_nouns
+        return n_concrete_nouns / total_nouns
 
     def calculate_lint_score(self) -> float:
         """Calculate LiNT readability score for the sentence."""
@@ -132,7 +146,7 @@ class SentenceAnalysis:
     def get_top_n_least_frequent(self, n: int = 5) -> list[tuple[str, float]]:
         """Get the top n least frequent words in the sentence."""
         frequencies = Counter({
-            feat.token.text:freq
+            feat.text:freq
             for feat in self.word_features
             if (freq:=feat.word_frequency) is not None
         })
@@ -148,6 +162,8 @@ class SentenceAnalysis:
             'mean_log_word_frequency': self.mean_log_word_frequency,
             'concrete_nouns': self.concrete_nouns,
             'abstract_nouns': self.abstract_nouns,
+            'undefined_nouns': self.undefined_nouns,
+            'unknown_nouns': self.unknown_nouns,
             'max_sdl': self.max_sdl,
             'sdls': self.sdls,
             'content_words': self.content_words,

@@ -1,7 +1,10 @@
 from functools import cached_property
 
+import pyarrow.compute as pc
 from spacy.tokens import Token
 from wordfreq import zipf_frequency
+
+from lint_ii import wordlists
 
 
 class WordFeatures:
@@ -10,17 +13,19 @@ class WordFeatures:
     def __init__(
         self,
         token: Token,
-        abstract_nouns_list: list[str]|None = None,
     ) -> None:
         self.token = token
-        self.abstract_nouns_list = [] if abstract_nouns_list is None else abstract_nouns_list
+
+    @cached_property
+    def text(self) -> str:
+        return self.token.text.lower()
 
     @cached_property
     def word_frequency(self) -> float|None:
         """Word frequency using zipf scale."""
         if not self.is_content_word_excl_propn:
             return None
-        freq = zipf_frequency(self.token.text, "nl")
+        freq = zipf_frequency(self.text, "nl")
         return freq if freq > 0 else 1.3555 # Default frequency for unknown words
 
     @property
@@ -56,16 +61,29 @@ class WordFeatures:
         return "WW|pv" in self.token.tag_
 
     @property
+    def super_sem_type(self) -> wordlists.SuperSemTypes:
+        if not self.is_noun:
+            return None
+
+        result = wordlists.noun_to_super_sem_type.get(self.text)
+
+        if result is None:
+            return wordlists.SuperSemTypes('unknown')
+
+        return wordlists.SuperSemTypes(result)
+
+    @property
     def is_abstract(self) -> bool:
-        """Check if word is an abstract noun: either an abstract named entity or listed in the RBN list of abstract nouns."""
-        return self.is_abstract_entity or self.is_in_abstract_nouns_list
+        return self.super_sem_type == wordlists.SuperSemTypes.ABSTRACT
 
     @property
-    def is_abstract_entity(self) -> bool:
-        """Check if word is an abstract named entity: ORG: organization, LANGUAGE: language, LAW: law or contract, NORP: nationality, religious or political group."""
-        return self.is_noun and self.token.ent_type_ in ["ORG", "LANGUAGE", "LAW", "NORP"]
+    def is_concrete(self) -> bool:
+        return self.super_sem_type == wordlists.SuperSemTypes.CONCRETE
 
     @property
-    def is_in_abstract_nouns_list(self) -> bool:
-        """Check if word is listed in the RBN list of abstract nouns."""
-        return self.is_noun and self.token.text in self.abstract_nouns_list
+    def is_undefined(self) -> bool:
+        return self.super_sem_type == wordlists.SuperSemTypes.UNDEFINED
+
+    @property
+    def is_unknown(self) -> bool:
+        return self.super_sem_type == wordlists.SuperSemTypes.UNKNOWN
