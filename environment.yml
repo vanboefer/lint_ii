@@ -6,5 +6,4 @@ dependencies:
   - python=3.11
   - spacy=3.7
   - wordfreq=3.1
-  - pandas=2.2
-  - openpyxl=3.1
+  - pyarrow=21.0
