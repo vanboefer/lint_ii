@@ -19,6 +19,9 @@ class SentenceAnalysis:
     ) -> None:
         self.doc = doc
 
+    def __repr__(self) -> str:
+        return f"{self.__class__.__name__}('{self.doc}')"
+
     @classmethod
     def from_text(
         cls,

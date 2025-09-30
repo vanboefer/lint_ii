@@ -14,7 +14,7 @@ class ReadabilityAnalysis:
         self.sentences = sentences
 
     def __repr__(self) -> str:
-        return f"{self.__class__.__name__}({[s.doc for s in self.sentences]})"
+        return f"{self.__class__.__name__}({[repr(s.doc) for s in self.sentences]})"
 
     @classmethod
     def from_text(
