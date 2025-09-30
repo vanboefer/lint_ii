@@ -30,14 +30,43 @@ class ReadabilityAnalysis:
         ]
         return cls(sentences)
 
+    @property
+    def word_features(self) -> list[WordFeatures]:
+        return [
+            feat
+            for sentence in self.sentences
+            for feat in sentence.word_features
+        ]
+
+    @property
+    def concrete_nouns(self) -> list[str]:
+        return [
+            noun
+            for sentence in self.sentences
+            for noun in sentence.concrete_nouns
+        ]
+
+    @property
+    def abstract_nouns(self) -> list[str]:
+        return [
+            noun
+            for sentence in self.sentences
+            for noun in sentence.abstract_nouns
+        ]
+
     @cached_property
     def lint_scores_per_sentence(self) -> list[float]:
         return [sent.calculate_lint_score() for sent in self.sentences]
 
     @cached_property
-    def mean_word_frequency_log(self) -> float:
-        """Mean value of sentence-level word frequencies"""
-        return statistics.mean(s.mean_log_word_frequency for s in self.sentences)
+    def mean_log_word_frequency(self) -> float:
+        """Mean log word frequency for the document."""
+        frequencies = [
+            freq
+            for feat in self.word_features
+            if (freq := feat.word_frequency) is not None
+        ]
+        return statistics.mean(frequencies) if frequencies else 0
 
     @cached_property
     def mean_max_sdl(self) -> float:
@@ -53,12 +82,14 @@ class ReadabilityAnalysis:
         )
 
     @cached_property
-    def mean_proportion_of_concrete_nouns(self) -> float:
-        """Mean value of sentence-level proportion of concrete nouns"""
-        return statistics.mean(
-            s.proportion_of_concrete_nouns
-            for s in self.sentences
-        )
+    def proportion_of_concrete_nouns(self) -> float:
+        """Proportion of concrete nouns out of all nouns in the document."""
+        n_concrete_nouns = len(self.concrete_nouns)
+        n_abstract_nouns = len(self.abstract_nouns)
+        total_nouns = n_concrete_nouns + n_abstract_nouns
+        if total_nouns == 0:
+            return 0
+        return n_concrete_nouns / total_nouns
 
     def calculate_document_stats(self) -> dict[str, float]:
         """Calculate statistics on a document level: sentence count, mean LiNT score, min LiNT score, max LiNT score."""
