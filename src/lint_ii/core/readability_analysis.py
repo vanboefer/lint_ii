@@ -2,8 +2,7 @@ from functools import cached_property
 from typing import Any
 import statistics
 
-from spacy.language import Language
-
+from lint_ii.core.word_features import WordFeatures
 from lint_ii.core.lint_scorer import LintScorer
 from lint_ii.core.sentence_analysis import SentenceAnalysis
 
@@ -21,9 +20,9 @@ class ReadabilityAnalysis:
     def from_text(
         cls,
         text: str,
-        nlp_model: Language,
     ) -> 'ReadabilityAnalysis':
-        doc = nlp_model(text)
+        from lint_ii.linguistic_data.nlp_model import NLP_MODEL
+        doc = NLP_MODEL(text)
         sentences = [
             SentenceAnalysis(sent)
             for sent in doc.sents

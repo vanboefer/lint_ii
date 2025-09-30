@@ -5,7 +5,6 @@ from typing import Any
 import statistics
 
 from spacy.tokens import Doc
-from spacy.language import Language
 
 from lint_ii.core.lint_scorer import LintScorer
 from lint_ii.core.word_features import WordFeatures
@@ -24,9 +23,9 @@ class SentenceAnalysis:
     def from_text(
         cls,
         text: str,
-        nlp_model: Language,
     ) -> 'SentenceAnalysis':
-        doc = nlp_model(text)
+        from lint_ii.linguistic_data.nlp_model import NLP_MODEL
+        doc = NLP_MODEL(text)
         return cls(doc)
 
     @cached_property
@@ -70,7 +69,7 @@ class SentenceAnalysis:
         ]
 
     @property
-    def undefined_nouns(self) -> list[str]:
+    def unknown_nouns(self) -> list[str]:
         """All unknown nouns in the sentence."""
         return [
             feat.text for feat in self.word_features

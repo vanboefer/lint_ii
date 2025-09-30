@@ -52,3 +52,9 @@ doc.get_detailed_analysis()
 from lint_ii.core.readability_analysis import ReadabilityAnalysis
 from lint_ii.core.sentence_analysis import SentenceAnalysis
 from lint_ii.core.word_features import WordFeatures
+
+
+class LiNT_II_Exception(Exception):
+    def __init__(self, message):
+        self.message = message
+        super().__init__(self.message)

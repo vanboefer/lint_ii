@@ -1,10 +1,9 @@
 from functools import cached_property
 
-import pyarrow.compute as pc
 from spacy.tokens import Token
 from wordfreq import zipf_frequency
 
-from lint_ii import wordlists
+from lint_ii.linguistic_data import SuperSemTypes
 
 
 class WordFeatures:
@@ -61,29 +60,30 @@ class WordFeatures:
         return "WW|pv" in self.token.tag_
 
     @property
-    def super_sem_type(self) -> wordlists.SuperSemTypes:
+    def super_sem_type(self) -> SuperSemTypes:
+        import lint_ii.linguistic_data.wordlists as wordlists
         if not self.is_noun:
             return None
 
         result = wordlists.noun_to_super_sem_type.get(self.text)
 
         if result is None:
-            return wordlists.SuperSemTypes('unknown')
+            return SuperSemTypes('unknown')
 
-        return wordlists.SuperSemTypes(result)
+        return SuperSemTypes(result)
 
     @property
     def is_abstract(self) -> bool:
-        return self.super_sem_type == wordlists.SuperSemTypes.ABSTRACT
+        return self.super_sem_type == SuperSemTypes.ABSTRACT
 
     @property
     def is_concrete(self) -> bool:
-        return self.super_sem_type == wordlists.SuperSemTypes.CONCRETE
+        return self.super_sem_type == SuperSemTypes.CONCRETE
 
     @property
     def is_undefined(self) -> bool:
-        return self.super_sem_type == wordlists.SuperSemTypes.UNDEFINED
+        return self.super_sem_type == SuperSemTypes.UNDEFINED
 
     @property
     def is_unknown(self) -> bool:
-        return self.super_sem_type == wordlists.SuperSemTypes.UNKNOWN
+        return self.super_sem_type == SuperSemTypes.UNKNOWN
