@@ -18,6 +18,15 @@ class WordFeatures:
     def __repr__(self) -> str:
         return f"{self.__class__.__name__}('{self.text}')"
 
+    @classmethod
+    def from_text(
+        cls,
+        text: str,
+    ) -> 'WordFeatures':
+        from lint_ii.linguistic_data.nlp_model import NLP_MODEL
+        doc = NLP_MODEL(text)
+        return cls(doc[0])
+
     @cached_property
     def text(self) -> str:
         return self.token.text.lower()
