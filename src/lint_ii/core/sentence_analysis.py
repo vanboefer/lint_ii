@@ -1,13 +1,18 @@
 
-from collections import Counter
+from operator import itemgetter
 from functools import cached_property
-from typing import Any
+from typing import Any, TypedDict
 import statistics
 
-from spacy.tokens import Doc
+from spacy.tokens import Doc, Span
 
 from lint_ii.core.lint_scorer import LintScorer
 from lint_ii.core.word_features import WordFeatures
+
+
+class SDLInfo(TypedDict):
+    dep_length: int
+    head: str
 
 
 class SentenceAnalysis:
@@ -15,7 +20,7 @@ class SentenceAnalysis:
 
     def __init__(
         self,
-        doc: Doc,
+        doc: Doc|Span,
     ) -> None:
         self.doc = doc
 
@@ -37,7 +42,7 @@ class SentenceAnalysis:
         return [WordFeatures(token) for token in self.doc]
 
     @cached_property
-    def sdls(self) -> dict[str, int]:
+    def sdls(self) -> dict[str, SDLInfo]:
         """The dependency length (number of intervening tokens) between a token and its syntactic head, for each token in the sentence."""
         return {
             feat.text:{
@@ -147,12 +152,12 @@ class SentenceAnalysis:
 
     def get_top_n_least_frequent(self, n: int = 5) -> list[tuple[str, float]]:
         """Get the top n least frequent words in the sentence."""
-        frequencies = Counter({
+        frequencies = {
             feat.text:freq
             for feat in self.word_features
-            if (freq:=feat.word_frequency) is not None
-        })
-        return frequencies.most_common()[:-n-1:-1]
+            if (freq := feat.word_frequency) is not None
+        }
+        return sorted(frequencies.items(), key=itemgetter(1))[:n]
 
     def get_detailed_analysis(self, n: int = 5) -> dict[str, Any]:
         """Get detailed analysis for the sentence."""

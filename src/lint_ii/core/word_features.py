@@ -60,7 +60,7 @@ class WordFeatures:
         return "WW|pv" in self.token.tag_
 
     @property
-    def super_sem_type(self) -> SuperSemTypes:
+    def super_sem_type(self) -> SuperSemTypes|None:
         import lint_ii.linguistic_data.wordlists as wordlists
         if not self.is_noun:
             return None
