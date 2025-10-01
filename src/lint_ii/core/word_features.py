@@ -29,7 +29,7 @@ class WordFeatures:
 
     @cached_property
     def text(self) -> str:
-        return self.token.text.lower()
+        return self.token.lower_
 
     @cached_property
     def word_frequency(self) -> float|None:
