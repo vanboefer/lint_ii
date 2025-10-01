@@ -3,7 +3,6 @@ from typing import Any
 import statistics
 
 from lint_ii.core.word_features import WordFeatures
-from lint_ii.core.lint_scorer import LintScorer
 from lint_ii.core.sentence_analysis import SentenceAnalysis
 
 
@@ -31,6 +30,7 @@ class ReadabilityAnalysis:
 
     @property
     def word_features(self) -> list[WordFeatures]:
+        """Bag of word features for the document."""
         return [
             feat
             for sentence in self.sentences
@@ -39,6 +39,7 @@ class ReadabilityAnalysis:
 
     @property
     def concrete_nouns(self) -> list[str]:
+        """Bag of concrete nouns for the document."""
         return [
             noun
             for sentence in self.sentences
@@ -47,6 +48,7 @@ class ReadabilityAnalysis:
 
     @property
     def abstract_nouns(self) -> list[str]:
+        """Bag of abstract nouns for the document."""
         return [
             noun
             for sentence in self.sentences
