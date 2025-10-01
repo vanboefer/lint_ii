@@ -7,12 +7,21 @@ import statistics
 from spacy.tokens import Doc, Span
 
 from lint_ii.core.lint_scorer import LintScorer
-from lint_ii.core.word_features import WordFeatures
+from lint_ii.core.word_features import WordFeatures, WordFeaturesDict
 
 
 class SDLInfo(TypedDict):
     dep_length: int
     head: str
+
+
+class SentenceAnalysisDict(TypedDict):
+    word_features: list[WordFeaturesDict]
+    score: float
+    level: int
+    mean_log_word_frequency: float
+    max_sdl: int
+    proportion_of_concrete_nouns: float
 
 
 class SentenceAnalysis:
@@ -174,4 +183,14 @@ class SentenceAnalysis:
             'max_sdl': self.max_sdl,
             'sdls': self.sdls,
             'content_words': self.content_words,
+        }
+
+    def as_dict(self) -> SentenceAnalysisDict:
+        return {
+            'word_features': [feat.as_dict() for feat in self.word_features],
+            'score': self.calculate_lint_score(),
+            'level': self.get_difficulty_level(),
+            'mean_log_word_frequency': self.mean_log_word_frequency,
+            'max_sdl': self.max_sdl,
+            'proportion_of_concrete_nouns': self.proportion_of_concrete_nouns,
         }

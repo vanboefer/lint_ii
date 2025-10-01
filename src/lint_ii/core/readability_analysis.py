@@ -1,10 +1,25 @@
 from functools import cached_property
-from typing import Any
+from typing import Any, TypedDict
 import statistics
 
 from lint_ii.core.word_features import WordFeatures
 from lint_ii.core.lint_scorer import LintScorer
-from lint_ii.core.sentence_analysis import SentenceAnalysis
+from lint_ii.core.sentence_analysis import SentenceAnalysis, SentenceAnalysisDict
+
+
+class DocumentStatsDict(TypedDict):
+    sentence_count: int
+    mean_lint_score: float
+    min_lint_score: float
+    max_lint_score: float
+
+
+class ReadabilityAnalysisDict(TypedDict):
+    sentences: list[SentenceAnalysisDict]
+    sentence_count: int
+    mean_lint_score: float
+    min_lint_score: float
+    max_lint_score: float
 
 
 class ReadabilityAnalysis:
@@ -90,10 +105,8 @@ class ReadabilityAnalysis:
             return 0
         return n_concrete_nouns / total_nouns
 
-    def calculate_document_stats(self) -> dict[str, float]:
+    def calculate_document_stats(self) -> DocumentStatsDict:
         """Calculate statistics on a document level: sentence count, mean LiNT score, min LiNT score, max LiNT score."""
-        if not self.sentences:
-            return {}
         return {
             'sentence_count': len(self.sentences),
             'mean_lint_score': statistics.mean(self.lint_scores_per_sentence),
@@ -109,4 +122,10 @@ class ReadabilityAnalysis:
                 sent.get_detailed_analysis()
                 for sent in self.sentences
             ],
+        }
+
+    def as_dict(self) -> ReadabilityAnalysisDict:
+        return {
+            'sentences': [sent.as_dict() for sent in self.sentences],
+            **self.calculate_document_stats(),
         }

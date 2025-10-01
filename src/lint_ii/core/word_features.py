@@ -1,9 +1,25 @@
 from functools import cached_property
+from typing import TypedDict
 
 from spacy.tokens import Token
 from wordfreq import zipf_frequency
 
 from lint_ii.linguistic_data import SuperSemTypes
+
+
+class WordFeaturesDict(TypedDict):
+    text: str
+    word_frequency: float | None
+    dep_length: int
+    is_content_word_excl_propn: bool
+    is_content_word_excl_adv: bool
+    is_noun: bool
+    is_finite_verb: bool
+    super_sem_type: str | None
+    is_abstract: bool
+    is_concrete: bool
+    is_undefined: bool
+    is_unknown: bool
 
 
 class WordFeatures:
@@ -99,3 +115,19 @@ class WordFeatures:
     @property
     def is_unknown(self) -> bool:
         return self.super_sem_type == SuperSemTypes.UNKNOWN
+
+    def as_dict(self) -> WordFeaturesDict:
+        return {
+            'text': self.text,
+            'word_frequency': self.word_frequency,
+            'dep_length': self.dep_length,
+            'is_content_word_excl_propn': self.is_content_word_excl_propn,
+            'is_content_word_excl_adv': self.is_content_word_excl_adv,
+            'is_noun': self.is_noun,
+            'is_finite_verb': self.is_finite_verb,
+            'super_sem_type': self.super_sem_type.value if self.super_sem_type else None,
+            'is_abstract': self.is_abstract,
+            'is_concrete': self.is_concrete,
+            'is_undefined': self.is_undefined,
+            'is_unknown': self.is_unknown,
+        }
