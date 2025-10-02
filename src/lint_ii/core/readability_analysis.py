@@ -46,6 +46,7 @@ class ReadabilityAnalysis:
 
     @property
     def word_features(self) -> list[WordFeatures]:
+        """Bag of word features for the document."""
         return [
             feat
             for sentence in self.sentences
@@ -54,6 +55,7 @@ class ReadabilityAnalysis:
 
     @property
     def concrete_nouns(self) -> list[str]:
+        """Bag of concrete nouns for the document."""
         return [
             noun
             for sentence in self.sentences
@@ -62,6 +64,7 @@ class ReadabilityAnalysis:
 
     @property
     def abstract_nouns(self) -> list[str]:
+        """Bag of abstract nouns for the document."""
         return [
             noun
             for sentence in self.sentences
