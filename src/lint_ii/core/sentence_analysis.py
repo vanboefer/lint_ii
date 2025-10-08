@@ -11,6 +11,7 @@ from lint_ii.core.word_features import WordFeatures, WordFeaturesDict
 
 
 class SDLInfo(TypedDict):
+    token: str
     dep_length: int
     head: str
 
@@ -51,15 +52,16 @@ class SentenceAnalysis:
         return [WordFeatures(token) for token in self.doc]
 
     @cached_property
-    def sdls(self) -> dict[str, SDLInfo]:
+    def sdls(self) -> list[SDLInfo]:
         """The dependency length (number of intervening tokens) between a token and its syntactic head, for each token in the sentence."""
-        return {
-            feat.text:{
+        return [
+            {
+                'token': feat.text,
                 'dep_length': feat.dep_length,
-                'head': feat.token.head.text,
+                'head': feat.head.text,
             }
             for feat in self.word_features
-        }
+        ]
 
     @property
     def concrete_nouns(self) -> list[str]:
@@ -114,7 +116,7 @@ class SentenceAnalysis:
     @cached_property
     def max_sdl(self) -> int:
         """Maximum dependency length in the sentence."""
-        values = {self.sdls[sdl]['dep_length'] for sdl in self.sdls}
+        values = {sdl['dep_length'] for sdl in self.sdls}
         return max(values, default=0)
 
     def count_content_words_excluding_adverbs(self) -> int:
