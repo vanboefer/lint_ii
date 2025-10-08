@@ -47,7 +47,7 @@ class SentenceAnalysis:
         return {
             feat.text:{
                 'dep_length': feat.dep_length,
-                'head': feat.token.head.text,
+                'head': feat.head.text,
             }
             for feat in self.word_features
         }

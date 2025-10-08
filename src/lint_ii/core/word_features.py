@@ -27,9 +27,20 @@ class WordFeatures:
         doc = NLP_MODEL(text)
         return cls(doc[0])
 
-    @cached_property
+    @property
     def text(self) -> str:
         return self.token.lower_
+
+    @property
+    def head(self) -> Token:
+        """
+        Head of the token.
+
+        Special cases:
+        =============
+        - Conjunctions: If a token is in a conjunction then the head of the second conjunct is taken from the first. This is necessary since spaCy considers the first conjunct as the head of the second (which we consider incorrect).
+        """
+        return self.token.head.head if self.token.dep_ == 'conj' else self.token.head
 
     @cached_property
     def word_frequency(self) -> float|None:
@@ -43,13 +54,20 @@ class WordFeatures:
     def dep_length(self) -> int:
         """
         Dependency length (number of intervening tokens) between a word and its syntactic head. The dep_length is 0 if the words are adjacent.
+
+        Special cases:
+        =============
+        - Punctuation: (a) punctuation marks are not counted as intervening tokens, (b) for a punctuation mark, the dependency length is always 0.
+        - Conjunctions: If a token is in a conjunction then the head of the second conjunct is taken from the first. This is necessary since spaCy considers the first conjunct as the head of the second (which we consider incorrect).
         """
-        if self.token.dep_ in ["punct"]:
+        if self.token.dep_ == 'punct':
             return 0
-        raw_len = self.token.head.i - self.token.i
-        if raw_len == 0:
-            return 0
-        return int(abs(self.token.head.i - self.token.i) - 1)
+
+        span = sorted([self.token.i, self.head.i])
+        part = self.token.sent[slice(*span)]
+
+        dep_length = len([t for t in part if t.dep_ != 'punct']) - 1
+        return dep_length if dep_length >= 0 else 0
 
     @property
     def is_content_word_excl_propn(self) -> bool:
