@@ -11,6 +11,7 @@ from lint_ii.core.word_features import WordFeatures
 
 
 class SDLInfo(TypedDict):
+    token: str
     dep_length: int
     head: str
 
