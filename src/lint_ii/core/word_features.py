@@ -64,7 +64,7 @@ class WordFeatures:
             return 0
 
         span = sorted([self.token.i, self.head.i])
-        part = self.token.sent[slice(*span)]
+        part = self.token.doc[slice(*span)]
 
         dep_length = len([t for t in part if t.dep_ != 'punct']) - 1
         return dep_length if dep_length >= 0 else 0
