@@ -6,6 +6,7 @@ import statistics
 
 from spacy.tokens import Doc, Span
 
+from lint_ii.core.preprocessor import preprocess_text
 from lint_ii.core.lint_scorer import LintScorer
 from lint_ii.core.word_features import WordFeatures
 
@@ -34,7 +35,8 @@ class SentenceAnalysis:
         text: str,
     ) -> 'SentenceAnalysis':
         from lint_ii.linguistic_data.nlp_model import NLP_MODEL
-        doc = NLP_MODEL(text)
+        clean_text = preprocess_text(text)
+        doc = NLP_MODEL(clean_text)
         return cls(doc)
 
     @cached_property
