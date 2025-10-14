@@ -1,0 +1,20 @@
+<div id="{{ visualizer_id }}">
+  Loading LiNT-II visualizer...
+</div>
+
+<script type="module">
+if (!window.vegaEmbed) {
+  const vegaEmbed = await import('https://cdn.jsdelivr.net/npm/vega-embed@6/+esm')
+  window.vegaEmbed = vegaEmbed.default
+}
+
+if (!window.LintIIVisualizer) {
+  const { LintIIVisualizer } = await import("./lint_ii_visualizer.js")
+  window.LintIIVisualizer = LintIIVisualizer
+}
+
+// Create this specific viewer instance
+const visualizer = new window.LintIIVisualizer()
+visualizer.data = {{ data | safe }}
+document.getElementById("{{ visualizer_id }}").replaceWith(visualizer);
+</script>

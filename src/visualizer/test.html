@@ -1,0 +1,37 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>LintII Visualizer Test</title>
+    <style>
+        body {
+            font-family: Arial, Helvetica, sans-serif;
+            /* background-color: hsl(120, 100%, 10%); */
+            color: hsl(200, 100%, 30%);
+            color: hsl(199, 44%, 89%);
+            color: hsl(8, 73%, 12%);
+            color: rgb(113, 113, 83);
+        }
+        lint-ii-visualizer {
+            margin-bottom: 5em;
+        }
+    </style>
+    <script src="https://cdn.jsdelivr.net/npm/vega@5"></script>
+    <script src="https://cdn.jsdelivr.net/npm/vega-lite@5"></script>
+    <script src="https://cdn.jsdelivr.net/npm/vega-embed@6"></script>
+</head>
+<body>
+
+    <lint-ii-visualizer id="viz"></lint-ii-visualizer>
+    <lint-ii-visualizer id="viz2"></lint-ii-visualizer>
+
+    <script type="module" src="lint_ii_visualizer.js"></script>
+    <script type="module">
+        const data = {"sentences": [{"word_features": [{"text": "we", "dep_length": 6}, {"text": "zijn", "dep_length": 5}, {"text": "een"}, {"text": "volk", "word_frequency": 4.92, "dep_length": 3, "super_sem_type": "undefined"}, {"text": "van"}, {"text": "godsdiensttwisten", "word_frequency": 1.18, "dep_length": 1, "super_sem_type": "abstract"}, {"text": ",", "punct_placement": "trailing"}, {"text": "afsplitsingen", "word_frequency": 2.31, "super_sem_type": "abstract"}, {"text": ",", "punct_placement": "trailing"}, {"text": "scheurmakers", "word_frequency": 1.3555, "dep_length": 1, "super_sem_type": "unknown"}, {"text": ",", "punct_placement": "trailing"}, {"text": "ketters", "word_frequency": 2.8, "dep_length": 3, "super_sem_type": "concrete"}, {"text": "en"}, {"text": "verketteraars", "word_frequency": 1.3555, "dep_length": 5, "super_sem_type": "unknown"}, {"text": ".", "punct_placement": "trailing"}], "score": 86.62762583333333, "level": 4, "mean_log_word_frequency": 2.3201666666666667, "max_sdl": 6, "proportion_of_concrete_nouns": 0.3333333333333333, "content_words_per_clause": 6.0}, {"word_features": [{"text": "zelfs", "word_frequency": 5.64, "dep_length": 2}, {"text": "na", "dep_length": 1}, {"text": "de"}, {"text": "ontkerkelijking", "word_frequency": 1.95, "super_sem_type": "abstract"}, {"text": "is", "word_frequency": 7.2, "dep_length": 4}, {"text": "er", "word_frequency": 6.78, "dep_length": 3}, {"text": "veel", "dep_length": 1}, {"text": "religieuze", "word_frequency": 4.45}, {"text": "energie", "word_frequency": 5.04, "super_sem_type": "abstract"}, {"text": "achtergebleven", "word_frequency": 3.53}, {"text": ".", "punct_placement": "trailing"}], "score": 42.96806428571429, "level": 2, "mean_log_word_frequency": 4.941428571428571, "max_sdl": 4, "proportion_of_concrete_nouns": 0.0, "content_words_per_clause": 5.0}, {"word_features": [{"text": "steeds", "word_frequency": 5.82}, {"text": "is", "word_frequency": 7.2, "dep_length": 21}, {"text": "er", "word_frequency": 6.78}, {"text": "weer", "word_frequency": 6.05, "dep_length": 1}, {"text": "het"}, {"text": "geloof", "word_frequency": 5.17, "dep_length": 3, "super_sem_type": "abstract"}, {"text": "in", "dep_length": 2}, {"text": "een", "dep_length": 1}, {"text": "nieuwe", "word_frequency": 6.05}, {"text": "hemel", "word_frequency": 4.46, "dep_length": 3, "super_sem_type": "undefined"}, {"text": "of"}, {"text": "hel", "word_frequency": 4.38, "dep_length": 1, "super_sem_type": "abstract"}, {"text": ",", "punct_placement": "trailing"}, {"text": "is", "word_frequency": 7.2, "dep_length": 9}, {"text": "er", "word_frequency": 6.78}, {"text": "een", "dep_length": 1}, {"text": "nieuwe", "word_frequency": 6.05}, {"text": "duivel", "word_frequency": 4.05, "dep_length": 5, "super_sem_type": "concrete"}, {"text": "met"}, {"text": "wie", "dep_length": 3}, {"text": "de"}, {"text": "strijd", "word_frequency": 4.98, "dep_length": 1, "super_sem_type": "abstract"}, {"text": "wordt"}, {"text": "aangebonden", "word_frequency": 1.82}, {"text": ",", "punct_placement": "trailing"}, {"text": "stelde", "word_frequency": 4.7, "dep_length": 1}, {"text": "ooit", "word_frequency": 5.43}, {"text": "historicus", "word_frequency": 3.82, "dep_length": 1, "super_sem_type": "concrete"}, {"text": "maarten", "super_sem_type": "unknown"}, {"text": "brands", "super_sem_type": "unknown"}, {"text": "(", "punct_placement": "leading"}, {"text": "1933-2018", "dep_length": 5}, {"text": ")", "punct_placement": "embedded"}, {"text": ".", "punct_placement": "embedded"}, {"text": "\n"}], "score": 32.36308235294118, "level": 1, "mean_log_word_frequency": 5.33764705882353, "max_sdl": 9, "proportion_of_concrete_nouns": 0.4, "content_words_per_clause": 3.5}], "level": 3, "sentence_count": 3, "mean_lint_score": 53.98625749066293, "min_lint_score": 32.36308235294118, "max_lint_score": 86.62762583333333}
+
+        document.getElementById('viz').data = data
+        document.getElementById('viz2').loadFromUrl('./test.json')
+    </script>
+</body>
+</html>

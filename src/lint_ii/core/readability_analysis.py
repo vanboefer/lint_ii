@@ -6,6 +6,8 @@ from lint_ii.core.word_features import WordFeatures
 from lint_ii.core.lint_scorer import LintScorer
 from lint_ii.core.sentence_analysis import SentenceAnalysis, SentenceAnalysisDict
 
+from lint_ii.visualization.html import LintIIVisualizer
+
 
 class DocumentStatsDict(TypedDict):
     sentence_count: int
@@ -16,13 +18,14 @@ class DocumentStatsDict(TypedDict):
 
 class ReadabilityAnalysisDict(TypedDict):
     sentences: list[SentenceAnalysisDict]
+    level: int
     sentence_count: int
     mean_lint_score: float
     min_lint_score: float
     max_lint_score: float
 
 
-class ReadabilityAnalysis:
+class ReadabilityAnalysis(LintIIVisualizer):
     """Readability analysis for a given text."""
 
     def __init__(self, sentences: list[SentenceAnalysis]) -> None:
@@ -112,10 +115,26 @@ class ReadabilityAnalysis:
         """Calculate statistics on a document level: sentence count, mean LiNT score, min LiNT score, max LiNT score."""
         return {
             'sentence_count': len(self.sentences),
-            'mean_lint_score': statistics.mean(self.lint_scores_per_sentence),
-            'min_lint_score': min(self.lint_scores_per_sentence),
-            'max_lint_score': max(self.lint_scores_per_sentence),
+            'mean_lint_score': self.mean_lint_score,
+            'min_lint_score': self.min_lint_score,
+            'max_lint_score': self.max_lint_score,
         }
+
+    @cached_property
+    def mean_lint_score(self) -> float:
+        return statistics.mean(self.lint_scores_per_sentence)
+
+    @cached_property
+    def min_lint_score(self) -> float:
+        return min(self.lint_scores_per_sentence)
+
+    @cached_property
+    def max_lint_score(self) -> float:
+        return max(self.lint_scores_per_sentence)
+
+    @cached_property
+    def difficulty_level(self) -> int:
+        return LintScorer.get_difficulty_level(self.mean_lint_score)
 
     def get_detailed_analysis(self) -> dict[str, Any]:
         """Get detailed readability analysis per sentence in the document."""
@@ -130,5 +149,6 @@ class ReadabilityAnalysis:
     def as_dict(self) -> ReadabilityAnalysisDict:
         return {
             'sentences': [sent.as_dict() for sent in self.sentences],
+            'level': self.difficulty_level,
             **self.calculate_document_stats(),
         }
