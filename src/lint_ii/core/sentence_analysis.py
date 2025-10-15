@@ -96,6 +96,14 @@ class SentenceAnalysis:
             if feat.is_content_word_excl_adv
         ]
 
+    @property
+    def finite_verbs(self) -> list[str]:
+        """All finite verbs in the sentence."""
+        return [
+            feat.text for feat in self.word_features
+            if feat.is_finite_verb
+        ]
+
     @cached_property
     def mean_log_word_frequency(self) -> float:
         """Mean log word frequency for the sentence."""
@@ -118,10 +126,7 @@ class SentenceAnalysis:
 
     def count_clauses(self) -> int:
         """Count clauses (= finite verbs) in the sentence."""
-        finite_verb_counts = sum(
-            feat.is_finite_verb
-            for feat in self.word_features
-        )
+        finite_verb_counts = sum(feat.is_finite_verb for feat in self.word_features)
         return finite_verb_counts if finite_verb_counts > 0 else 1
 
     @cached_property
@@ -177,5 +182,7 @@ class SentenceAnalysis:
             'unknown_nouns': self.unknown_nouns,
             'max_sdl': self.max_sdl,
             'sdls': self.sdls,
+            'content_words_per_clause': self.content_words_per_clause,
             'content_words': self.content_words,
+            'finite_verbs': self.finite_verbs,
         }
