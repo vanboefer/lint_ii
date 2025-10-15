@@ -38,9 +38,12 @@ class WordFeatures:
 
         Special cases:
         =============
-        - Conjunctions: If a token is in a conjunction then the head of the second conjunct is taken from the first. This is necessary since spaCy considers the first conjunct as the head of the second (which we consider incorrect).
+        - Conjunctions: If a token is in a conjunction then the head of the last conjunct is taken recursively from the first. This is necessary since spaCy considers the first conjunct as the head of the second (which we consider incorrect).
         """
-        return self.token.head.head if self.token.dep_ == 'conj' else self.token.head
+        current_token = self.token
+        while current_token.dep_ == 'conj':
+            current_token = current_token.head
+        return current_token.head
 
     @cached_property
     def word_frequency(self) -> float|None:
