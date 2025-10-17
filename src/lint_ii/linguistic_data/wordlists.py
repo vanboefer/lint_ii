@@ -3,7 +3,7 @@ from pathlib import Path
 import pyarrow.parquet as pq
 
 
-LINGUISTIC_DATA_PATH = Path(__file__).parent.resolve()
+LINGUISTIC_DATA_PATH = Path(__file__).parent.resolve() / 'data'
 
 path_nouns_sem_types = next(LINGUISTIC_DATA_PATH.glob('nouns_sem_types_*.parquet'))
 
