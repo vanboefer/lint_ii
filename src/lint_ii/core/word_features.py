@@ -3,6 +3,7 @@ from functools import cached_property
 from spacy.tokens import Token
 from wordfreq import zipf_frequency
 
+from lint_ii import linguistic_data
 from lint_ii.linguistic_data import SuperSemTypes
 
 
@@ -28,6 +29,11 @@ class WordFeatures:
         return cls(doc[0])
 
     @property
+    def _NOUN_DATA(self) -> dict[str, dict[str, str|bool]]:
+        import lint_ii.linguistic_data.wordlists as wordlists
+        return wordlists.NOUN_DATA
+
+    @property
     def text(self) -> str:
         return self.token.lower_
 
@@ -50,7 +56,13 @@ class WordFeatures:
         """Word frequency using zipf scale."""
         if not self.is_content_word_excl_propn:
             return None
-        freq = zipf_frequency(self.text, "nl")
+
+        text = self.text
+        # because PROPN was filtered out above here we only get NOUN
+        if self.is_noun and linguistic_data.WORD_FREQ_COMPOUND_ADJUSTMENT:
+            text = self._NOUN_DATA.get(text, {}).get('head', text)
+
+        freq = zipf_frequency(text, "nl")
         return freq if freq > 0 else 1.3555 # Default frequency for unknown words
 
     @property
@@ -94,11 +106,10 @@ class WordFeatures:
 
     @property
     def super_sem_type(self) -> SuperSemTypes|None:
-        import lint_ii.linguistic_data.wordlists as wordlists
         if not self.is_noun:
             return None
 
-        result = wordlists.noun_to_super_sem_type.get(self.text)
+        result = self._NOUN_DATA.get(self.text, {}).get('super_sem_type')
 
         if result is None:
             return SuperSemTypes('unknown')

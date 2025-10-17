@@ -2,6 +2,7 @@ from functools import cached_property
 from typing import Any
 import statistics
 
+from lint_ii import linguistic_data
 from lint_ii.core.preprocessor import preprocess_text
 from lint_ii.core.word_features import WordFeatures
 from lint_ii.core.sentence_analysis import SentenceAnalysis
@@ -103,6 +104,7 @@ class ReadabilityAnalysis:
             'mean_lint_score': statistics.mean(self.lint_scores_per_sentence),
             'min_lint_score': min(self.lint_scores_per_sentence),
             'max_lint_score': max(self.lint_scores_per_sentence),
+            'word_freq_compound_adjustment': linguistic_data.WORD_FREQ_COMPOUND_ADJUSTMENT,
         }
 
     def get_detailed_analysis(self) -> dict[str, Any]:

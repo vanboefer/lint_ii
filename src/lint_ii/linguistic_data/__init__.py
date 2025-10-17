@@ -6,3 +6,6 @@ class SuperSemTypes(StrEnum):
     ABSTRACT = 'abstract'
     UNDEFINED = 'undefined'
     UNKNOWN = 'unknown'
+
+
+WORD_FREQ_COMPOUND_ADJUSTMENT = False
