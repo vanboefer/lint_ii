@@ -34,6 +34,11 @@ class WordFeatures:
         return wordlists.NOUN_DATA
 
     @property
+    def _MANNER_ADVERBS(self) -> dict[str, dict[str, str|bool]]:
+        import lint_ii.linguistic_data.wordlists as wordlists
+        return wordlists.MANNER_ADVERBS
+
+    @property
     def text(self) -> str:
         return self.token.lower_
 
@@ -91,8 +96,14 @@ class WordFeatures:
 
     @property
     def is_content_word_excl_adv(self) -> bool:
-        """Check if word is a content word, excluding adverbs."""
-        return self.token.pos_ in ["NOUN", "PROPN", "VERB", "ADJ"]
+        """
+        Check if word is a content word.
+        Adverbs are excluded except for manner adverbs.
+        """
+        return (
+            self.token.pos_ in ["NOUN", "PROPN", "VERB", "ADJ"]
+            or self.token.text in self._MANNER_ADVERBS
+        )
 
     @property
     def is_noun(self) -> bool:
