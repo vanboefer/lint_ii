@@ -4,6 +4,7 @@ from typing import TypedDict
 from spacy.tokens import Token
 from wordfreq import zipf_frequency
 
+from lint_ii import linguistic_data
 from lint_ii.linguistic_data import SuperSemTypes
 
 
@@ -44,6 +45,16 @@ class WordFeatures:
         return cls(doc[0])
 
     @property
+    def _NOUN_DATA(self) -> dict[str, dict[str, str|bool]]:
+        import lint_ii.linguistic_data.wordlists as wordlists
+        return wordlists.NOUN_DATA
+
+    @property
+    def _MANNER_ADVERBS(self) -> dict[str, dict[str, str|bool]]:
+        import lint_ii.linguistic_data.wordlists as wordlists
+        return wordlists.MANNER_ADVERBS
+
+    @property
     def text(self) -> str:
         return self.token.lower_
 
@@ -54,16 +65,25 @@ class WordFeatures:
 
         Special cases:
         =============
-        - Conjunctions: If a token is in a conjunction then the head of the second conjunct is taken from the first. This is necessary since spaCy considers the first conjunct as the head of the second (which we consider incorrect).
+        - Conjunctions: If a token is in a conjunction then the head of the last conjunct is taken recursively from the first. This is necessary since spaCy considers the first conjunct as the head of the second (which we consider incorrect).
         """
-        return self.token.head.head if self.token.dep_ == 'conj' else self.token.head
+        current_token = self.token
+        while current_token.dep_ == 'conj':
+            current_token = current_token.head
+        return current_token.head
 
     @cached_property
     def word_frequency(self) -> float|None:
         """Word frequency using zipf scale."""
         if not self.is_content_word_excl_propn:
             return None
-        freq = zipf_frequency(self.text, "nl")
+
+        text = self.text
+        # because PROPN was filtered out above here we only get NOUN
+        if self.is_noun and linguistic_data.WORD_FREQ_COMPOUND_ADJUSTMENT:
+            text = self._NOUN_DATA.get(text, {}).get('head', text)
+
+        freq = zipf_frequency(text, "nl")
         return freq if freq > 0 else 1.3555 # Default frequency for unknown words
 
     @property
@@ -92,8 +112,14 @@ class WordFeatures:
 
     @property
     def is_content_word_excl_adv(self) -> bool:
-        """Check if word is a content word, excluding adverbs."""
-        return self.token.pos_ in ["NOUN", "PROPN", "VERB", "ADJ"]
+        """
+        Check if word is a content word.
+        Adverbs are excluded except for manner adverbs.
+        """
+        return (
+            self.token.pos_ in ["NOUN", "PROPN", "VERB", "ADJ"]
+            or self.token.text in self._MANNER_ADVERBS
+        )
 
     @property
     def is_noun(self) -> bool:
@@ -107,11 +133,10 @@ class WordFeatures:
 
     @property
     def super_sem_type(self) -> SuperSemTypes|None:
-        import lint_ii.linguistic_data.wordlists as wordlists
         if not self.is_noun:
             return None
 
-        result = wordlists.noun_to_super_sem_type.get(self.text)
+        result = self._NOUN_DATA.get(self.text, {}).get('super_sem_type')
 
         if result is None:
             return SuperSemTypes('unknown')

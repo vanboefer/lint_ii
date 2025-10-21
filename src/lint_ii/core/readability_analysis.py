@@ -2,6 +2,8 @@ from functools import cached_property
 from typing import Any, TypedDict
 import statistics
 
+from lint_ii import linguistic_data
+from lint_ii.core.preprocessor import preprocess_text
 from lint_ii.core.word_features import WordFeatures
 from lint_ii.core.lint_scorer import LintScorer
 from lint_ii.core.sentence_analysis import SentenceAnalysis, SentenceAnalysisDict
@@ -40,7 +42,8 @@ class ReadabilityAnalysis(LintIIVisualizer):
         text: str,
     ) -> 'ReadabilityAnalysis':
         from lint_ii.linguistic_data.nlp_model import NLP_MODEL
-        doc = NLP_MODEL(text)
+        clean_text = preprocess_text(text)
+        doc = NLP_MODEL(clean_text)
         sentences = [
             SentenceAnalysis(sent)
             for sent in doc.sents
@@ -118,6 +121,7 @@ class ReadabilityAnalysis(LintIIVisualizer):
             'mean_lint_score': self.mean_lint_score,
             'min_lint_score': self.min_lint_score,
             'max_lint_score': self.max_lint_score,
+            'word_freq_compound_adjustment': linguistic_data.WORD_FREQ_COMPOUND_ADJUSTMENT,
         }
 
     @cached_property
