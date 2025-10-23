@@ -166,7 +166,6 @@ export class StatsSpecs {
     }
 
     static createStatsVisualization({wordFreqs, sentScores, nounCounts, depLengths, contentWordsPerClause}, colors) {
-        console.log(contentWordsPerClause)
         return {
             $schema: "https://vega.github.io/schema/vega-lite/v5.json",
             hconcat: [

@@ -82,7 +82,6 @@ export class LintIIVisualizer extends HTMLElement {
 
     setupEventListeners() {
         // View toggle buttons
-        console.log(this.shadowRoot.querySelector('.view-toggle'))
         this.shadowRoot.querySelector('.view-toggle').addEventListener('click', (e) => {
             this.switchView(e.target.dataset.targetView)
         })
