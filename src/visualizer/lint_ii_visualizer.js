@@ -150,8 +150,8 @@ export class LintIIVisualizer extends HTMLElement {
                 <dd>${totalWords}</dd>
             </div>
             <div class="doc-stat">
-                <dt>mean score</dt>
-                <dd>${this._data.mean_lint_score.toFixed(1)}</dd>
+                <dt>lint score</dt>
+                <dd>${this._data.document_lint_score.toFixed(1)}</dd>
             </div>
             <div class="doc-stat">
                 <dt>max score</dt>
@@ -162,7 +162,7 @@ export class LintIIVisualizer extends HTMLElement {
     }
 
     renderDocumentLevel() {
-        return `<div data-level="${this._data.level}"><span class="level-badge">${this._data.level}</span></div>`
+        return `<div data-level="${this._data.document_difficulty_level}"><span class="level-badge">${this._data.document_difficulty_level}</span></div>`
     }
 
     renderSentence(sentence, idx) {
