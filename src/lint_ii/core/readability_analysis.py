@@ -137,7 +137,6 @@ class ReadabilityAnalysis(LintIIVisualizer):
             'sentence_count': len(self.sentences),
             'document_lint_score': self.calculate_lint_score(),
             'document_difficulty_level': self.get_difficulty_level(),
-            'mean_lint_score': self.mean_lint_score,
             'min_lint_score': self.min_lint_score,
             'max_lint_score': self.max_lint_score,
             'word_freq_compound_adjustment': linguistic_data.WORD_FREQ_COMPOUND_ADJUSTMENT,
