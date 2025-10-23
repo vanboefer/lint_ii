@@ -1,0 +1,109 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>LiNT-II | Demo</title>
+    <script src="https://cdn.jsdelivr.net/npm/vega@5"></script>
+    <script src="https://cdn.jsdelivr.net/npm/vega-lite@5"></script>
+    <script src="https://cdn.jsdelivr.net/npm/vega-embed@6"></script>
+    <script src="https://cdn.jsdelivr.net/npm/prismjs/prism.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/prismjs/plugins/autoloader/prism-autoloader.min.js"></script>
+    <script type="module" src="https://lcvriend.github.io/wc-darkmode-toggle/src/darkmode-toggle.js"></script>
+    <link rel="stylesheet" href="https://latex.vercel.app/prism/prism.css">
+    <link rel="stylesheet" href="https://latex.vercel.app/style.css">
+    <style>
+        html, body {
+            max-width: 900px !important;
+            margin-inline: auto;
+        }
+        body {
+            --max-content-width: 80ch;
+
+            lint-ii-visualizer {
+                --background: hsl(12, 50%, 97%);
+                margin-block: 2.5rem;
+            }
+            &:has(darkmode-toggle[scheme="dark"]) {
+                lint-ii-visualizer {
+                    --background: hsl(12, 50%, 7%);
+                }
+            }
+        }
+        header {
+            position: relative;
+
+            darkmode-toggle {
+                position: absolute;
+                right: 0;
+                top: 1em;
+                font-size: 1.5rem;
+            }
+        }
+        section {
+            display: grid;
+            grid-template-columns:
+                minmax(1rem, 1fr) [breakout-start]
+                minmax(0, auto) [content-start]
+                min(var(--max-content-width), calc(100% - 2rem))
+                [content-end] minmax(0, auto)
+                [breakout-end] minmax(1rem, 1fr);
+
+            & > * {
+                grid-column: content;
+            }
+            & > .breakout {
+                grid-column: breakout;
+                overflow-x: auto;
+            }
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <h1>LiNT-II: readability assessment for Dutch</h1>
+        <darkmode-toggle></darkmode-toggle>
+    </header>
+    <p class="author">Jenia Kim</p>
+    <section>
+        <p>
+            <strong>LiNT-II</strong> analyzes Dutch text readability using four linguistic features: word frequency, concrete vs abstract nouns, syntactic dependency length, and content words per clause. Each sentence receives a difficulty score from 1 (easy) to 4 (difficult).
+        </p>
+        <p>
+            Try the interactive visualization<label for="sn-1" class="sidenote-toggle sidenote-number"></label><input type="checkbox" id="sn-1" class="sidenote-toggle" /><span class="sidenote">The passage is from <a href="https://www.dbnl.org/tekst/eman001nage01_01/eman001nage01_01_0001.php">"Een nagelaten bekentenis" (1894)</a> by Marcellus Emants</span> below to explore sentence-level analysis. Hover over words to see their linguistic features, or click Σ to view document statistics.
+        </p>
+    </section>
+    <section>
+        <h2>Demo</h2>
+        <lint-ii-visualizer id="viz" class="breakout"></lint-ii-visualizer>
+    </section>
+    <section>
+    <h2>Installation</h2>
+    <pre><code class="language-bash">    pip install lint-ii
+    python -m spacy download nl_core_news_sm</code></pre>
+    </section>
+    <section>
+        <h2>Usage</h2>
+        <pre><code class="language-python">    from lint_ii import ReadabilityAnalysis
+
+    doc = ReadabilityAnalysis.from_text("Uw Nederlandse tekst hier")
+    print(doc.lint_scores_per_sentence)</code></pre>
+    </section>
+    <section>
+        <footer>
+            <a href="https://github.com/vanboefer/lint_ii">github.com/vanboefer/lint_ii</a>
+        </footer>
+    </section>
+    <script type="module" src="./src/visualizer/lint_ii_visualizer.js"></script>
+    <script type="module">
+        document.getElementById('viz').loadFromUrl('./data/nagelaten_bekentenis.json')
+    </script>
+    <script>
+        document.addEventListener("color-scheme-change", event => {
+            event.detail.scheme === "dark"
+            ? document.body.classList.add("latex-dark")
+            : document.body.classList.remove("latex-dark")
+        })
+    </script>
+</body>
+</html>
