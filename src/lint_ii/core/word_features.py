@@ -1,5 +1,5 @@
 from functools import cached_property
-from typing import TypedDict
+from typing import TypedDict, NotRequired
 
 from spacy.tokens import Token
 from wordfreq import zipf_frequency
@@ -10,17 +10,18 @@ from lint_ii.linguistic_data import SuperSemTypes
 
 class WordFeaturesDict(TypedDict):
     text: str
-    word_frequency: float | None
-    dep_length: int
-    is_content_word_excl_propn: bool
-    is_content_word_excl_adv: bool
-    is_noun: bool
-    is_finite_verb: bool
-    super_sem_type: str | None
-    is_abstract: bool
-    is_concrete: bool
-    is_undefined: bool
-    is_unknown: bool
+    word_frequency: NotRequired[float]
+    dep_length: NotRequired[int]
+    # is_content_word_excl_propn: bool
+    # is_content_word_excl_adv: bool
+    # is_noun: bool
+    # is_finite_verb: bool
+    super_sem_type: NotRequired[str]
+    # is_abstract: bool
+    # is_concrete: bool
+    # is_undefined: bool
+    # is_unknown: bool
+    punct_placement: NotRequired[str]
 
 
 class WordFeatures:
@@ -159,18 +160,36 @@ class WordFeatures:
     def is_unknown(self) -> bool:
         return self.super_sem_type == SuperSemTypes.UNKNOWN
 
+    @property
+
+    def punct_placement(self) -> str | None:
+        """Placement of punctuation relative to adjacent tokens."""
+        if not self.token.is_punct:
+            return None
+
+        has_space_before = self.token.i > 0 and self.token.nbor(-1).whitespace_
+        has_space_after = self.token.whitespace_
+
+        if not has_space_before and not has_space_after:
+            return 'embedded'
+        elif not has_space_before:
+            return 'trailing'
+        elif not has_space_after:
+            return 'leading'
+        else:
+            return 'standalone'
+
+
     def as_dict(self) -> WordFeaturesDict:
-        return {
-            'text': self.text,
-            'word_frequency': self.word_frequency,
-            'dep_length': self.dep_length,
-            'is_content_word_excl_propn': self.is_content_word_excl_propn,
-            'is_content_word_excl_adv': self.is_content_word_excl_adv,
-            'is_noun': self.is_noun,
-            'is_finite_verb': self.is_finite_verb,
-            'super_sem_type': self.super_sem_type.value if self.super_sem_type else None,
-            'is_abstract': self.is_abstract,
-            'is_concrete': self.is_concrete,
-            'is_undefined': self.is_undefined,
-            'is_unknown': self.is_unknown,
-        }
+        result: WordFeaturesDict = {'text': self.text}
+
+        if (freq := self.word_frequency) is not None:
+            result['word_frequency'] = freq
+        if (dep := self.dep_length) > 0:
+            result['dep_length'] = dep
+        if (sem := self.super_sem_type) is not None:
+            result['super_sem_type'] = sem.value
+        if (punct := self.punct_placement) is not None:
+            result['punct_placement'] = punct
+
+        return result
