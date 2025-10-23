@@ -6,6 +6,7 @@ from lint_ii import linguistic_data
 from lint_ii.core.preprocessor import preprocess_text
 from lint_ii.core.word_features import WordFeatures
 from lint_ii.core.sentence_analysis import SentenceAnalysis
+from lint_ii.core.lint_scorer import LintScorer
 
 
 class ReadabilityAnalysis:
@@ -95,13 +96,27 @@ class ReadabilityAnalysis:
             return 0
         return n_concrete_nouns / total_nouns
 
+    def calculate_lint_score(self) -> float:
+        """Calculate LiNT readability score for the document."""
+        return LintScorer.calculate_lint_score(
+            freq_log = self.mean_log_word_frequency,
+            max_sdl = self.mean_max_sdl,
+            content_words_per_clause = self.mean_content_words_per_clause,
+            proportion_concrete = self.proportion_of_concrete_nouns,
+        )
+
+    def get_difficulty_level(self) -> int:
+        """Get difficulty level for the document."""
+        return LintScorer.get_difficulty_level(self.calculate_lint_score())
+
     def calculate_document_stats(self) -> dict[str, float]:
         """Calculate statistics on a document level: sentence count, mean LiNT score, min LiNT score, max LiNT score."""
         if not self.sentences:
             return {}
         return {
             'sentence_count': len(self.sentences),
-            'mean_lint_score': statistics.mean(self.lint_scores_per_sentence),
+            'document_lint_score': self.calculate_lint_score(),
+            'document_difficulty_level': self.get_difficulty_level(),
             'min_lint_score': min(self.lint_scores_per_sentence),
             'max_lint_score': max(self.lint_scores_per_sentence),
             'word_freq_compound_adjustment': linguistic_data.WORD_FREQ_COMPOUND_ADJUSTMENT,
