@@ -30,13 +30,15 @@ export const css = `
 
         h1 {
             user-select: none;
-            padding-left: .3em;
+            line-height: 1.5em;
+            padding-left: .35em;
             letter-spacing: 0.2em;
+            font-family: arial;
             :nth-child(4) {
                 letter-spacing: 0.125em;
             }
-            border-left: .2em solid currentColor;
-            border-bottom: .2em solid currentColor;
+            border-left: .225em solid currentColor;
+            border-bottom: .2225em solid currentColor;
 
             span {
                 font-size: calc(1em + var(--index) * 0.1em);
@@ -119,14 +121,15 @@ export const css = `
 
     .level-badge {
         display: grid;
-        user-select: none;
         place-items: center;
         width: 1.5em;
         height: 1.5em;
         border-radius: 50%;
         margin-right: 1em;
-        color: white;
         font-family: monospace;
+        line-height: 1em;
+        color: white;
+        user-select: none;
     }
     header .level-badge {
         font-size: 2em;
@@ -194,6 +197,9 @@ export const css = `
             font-size: .7em;
             position: absolute;
             top: 1em;
+            right: 100%;
+            margin-right: -.5em;
+            text-align: right;
             font-family: monospace;
         }
         .sent-start::before,
