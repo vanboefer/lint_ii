@@ -127,7 +127,11 @@ export class StatsSpecs {
                         ]
                     },
                     legend: null
-                }
+                },
+                tooltip: [
+                    { field: "type", type: "nominal", title: "Type" },
+                    { field: "count", type: "quantitative", title: "Count" }
+                ]
             },
             width: 250
         }
@@ -159,7 +163,10 @@ export class StatsSpecs {
                     field: "count",
                     type: "quantitative",
                     title: "Count"
-                }
+                },
+                tooltip: [
+                    { field: "count", type: "quantitative", title: "Count" }
+                ]
             },
             width: 200
         }
