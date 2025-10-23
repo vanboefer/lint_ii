@@ -9,6 +9,7 @@
     <script src="https://cdn.jsdelivr.net/npm/vega-embed@6"></script>
     <script src="https://cdn.jsdelivr.net/npm/prismjs/prism.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/prismjs/plugins/autoloader/prism-autoloader.min.js"></script>
+    <script async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
     <script type="module" src="https://lcvriend.github.io/wc-darkmode-toggle/src/darkmode-toggle.js"></script>
     <link rel="stylesheet" href="https://latex.vercel.app/prism/prism.css">
     <link rel="stylesheet" href="https://latex.vercel.app/style.css">
@@ -30,15 +31,13 @@
                 }
             }
         }
-        header {
-            darkmode-toggle {
-                position: absolute;
-                right: 1em;
-                top: 0;
-                font-size: 1.5rem;
-            }
+        darkmode-toggle {
+            position: absolute;
+            right: 1em;
+            top: 0;
+            font-size: 1.5rem;
         }
-        section {
+        header, footer, section {
             display: grid;
             grid-template-columns:
                 minmax(1rem, 1fr) [breakout-start]
@@ -58,14 +57,23 @@
     </style>
 </head>
 <body>
+    <darkmode-toggle></darkmode-toggle>
     <header>
         <h1>LiNT-II: readability assessment for Dutch</h1>
-        <darkmode-toggle></darkmode-toggle>
+        <p class="author">Jenia Kim</p>
     </header>
-    <p class="author">Jenia Kim</p>
     <section>
         <p>
-            <strong>LiNT-II</strong> analyzes Dutch text readability using four linguistic features: word frequency, concrete vs abstract nouns, syntactic dependency length, and content words per clause. Each sentence receives a difficulty score from 1 (easy) to 4 (difficult).
+            <strong>LiNT-II</strong> analyzes Dutch text readability using four linguistic features: word frequency, concrete vs abstract nouns, syntactic dependency length, and content words per clause. Each sentence receives a difficulty score from 1 (easy) to 4 (difficult). The score is calculated as follows:
+        </p>
+        <p>
+            \[
+            \begin{aligned}
+            \text{score} &= 3.204 + 15.845 \cdot \overline{f}_{\text{zipf}} - 1.331 \cdot \text{SDL}_{\max} \\
+            &\quad - 3.829 \cdot \frac{n_{\text{content}}}{n_{\text{clauses}}} + 13.096 \cdot \frac{n_{\text{concrete}}}{n_{\text{concrete}} + n_{\text{abstract}}} \\[1em]
+            \text{LiNT} &= \min\left(100, \max(0, 100 - \text{score})\right)
+            \end{aligned}
+            \]
         </p>
         <p>
             Try the interactive visualization<label for="sn-1" class="sidenote-toggle sidenote-number"></label><input type="checkbox" id="sn-1" class="sidenote-toggle" /><span class="sidenote">The passage is from <a href="https://www.dbnl.org/tekst/eman001nage01_01/eman001nage01_01_0001.php">"Een nagelaten bekentenis" (1894)</a> by Marcellus Emants</span> below to explore sentence-level analysis. Hover over words to see their linguistic features, or click Σ to view document statistics.
@@ -73,6 +81,13 @@
     </section>
     <section>
         <h2>Demo</h2>
+        <p>Pick a CEFR level:</p>
+        <div style="margin-bottom: 1.5rem;">
+            <label><input type="radio" name="cefr" value="A2" checked> A2</label>
+            <label><input type="radio" name="cefr" value="B1"> B1</label>
+            <label><input type="radio" name="cefr" value="B2"> B2</label>
+            <label><input type="radio" name="cefr" value="C2"> C2</label>
+        </div>
         <lint-ii-visualizer id="viz" class="breakout"></lint-ii-visualizer>
     </section>
     <section>
@@ -87,14 +102,27 @@
     doc = ReadabilityAnalysis.from_text("Uw Nederlandse tekst hier")
     print(doc.lint_scores_per_sentence)</code></pre>
     </section>
-    <section>
-        <footer>
-            <a href="https://github.com/vanboefer/lint_ii">github.com/vanboefer/lint_ii</a>
-        </footer>
-    </section>
+    <footer>
+        <a href="https://github.com/vanboefer/lint_ii">github.com/vanboefer/lint_ii</a>
+    </footer>
     <script type="module" src="./src/visualizer/lint_ii_visualizer.js"></script>
     <script type="module">
-        document.getElementById('viz').loadFromUrl('./data/nagelaten_bekentenis.json')
+        const viz = document.getElementById('viz')
+        const radios = document.querySelectorAll('input[name="cefr"]')
+        
+        const loadLevel = (level) => {
+            viz.loadFromUrl(`./data/${level}.json`)
+        }
+        
+        radios.forEach(radio => {
+            radio.addEventListener('change', (e) => {
+                if (e.target.checked) loadLevel(e.target.value)
+            })
+        })
+        
+        // Initialize with checked radio
+        const checked = document.querySelector('input[name="cefr"]:checked')
+        if (checked) loadLevel(checked.value)
     </script>
     <script>
         document.addEventListener("color-scheme-change", event => {
