@@ -24,6 +24,7 @@ class SentenceAnalysisDict(TypedDict):
     mean_log_word_frequency: float
     max_sdl: int
     proportion_of_concrete_nouns: float
+    content_words_per_clause: float
 
 
 class SentenceAnalysis:
@@ -204,4 +205,5 @@ class SentenceAnalysis:
             'mean_log_word_frequency': self.mean_log_word_frequency,
             'max_sdl': self.max_sdl,
             'proportion_of_concrete_nouns': self.proportion_of_concrete_nouns,
+            'content_words_per_clause': self.content_words_per_clause,
         }
