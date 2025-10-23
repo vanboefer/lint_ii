@@ -103,7 +103,8 @@
             : document.body.classList.remove("latex-dark")
 
             const viz = document.getElementById('viz')
-            if (viz._currentView === 'stats' && viz._data) {
+            const statsContainer = viz.shadowRoot?.querySelector('[data-view="stats"]')
+            if (statsContainer && statsContainer.children.length > 0) {
                 viz.renderStats()
             }
         })
