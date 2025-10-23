@@ -31,12 +31,10 @@
             }
         }
         header {
-            position: relative;
-
             darkmode-toggle {
                 position: absolute;
-                right: 0;
-                top: 1em;
+                right: 1em;
+                top: 0;
                 font-size: 1.5rem;
             }
         }
@@ -103,6 +101,11 @@
             event.detail.scheme === "dark"
             ? document.body.classList.add("latex-dark")
             : document.body.classList.remove("latex-dark")
+
+            const viz = document.getElementById('viz')
+            if (viz._currentView === 'stats' && viz._data) {
+                viz.renderStats()
+            }
         })
     </script>
 </body>
