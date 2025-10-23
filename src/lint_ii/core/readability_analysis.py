@@ -5,6 +5,7 @@ import statistics
 from lint_ii import linguistic_data
 from lint_ii.core.preprocessor import preprocess_text
 from lint_ii.core.word_features import WordFeatures
+from lint_ii.core.sentence_analysis import SentenceAnalysis
 from lint_ii.core.lint_scorer import LintScorer
 from lint_ii.core.sentence_analysis import SentenceAnalysis, SentenceAnalysisDict
 
@@ -13,6 +14,8 @@ from lint_ii.visualization.html import LintIIVisualizer
 
 class DocumentStatsDict(TypedDict):
     sentence_count: int
+    document_lint_score: float
+    document_difficulty_level: int
     mean_lint_score: float
     min_lint_score: float
     max_lint_score: float
@@ -20,7 +23,8 @@ class DocumentStatsDict(TypedDict):
 
 class ReadabilityAnalysisDict(TypedDict):
     sentences: list[SentenceAnalysisDict]
-    level: int
+    document_lint_score: float
+    document_difficulty_level: int
     sentence_count: int
     mean_lint_score: float
     min_lint_score: float
@@ -114,19 +118,30 @@ class ReadabilityAnalysis(LintIIVisualizer):
             return 0
         return n_concrete_nouns / total_nouns
 
+    def calculate_lint_score(self) -> float:
+        """Calculate LiNT readability score for the document."""
+        return LintScorer.calculate_lint_score(
+            freq_log = self.mean_log_word_frequency,
+            max_sdl = self.mean_max_sdl,
+            content_words_per_clause = self.mean_content_words_per_clause,
+            proportion_concrete = self.proportion_of_concrete_nouns,
+        )
+
+    def get_difficulty_level(self) -> int:
+        """Get difficulty level for the document."""
+        return LintScorer.get_difficulty_level(self.calculate_lint_score())
+
     def calculate_document_stats(self) -> DocumentStatsDict:
         """Calculate statistics on a document level: sentence count, mean LiNT score, min LiNT score, max LiNT score."""
         return {
             'sentence_count': len(self.sentences),
+            'document_lint_score': self.calculate_lint_score(),
+            'document_difficulty_level': self.get_difficulty_level(),
             'mean_lint_score': self.mean_lint_score,
             'min_lint_score': self.min_lint_score,
             'max_lint_score': self.max_lint_score,
             'word_freq_compound_adjustment': linguistic_data.WORD_FREQ_COMPOUND_ADJUSTMENT,
         }
-
-    @cached_property
-    def mean_lint_score(self) -> float:
-        return statistics.mean(self.lint_scores_per_sentence)
 
     @cached_property
     def min_lint_score(self) -> float:
@@ -135,10 +150,6 @@ class ReadabilityAnalysis(LintIIVisualizer):
     @cached_property
     def max_lint_score(self) -> float:
         return max(self.lint_scores_per_sentence)
-
-    @cached_property
-    def difficulty_level(self) -> int:
-        return LintScorer.get_difficulty_level(self.mean_lint_score)
 
     def get_detailed_analysis(self) -> dict[str, Any]:
         """Get detailed readability analysis per sentence in the document."""
@@ -153,6 +164,5 @@ class ReadabilityAnalysis(LintIIVisualizer):
     def as_dict(self) -> ReadabilityAnalysisDict:
         return {
             'sentences': [sent.as_dict() for sent in self.sentences],
-            'level': self.difficulty_level,
             **self.calculate_document_stats(),
         }
