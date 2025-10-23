@@ -22,7 +22,7 @@ class LintScorer:
         """
         score = (
             - 5.16
-            + (13.134 * freq_log)
+            + (16.134 * freq_log)
             - (1.285 * max_sdl)
             - (3.522 * content_words_per_clause)
             + (16.259 * proportion_concrete)
