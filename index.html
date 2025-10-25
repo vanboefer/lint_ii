@@ -64,7 +64,7 @@
     </header>
     <section>
         <p>
-            <strong>LiNT-II</strong> analyzes Dutch text readability using four linguistic features: word frequency, concrete vs abstract nouns, syntactic dependency length, and content words per clause. Each sentence receives a difficulty score from 1 (easy) to 4 (difficult). The score is calculated as follows:
+            <strong>LiNT-II</strong> analyzes Dutch text readability using four linguistic features: word frequency, concrete vs abstract nouns, syntactic dependency length, and content words per clause. Each sentence receives a difficulty score from 1 (easy) to 4 (difficult). The score is calculated as follows (where \(w = \text{words}\) and \(n = \text{nouns}\)):
         </p>
         <p>
             \[
@@ -73,7 +73,7 @@
             &\quad -5.16 \\
             &\quad + 16.134 \cdot \bar{f}_{\text{zipf}} \\
             &\quad - 1.285 \cdot \bar{SDL}_{\max} \\
-            &\quad - 3.522 \cdot \frac{n_{\text{content}}}{n_{\text{clauses}}} \\
+            &\quad - 3.522 \cdot \frac{w_{\text{content}}}{w_{\text{clauses}}} \\
             &\quad + 16.259 \cdot \frac{n_{\text{concrete}}}{n_{\text{concrete}} + n_{\text{abstract}}} \\[1em]
             \text{LiNT} &= \min\left(100, \max(0, 100 - \text{score})\right)
             \end{aligned}
@@ -85,12 +85,12 @@
     </section>
     <section>
         <h2>Demo</h2>
-        <p>Pick a CEFR level:</p>
+        <p>Pick a level:</p>
         <div style="margin-bottom: 1.5rem;">
-            <label><input type="radio" name="cefr" value="A2" checked> A2</label>
-            <label><input type="radio" name="cefr" value="B1"> B1</label>
-            <label><input type="radio" name="cefr" value="B2"> B2</label>
-            <label><input type="radio" name="cefr" value="C2"> C2</label>
+            <label><input type="radio" name="cefr" value="A2" checked> Level 1</label>
+            <label><input type="radio" name="cefr" value="B1"> Level 2</label>
+            <label><input type="radio" name="cefr" value="B2"> Level 3</label>
+            <label><input type="radio" name="cefr" value="C2"> Level 4</label>
         </div>
         <lint-ii-visualizer id="viz" class="breakout"></lint-ii-visualizer>
     </section>
