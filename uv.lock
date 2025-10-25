@@ -825,22 +825,22 @@ dependencies = [
 ]
 
 [package.optional-dependencies]
-dev = [
+notebook = [
     { name = "ipykernel" },
     { name = "jupyter" },
 ]
 
 [package.metadata]
 requires-dist = [
-    { name = "ipykernel", marker = "extra == 'dev'" },
-    { name = "jupyter", marker = "extra == 'dev'" },
+    { name = "ipykernel", marker = "extra == 'notebook'" },
+    { name = "jupyter", marker = "extra == 'notebook'" },
     { name = "mistune", specifier = ">=3.1,<3.2" },
     { name = "numpy", specifier = ">=1.25.0,<2.0" },
     { name = "pyarrow", specifier = ">=21.0,<22.0" },
     { name = "spacy", specifier = ">=3.7,<3.8" },
     { name = "wordfreq", specifier = ">=3.1,<3.2" },
 ]
-provides-extras = ["dev"]
+provides-extras = ["notebook"]
 
 [[package]]
 name = "locate"
