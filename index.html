@@ -87,10 +87,10 @@
         <h2>Demo</h2>
         <p>Pick a level:</p>
         <div style="margin-bottom: 1.5rem;">
-            <label><input type="radio" name="cefr" value="A2" checked> Level 1</label>
-            <label><input type="radio" name="cefr" value="B1"> Level 2</label>
-            <label><input type="radio" name="cefr" value="B2"> Level 3</label>
-            <label><input type="radio" name="cefr" value="C2"> Level 4</label>
+            <label><input type="radio" name="text_examples" value="level1" checked> Level 1</label>
+            <label><input type="radio" name="text_examples" value="level2"> Level 2</label>
+            <label><input type="radio" name="text_examples" value="level3"> Level 3</label>
+            <label><input type="radio" name="text_examples" value="level4"> Level 4</label>
         </div>
         <lint-ii-visualizer id="viz" class="breakout"></lint-ii-visualizer>
     </section>
@@ -112,10 +112,10 @@
     <script type="module" src="./src/visualizer/lint_ii_visualizer.js"></script>
     <script type="module">
         const viz = document.getElementById('viz')
-        const radios = document.querySelectorAll('input[name="cefr"]')
+        const radios = document.querySelectorAll('input[name="text_examples"]')
         
         const loadLevel = (level) => {
-            viz.loadFromUrl(`./data/${level}.json`)
+            viz.loadFromUrl(`./examples_for_visualizer/${level}.json`)
         }
         
         radios.forEach(radio => {
@@ -125,7 +125,7 @@
         })
         
         // Initialize with checked radio
-        const checked = document.querySelector('input[name="cefr"]:checked')
+        const checked = document.querySelector('input[name="text_examples"]:checked')
         if (checked) loadLevel(checked.value)
     </script>
     <script>
