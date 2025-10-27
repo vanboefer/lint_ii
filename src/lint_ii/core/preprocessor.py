@@ -12,6 +12,13 @@ def extract_text_from_node(node):
     return ''
 
 
+def remove_quotemarks(text) -> str:
+    quotemarks = [i for i in "\"'«»‘’‛“”„‟‹›"]
+    for quotemark in quotemarks:
+        text = text.replace(quotemark, '')
+    return text
+
+
 def preprocess_text(text: str) -> str:
     """Extract text from paragraphs, blockquotes, and lists. Remove redundant whitespaces."""
     markdown = mistune.create_markdown(renderer='ast')
@@ -27,4 +34,8 @@ def preprocess_text(text: str) -> str:
     regex = re.compile(r'\s+')
 
     clean_text, _ = regex.subn(' ', combined_text)
-    return clean_text
+    clean_text_without_quotemarks = remove_quotemarks(clean_text)
+    return clean_text_without_quotemarks
+
+
+    
