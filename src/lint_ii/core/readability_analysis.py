@@ -84,6 +84,10 @@ class ReadabilityAnalysis(LintIIVisualizer):
     @cached_property
     def lint_scores_per_sentence(self) -> list[float]:
         return [sent.calculate_lint_score() for sent in self.sentences]
+    
+    @cached_property
+    def document_lint_score(self) -> float:
+        return self.calculate_lint_score()
 
     @cached_property
     def mean_log_word_frequency(self) -> float:
@@ -135,7 +139,7 @@ class ReadabilityAnalysis(LintIIVisualizer):
         """Calculate statistics on a document level: sentence count, mean LiNT score, min LiNT score, max LiNT score."""
         return {
             'sentence_count': len(self.sentences),
-            'document_lint_score': self.calculate_lint_score(),
+            'document_lint_score': self.document_lint_score,
             'document_difficulty_level': self.get_difficulty_level(),
             'min_lint_score': self.min_lint_score,
             'max_lint_score': self.max_lint_score,
