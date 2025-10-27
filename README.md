@@ -1,7 +1,7 @@
 # **LiNT-II**: readability assessment for Dutch
 
 [![License: EUPL v1.2](https://img.shields.io/badge/License-EUPL%20v1.2-blue.svg)](LICENSE)
-[![Python 3.9+](https://img.shields.io/badge/python-3.9+-blue.svg)](https://www.python.org/downloads/)
+[![Python 3.11](https://img.shields.io/badge/python-3.11-blue.svg)](https://www.python.org/downloads/)
 
 ## Table of contents
 1. [Introduction](#introduction)
@@ -11,69 +11,46 @@
 
 ## Introduction
 
-**LiNT-II** is a readability assessment tool for Dutch. The library (a) calculates a readability score for a text using the LiNT-formula, and (b) provides an analysis per sentence, based on the 4 features that are used in the formula.
+**LiNT-II** is a readability assessment tool for Dutch. The library (a) calculates a readability score for a text using the LiNT-II formula, and (b) provides an analysis per sentence, based on the 4 features that are used in the formula.
 
-**LiNT-II** is a new implementation of the original **LiNT** tool (see [here](#original-lint)). There are three differences between **LiNT** and **LiNT-II**:
+**LiNT-II** is a new implementation of the original **LiNT** tool (see [here](#original-lint)). There are two differences between **LiNT** and **LiNT-II**:
 
 - The **NLP tools** used to extract linguistic features from the text. LiNT has [T-Scan](https://github.com/CentreForDigitalHumanities/tscan) under the hood, while LiNT-II uses the [spaCy](https://spacy.io/) and [wordfreq](https://github.com/rspeer/wordfreq) libraries.
-- The **post-processing** done to refine the features. LiNT implements various manual corrections on top of the automated analysis (for example in how concrete and abstract nouns are defined; see the [T-Scan manual](https://raw.githubusercontent.com/CentreForDigitalHumanities/tscan/master/docs/tscanhandleiding.pdf)). LiNT-II does not apply any post-processing on the automatically extracted features.
-- The **weights** of the features in the formula. *TBD*
+- The **coefficients** (weights) used in the formula. Since the features are calculated differently, the coefficients are also different.
+
+For more information, please refer to ['What is LiNT-II?'](#what-is-lint-ii) and [LiNT-II documentation]().
 
 ## Quick Start
 
 ### Installation
 
-#### Requirements
-
-The requirements are listed in the [environment.yml](environment.yml) file. It is recommended to create a virtual environment with conda (you need to have [`miniconda`](https://www.anaconda.com/docs/getting-started/miniconda/main) installed):
-
 ```bash
-conda env create -f environment.yml
-conda activate lint
+pip install lint-ii
+python -m spacy download nl_core_news_lg
 ```
-#### Dutch language model
-
-After creating and activating the environment, you need to download the Dutch language model from spaCy:
-
-```bash
-python -m spacy download nl_core_news_sm
-```
-
-#### Abstract nouns list
-
-You need to download and process the list of abstract nouns used in LiNT-II. Due to licensing restrictions, we cannot publish it in the repo. See instructions in the [abstract_nouns](abstract_nouns/README.md) folder.
-
 ### Usage in Python
 
+#### Create `ReadabilityAnalysis` object from text
+
 ```python
-from pathlib import Path
-import spacy
-from lint_ii import ReadabilityAnalysis
+>>> from lint_ii import ReadabilityAnalysis
 
-abstract_nouns = Path('abstract_nouns.txt').read_text().split('\n')
-nlp_model = spacy.load("nl_core_news_sm")
+>>> text = "De Oudegracht is het sfeervolle hart van de stad. In de middeleeuwen was het hier een drukte van belang met de aan- en afvoer van goederen. Nu is het een prachtige plek om te winkelen en te lunchen of te dineren in de oude stadskastelen."
 
-text = "De Oudegracht is het sfeervolle hart van de stad. In de middeleeuwen was het hier een drukte van belang met de aan- en afvoer van goederen. Nu is het een prachtige plek om te winkelen en te lunchen of te dineren in de oude stadskastelen."
-
-doc = ReadabilityAnalysis.from_text(
-    text,
-    nlp_model,
-    abstract_nouns,
-)
+>>> ra = ReadabilityAnalysis.from_text(text)
+Loading Dutch language model from spaCy... ✓ nl_core_news_lg
 ```
 
-#### Get LiNT scores
+#### Get LiNT-II scores
 
-If you only want the scores per sentence, use the `lint_scores_per_sentence` property:
-
-```python
-doc.lint_scores_per_sentence
-```
-
-You will get a list of scores per sentence:
+You can see the score for the whole document and/or per sentence:
 
 ```python
-[34.28665000000001, 49.89385833333334, 61.28863750000001]
+>>> ra.document_lint_score
+48.924787870674514
+
+>>> ra.lint_scores_per_sentence
+[31.068428969266677, 48.322685595433335, 69.87164005804999]
 ```
 
 #### Get detailed analysis
@@ -81,94 +58,107 @@ You will get a list of scores per sentence:
 For a detailed analysis, use the `get_detailed_analysis()` method:
 
 ```python
-analysis = doc.get_detailed_analysis()
-```
+>>> detailed_analysis = ra.get_detailed_analysis()
 
-You will get the mean LiNT score for the text, as well as scores and feature analysis per sentence:
+>>> detailed_analysis.keys()
+dict_keys(['document_stats', 'sentence_stats'])
 
-```python
-analysis['document_stats']
-
+>>> detailed_analysis['document_stats']
 {'sentence_count': 3,
- 'mean_lint_score': 44.10298194444445,
- 'min_lint_score': 32.955650000000006,
- 'max_lint_score': 53.4096375}
-```
+ 'document_lint_score': 48.924787870674514,
+ 'document_difficulty_level': 3,
+ 'min_lint_score': 31.068428969266677,
+ 'max_lint_score': 69.87164005804999,
+ 'word_freq_compound_adjustment': True}
 
-```python
-analysis['sentence_stats'][0]
-
+>>> detailed_analysis['sentence_stats'][0]
 {'text': 'De Oudegracht is het sfeervolle hart van de stad.',
- 'score': 32.955650000000006,
+ 'score': 31.068428969266677,
  'level': 1,
  'top_n_least_freq_words': [('sfeervolle', 3.21),
   ('hart', 5.2),
   ('stad', 5.68)],
- 'concrete_nouns': ['Oudegracht', 'stad'],
+ 'mean_log_word_frequency': 4.696666666666666,
+ 'concrete_nouns': ['stad'],
+ 'abstract_nouns': [],
+ 'undefined_nouns': ['hart'],
+ 'unknown_nouns': ['oudegracht'],
  'max_sdl': 3,
- 'sdls': {'De': {'dep_length': 0, 'head': 'Oudegracht'},
-  'Oudegracht': {'dep_length': 3, 'head': 'hart'},
-  'is': {'dep_length': 2, 'head': 'hart'},
-  'het': {'dep_length': 1, 'head': 'hart'},
-  'sfeervolle': {'dep_length': 0, 'head': 'hart'},
-  'hart': {'dep_length': 0, 'head': 'hart'},
-  'van': {'dep_length': 1, 'head': 'stad'},
-  'de': {'dep_length': 0, 'head': 'stad'},
-  'stad': {'dep_length': 2, 'head': 'hart'},
-  '.': {'dep_length': 0, 'head': 'hart'}},
- 'content_words': ['Oudegracht', 'sfeervolle', 'hart', 'stad']}
+ 'sdls': [{'token': 'de', 'dep_length': 0, 'head': 'Oudegracht'},
+  {'token': 'oudegracht', 'dep_length': 3, 'head': 'hart'},
+  {'token': 'is', 'dep_length': 2, 'head': 'hart'},
+  {'token': 'het', 'dep_length': 1, 'head': 'hart'},
+  {'token': 'sfeervolle', 'dep_length': 0, 'head': 'hart'},
+  {'token': 'hart', 'dep_length': 0, 'head': 'hart'},
+  {'token': 'van', 'dep_length': 1, 'head': 'stad'},
+  {'token': 'de', 'dep_length': 0, 'head': 'stad'},
+  {'token': 'stad', 'dep_length': 2, 'head': 'hart'},
+  {'token': '.', 'dep_length': 0, 'head': 'hart'}],
+ 'content_words_per_clause': 4.0,
+ 'content_words': ['oudegracht', 'sfeervolle', 'hart', 'stad'],
+ 'finite_verbs': ['is']}
 ```
 
 ## What is LiNT-II?
 
-**LiNT-II** is a Python implementation of **LiNT** (Leesbaar­heids­instrument voor Nederlandse Teksten), a readability assessment tool that analyzes Dutch texts and estimates their difficulty.
+**LiNT-II** is a Python implementation of **LiNT** (*Leesbaar­heids­instrument voor Nederlandse Teksten*), a readability assessment tool that analyzes Dutch texts and estimates their difficulty.
 
 LiNT-II outputs a readability score per sentence based on 4 features:
 
 Feature | Description
 --- | ---
-**word frequency** | Mean word frequency of all content words in the text (excluding proper nouns). Less frequent words make a text more difficult.
-**proportion concrete nouns** | Proportion of concrete nouns out of all the nouns in the text. Concrete nouns are less difficult than abstract nouns.
+**word frequency** | Mean word frequency of all the content words in the text (excluding proper nouns). Less frequent words make a text more difficult.
 **syntactic dependency length** | The biggest syntactic dependency length (SDL) in each sentence, averaged over all sentences in the text. SDL is calculated as the number of words between a syntactic head and its dependent (e.g., verb-subject). Bigger SDL makes a sentence more difficult.
+**proportion concrete nouns** | Proportion of concrete nouns out of all the nouns in the text. Concrete nouns are less difficult than abstract nouns.
 **content words per clause** | Number of content words (excluding adverbs) per clause. Larger number of content words indicates dense information and makes a text more difficult.
 
 #### Definitions
 
 - ***Content words*** are words that possess semantic content and contribute to the meaning of the sentence. In this library content words are defined based on their [part-of-speech (POS)](https://universaldependencies.org/u/pos/): nouns (NOUN), proper nouns (PROPN), lexical verb (VERB), adjective (ADJ), adverb (ADV).
-- ***Abstract nouns***: In this library, a noun is considered abstract if it either (a) belongs to one of the following types of named entities: ORG (organization), LANGUAGE (language), LAW (law or contract), NORP (nationality, religious or political group), or (b) is listed in the RBN list of abstract nouns (see [here](/abstract_nouns/README.md)).
 - ***Clause***: A clause is a group of words that contains a subject and a verb, functioning as a part of a sentence. In this library, the number of clauses is determined by the number of finite verbs (= verbs that show tense) in the sentence.
 
-### LiNT score
-
-*TBD: updated weights*
+### LiNT-II score
 
 The readability score is calculated based on the following formula:
 
 ```
-LiNT score =
+LiNT-II score = 
 
-    3.204	+ 15.845 * word frequency
-            + 13.096 * proportion concrete nouns
-            - 1.331  * syntactic dependency length
-            - 3.829  * content words per clause
+  100 - (
+      - 5.16
+      + (16.13 * word frequency)
+      - (1.28  * syntactic dependency length)
+      - (3.52  * content words per clause)
+      + (16.26 * proportion concrete nouns)
+  )
 ```
 
-The formula was created based on comprehension studies, in which the 4 features were identified (the features that were the most relevant for comprehension) and their weights were determined (based on a regression analysis). The correlation between the calculated score and the real comprehension score is 0.87. For more information about the research behind LiNT and LiNT-II, please refer to the sources listed in [References and Credits](#references-and-credits).
+The formula's coefficients were estimated using a linear regression model fitted on empirical reading comprehension data from highschool students.
 
-### Understanding the score
+For more information about the empirical study (done for the original LiNT), please refer to the sources listed in [References and Credits](#references-and-credits).
 
-*TBD: updated analysis*
-
-Score | Difficulty level | Proportion of adults who have diffuculty understanding this level
---- | --- | ---
-0-34 | 1 | 15%
-35-46 | 2 | 31%
-47-60 | 3 | 55%
-60-100 | 4 | 82%
-
-For more information about how this estimation was done, please refer to the sources listed in [References and Credits](#references-and-credits).
+For more information about the LiNT-II model, please refer to the [LiNT-II documentation]().
 
 ## References and Credits
+
+### LiNT-II
+
+LiNT-II was developed by [Jenia Kim](https://www.linkedin.com/in/jeniakim/) (Hogeschool Utrecht), in collaboration with Henk Pander Maat (Utrecht University) and Antal van den Bosch (Utrecht University).
+
+If you use this library, please cite as follows:
+
+```
+@software{lint_ii,
+  author = {Kim, Jenia},
+  title = {{LiNT-II: readability assessment for Dutch}},
+  year = {2025},
+  url = {https://github.com/vanboefer/lint_ii},
+  version = {1.0.0},
+  note = {Python package}
+}
+```
+
+The code for LiNT-II was inspired by a spaCy implementation of LiNT by the City of Amsterdam: [alletaal-lint](https://github.com/Amsterdam/alletaal-lint).
 
 ### Original LiNT
 
@@ -202,11 +192,3 @@ The readability research on which LiNT is based is described in the [PhD thesis 
   school={Utrecht University}
 }
 ```
-
-### LiNT-II
-
-LiNT-II was developed by [Jenia Kim](https://www.linkedin.com/in/jeniakim/) (Hogeschool Utrecht), in collaboration with Henk Pander Maat (Utrecht University) and Antal van den Bosch (Utrecht University).
-
-*Reference: TBD*
-
-LiNT-II was inspired by and based on a spaCy implementation of LiNT by the City of Amsterdam: [alletaal-lint](https://github.com/Amsterdam/alletaal-lint).
