@@ -25,7 +25,7 @@ For more information, please refer to ['What is LiNT-II?'](#what-is-lint-ii) and
 ### Installation
 
 ```bash
-pip install lint-ii
+pip install lint_ii
 python -m spacy download nl_core_news_lg
 ```
 ### Usage in Python
@@ -103,14 +103,14 @@ dict_keys(['document_stats', 'sentence_stats'])
 
 **LiNT-II** is a Python implementation of **LiNT** (*Leesbaar­heids­instrument voor Nederlandse Teksten*), a readability assessment tool that analyzes Dutch texts and estimates their difficulty.
 
-LiNT-II outputs a readability score per sentence based on 4 features:
+LiNT-II outputs a readability score based on 4 features:
 
 Feature | Description
 --- | ---
-**word frequency** | Mean word frequency of all the content words in the text (excluding proper nouns). Less frequent words make a text more difficult.
-**syntactic dependency length** | The biggest syntactic dependency length (SDL) in each sentence, averaged over all sentences in the text. SDL is calculated as the number of words between a syntactic head and its dependent (e.g., verb-subject). Bigger SDL makes a sentence more difficult.
-**proportion concrete nouns** | Proportion of concrete nouns out of all the nouns in the text. Concrete nouns are less difficult than abstract nouns.
-**content words per clause** | Number of content words (excluding adverbs) per clause. Larger number of content words indicates dense information and makes a text more difficult.
+**word frequency** | Mean word frequency of all the content words in the text (excluding proper nouns). <br>➡ Less frequent words make a text more difficult.
+**syntactic dependency length** | The biggest syntactic dependency length (SDL) in each sentence, averaged over all sentences in the text. SDL is calculated as the number of words between a syntactic head and its dependent (e.g., verb-subject). <br>➡ Bigger SDL's make a text more difficult.
+**content words per clause** | Mean number of content words (excluding adverbs) per clause. <br>➡ Larger number of content words indicates dense information and makes a text more difficult.
+**proportion concrete nouns** | Mean proportion of concrete nouns out of all the nouns in the text. <br>➡ Smaller proportion of concrete nouns (i.e. many abstract nouns) makes a text more difficult.
 
 #### Definitions
 
