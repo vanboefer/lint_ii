@@ -12,7 +12,8 @@ def extract_text_from_node(node):
     return ''
 
 
-def remove_quotemarks(text) -> str:
+def fix_quotemarks(text) -> str:
+    """Replace 'weird' quotemarks (e.g. curly) with straight double quotemarks."""
     quotemarks = [i for i in "«»‘’‛“”„‟‹›"]
     for quotemark in quotemarks:
         text = text.replace(quotemark, '"')
@@ -34,7 +35,7 @@ def preprocess_text(text: str) -> str:
     regex = re.compile(r'\s+')
 
     clean_text, _ = regex.subn(' ', combined_text)
-    clean_text_without_quotemarks = remove_quotemarks(clean_text)
+    clean_text_without_quotemarks = fix_quotemarks(clean_text)
     return clean_text_without_quotemarks
 
 
