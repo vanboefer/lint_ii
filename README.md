@@ -135,9 +135,24 @@ LiNT-II score =
 
 The formula's coefficients were estimated using a linear regression model fitted on empirical reading comprehension data from highschool students.
 
-For more information about the empirical study (done for the original LiNT), please refer to the sources listed in [References and Credits](#references-and-credits).
+For more information about the empirical study (done for the original LiNT), please refer to the sources listed in [Original LiNT](#original-lint).
 
 For more information about the LiNT-II model, please refer to the [LiNT-II documentation]().
+
+### Difficulty levels
+
+LiNT-II scores are mapped to 4 difficulty levels. For each level, it is estimated how many adult Dutch readers have difficulty understanding texts on this level.
+
+Score | Difficulty level | Proportion of adults who have diffuculty understanding this level
+--- | --- | ---
+0-34 | 1 | 15%
+35-46 | 2 | 31%
+47-60 | 3 | 55%
+60-100 | 4 | 82%
+
+For more information about how this estimation was done for the original LiNT, please refer to the sources listed in [Original LiNT](#original-lint).
+
+For more information about how the estimation was adapted for LiNT-II, please refer to the [LiNT-II documentation]().
 
 ## References and Credits
 
