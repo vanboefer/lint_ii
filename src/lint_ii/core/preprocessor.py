@@ -13,9 +13,9 @@ def extract_text_from_node(node):
 
 
 def remove_quotemarks(text) -> str:
-    quotemarks = [i for i in "\"'«»‘’‛“”„‟‹›"]
+    quotemarks = [i for i in "«»‘’‛“”„‟‹›"]
     for quotemark in quotemarks:
-        text = text.replace(quotemark, '')
+        text = text.replace(quotemark, '"')
     return text
 
 
