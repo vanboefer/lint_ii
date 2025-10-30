@@ -38,9 +38,9 @@ class WordFeatures:
     head : Token
         Syntactic head of the token, with special handling for conjunctions.
     word_frequency : float | None
-        Zipf frequency score (0-8 scale) for content words. Cached property.
+        Log frequency for content words. Cached property.
         Returns None for function words and proper nouns.
-        Unknown words default to 1.3555.
+        Unknown words (not in SUBTLEX-NL) default to 1.359.
     dep_length : int
         Syntactic dependency length (number of intervening tokens between token and 
         head).
@@ -61,31 +61,31 @@ class WordFeatures:
     Properties
     ----------
     is_content_word_excl_propn : bool
-        True if token is a content word (NOUN, VERB, ADJ, ADV), excluding proper nouns.
+        True if token has one of the parts-of-speech: NOUN, VERB, ADJ, ADV.
     is_content_word_excl_adv : bool
-        True if token is a content word (NOUN, PROPN, VERB, ADJ) or manner adverb.
+        True if token has one of the parts-of-speech: NOUN, PROPN, VERB, ADJ or is a manner adverb (from MANNER_ADVERBS list).
     is_noun : bool
-        True if token is a noun or proper noun.
+        True if token has one of the parts-of-speech: NOUN, PROPN.
     is_finite_verb : bool
-        True if token is a finite verb (shows tense).
+        True if token has the tag (fine-grained part-of-speech): WW|pv (verb that shows tense).
     is_abstract : bool
-        True if noun is semantically abstract.
+        True if noun is semantically abstract (based on the annotations in NOUN_DATA).
     is_concrete : bool
-        True if noun is semantically concrete.
+        True if noun is semantically concrete (based on the annotations in NOUN_DATA).
     is_undefined : bool
-        True if noun is neither concrete nor abstract.
+        True if noun has both a concrete and an abstract meaning (based on the annotations in NOUN_DATA).
     is_unknown : bool
-        True if noun is not found in the lexicon.
+        True if noun is not found in NOUN_DATA.
 
     Notes
     -----
-    **Word Frequency**: Uses the wordfreq library's Zipf scale (0-8), where higher 
-    values indicate more common words. The frequency is computed on the Zipf scale:
+    **Word Frequency**: Uses the log frequency calculated from the SUBTLEX-NL corpus (FREQ_DATA).
+    Higher values indicate more common words:
         - 6-8: Very common words (de, het, is)
         - 4-6: Common words
         - 2-4: Uncommon words
         - 0-2: Rare words
-    Only content words (excluding proper nouns) have frequency scores. Unknown words 
+    Only content words (excluding proper nouns) get frequency scores. Unknown words 
     receive a default zero count frequency.
 
     **Dependency Length**: The number of tokens between a word and its syntactic head. 
@@ -98,18 +98,21 @@ class WordFeatures:
     using spaCy's default behavior where the first conjunct heads the second.
 
     **Noun Categorization**: 
+    The noun categorizarion is based on the annotations in NOUN_DATA:
     - Concrete: Nouns referring to tangible entities (persons, animals, plants, 
     objects, substances, food, concrete events) or spatiotemporal referents (places, 
     times, measures).
     - Abstract: Nouns referring to intangible entities (abstract substances, abstract 
     events, organizations, abstract concepts).
-    - Undefined: Nouns with multiple possible senses that could not be disambiguated.
-    - Unknown: Nouns not in the nouns_sem_types dataset.
+    - Undefined: Nouns that have both a concrete sense and an abstract sense.
+    - Unknown: Nouns not in the NOUN_DATA.
 
-    **Content Words**: Different metrics use different definitions:
+    **Content Words**: Generally, content words belong to one of the following parts-of-speech:
+    nouns (NOUN), proper nouns (PROPN), lexical verb (VERB), adjective (ADJ), adverb (ADV).
+    In this library, different metrics use different subsets of content words:
     - `is_content_word_excl_propn`: Excludes proper nouns 
         (used for frequency calculation)
-    - `is_content_word_excl_adv`: Excludes most adverbs except manner adverbs 
+    - `is_content_word_excl_adv`: Excludes most adverbs except manner adverbs (from MANNER_ADVERBS list)
         (used for content words per clause)
 
     **Finite Verbs**: Identified using Dutch CGN part-of-speech tags. A verb is finite 
@@ -251,6 +254,7 @@ class WordFeatures:
 
     @property
     def super_sem_type(self) -> SuperSemTypes|None:
+        """Get the semantic type of a noun from NOUN_DATA."""
         if not self.is_noun:
             return None
 

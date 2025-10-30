@@ -34,9 +34,9 @@ class ReadabilityAnalysis(LintIIVisualizer):
     """
     Document-level readability analysis for Dutch texts using the LiNT-II formula.
 
-    This class analyzes entire documents by aggregating sentence-level features and 
+    This class analyzes documents by aggregating sentence-level features and 
     computing readability scores based on four linguistic features: word frequency, 
-    proportion of concrete nouns, syntactic dependency length, and content words per clause.
+    syntactic dependency length, content words per clause, and proportion of concrete nouns.
 
     Parameters
     ----------
@@ -63,7 +63,7 @@ class ReadabilityAnalysis(LintIIVisualizer):
     Methods
     -------
     from_text(text: str) -> ReadabilityAnalysis
-        Create analysis from raw text string. Preprocesses text and applies NLP 
+        Create analysis from text string. Preprocesses text and applies NLP 
         pipeline.
     calculate_lint_score() -> float
         Compute document LiNT score using aggregated linguistic features.
@@ -107,9 +107,7 @@ class ReadabilityAnalysis(LintIIVisualizer):
 
         LiNT = 100 - clamp(raw_score, 0, 100)
 
-    Higher scores indicate more difficult texts. The formula coefficients were derived 
-    from regression analysis to actual comprehension scores in Dutch readability 
-    studies.
+    Higher scores indicate more difficult texts.
 
     Examples
     --------
@@ -128,7 +126,7 @@ class ReadabilityAnalysis(LintIIVisualizer):
     --------
     SentenceAnalysis : Sentence-level readability analysis
     WordFeatures : Token-level linguistic feature extraction
-    LintScorer : Core LiNT scoring algorithms
+    LintScorer : LiNT scoring algorithms
     """
 
     def __init__(self, sentences: list[SentenceAnalysis]) -> None:
@@ -142,6 +140,12 @@ class ReadabilityAnalysis(LintIIVisualizer):
         cls,
         text: str,
     ) -> 'ReadabilityAnalysis':
+        """
+        Create analysis from text string:
+        (a) Load spaCy model
+        (b) Pre-process text (clean-up) and create spaCy Doc object
+        (c) Apply sentence-level readability analysis on each sentence in the Doc
+        """
         from lint_ii.linguistic_data.nlp_model import NLP_MODEL
         clean_text = preprocess_text(text)
         doc = NLP_MODEL(clean_text)
@@ -202,12 +206,12 @@ class ReadabilityAnalysis(LintIIVisualizer):
 
     @cached_property
     def mean_max_sdl(self) -> float:
-        """Mean value of sentence-level maximum dependency lengths"""
+        """Mean value of sentence-level maximum dependency lengths."""
         return statistics.mean(s.max_sdl for s in self.sentences)
 
     @cached_property
     def mean_content_words_per_clause(self) -> float:
-        """Mean value of sentence-level content words per clause"""
+        """Mean value of sentence-level content words per clause."""
         return statistics.mean(
             s.content_words_per_clause
             for s in self.sentences
@@ -215,7 +219,11 @@ class ReadabilityAnalysis(LintIIVisualizer):
 
     @cached_property
     def proportion_of_concrete_nouns(self) -> float:
-        """Proportion of concrete nouns out of all nouns in the document."""
+        """
+        Proportion of concrete nouns out of all nouns in the document.
+        Nouns of type `undefined` (have both a concrete and an abstract meaning)
+        and `unknown` (not in the list) are excluded from the totals count.
+        """
         n_concrete_nouns = len(self.concrete_nouns)
         n_abstract_nouns = len(self.abstract_nouns)
         total_nouns = n_concrete_nouns + n_abstract_nouns
@@ -237,7 +245,10 @@ class ReadabilityAnalysis(LintIIVisualizer):
         return LintScorer.get_difficulty_level(self.calculate_lint_score())
 
     def calculate_document_stats(self) -> DocumentStatsDict:
-        """Calculate statistics on a document level: sentence count, mean LiNT score, min LiNT score, max LiNT score."""
+        """
+        Statistics on a document level (sentence count, document LiNT score, document difficulty level,
+        min LiNT score, max LiNT score) + the value of `WORD_FREQ_COMPOUND_ADJUSTMENT` (True or False).
+        """
         return {
             'sentence_count': len(self.sentences),
             'document_lint_score': self.document_lint_score,
@@ -249,10 +260,12 @@ class ReadabilityAnalysis(LintIIVisualizer):
 
     @cached_property
     def min_lint_score(self) -> float:
+        """Lowest sentence-level score in the document."""
         return min(self.lint_scores_per_sentence)
 
     @cached_property
     def max_lint_score(self) -> float:
+        """Highest sentence-level score in the document."""
         return max(self.lint_scores_per_sentence)
 
     def get_detailed_analysis(self) -> dict[str, Any]:

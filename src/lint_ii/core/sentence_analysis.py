@@ -32,8 +32,8 @@ class SentenceAnalysis:
     Sentence-level readability analysis for Dutch texts using the LiNT-II formula.
 
     This class extracts linguistic features from individual sentences and computes 
-    readability scores based on word frequency, noun concreteness, syntactic dependency 
-    length, and information density (content words per clause).
+    readability scores based on four linguistic features: word frequency, 
+    syntactic dependency length, content words per clause, and proportion of concrete nouns.
 
     Parameters
     ----------
@@ -67,8 +67,7 @@ class SentenceAnalysis:
     Methods
     -------
     from_text(text: str) -> SentenceAnalysis
-        Create analysis from raw text string.
-        Preprocesses text and applies NLP pipeline.
+        Create analysis from raw text string. Preprocesses text and applies NLP pipeline.
     calculate_lint_score() -> float
         Compute LiNT score for the sentence using extracted linguistic features.
     get_difficulty_level() -> int
@@ -91,9 +90,9 @@ class SentenceAnalysis:
     abstract_nouns : list[str]
         All abstract nouns in the sentence.
     undefined_nouns : list[str]
-        Nouns not classified as concrete or abstract.
+        Nouns that have both a concrete and an abstract meaning.
     unknown_nouns : list[str]
-        Nouns not found in the frequency lexicon.
+        Nouns not found in NOUN_DATA.
     content_words : list[str]
         All content words excluding adverbs (nouns, proper nouns, verbs, adjectives).
     finite_verbs : list[str]
@@ -107,17 +106,23 @@ class SentenceAnalysis:
     **Clauses**: Counted by identifying finite verbs (verbs showing tense). If no 
     finite verbs are detected, the sentence is treated as containing one clause.
 
-    **Content words**: Nouns (NOUN), proper nouns (PROPN), lexical verbs (VERB),
-    and adjectives (ADJ).
+    **Content Words**: Generally, content words belong to one of the following parts-of-speech:
+    nouns (NOUN), proper nouns (PROPN), lexical verb (VERB), adjective (ADJ), adverb (ADV).
+    In this library, different metrics use different subsets of content words:
+    - `is_content_word_excl_propn`: Excludes proper nouns 
+        (used for frequency calculation)
+    - `is_content_word_excl_adv`: Excludes most adverbs except manner adverbs (from MANNER_ADVERBS list)
+        (used for content words per clause)
 
-    **Noun categorization**: 
+    **Noun Categorization**: 
+    The noun categorizarion is based on the annotations in NOUN_DATA:
     - Concrete: Nouns referring to tangible entities (persons, animals, plants, 
     objects, substances, food, concrete events) or spatiotemporal referents (places, 
     times, measures).
     - Abstract: Nouns referring to intangible entities (abstract substances, abstract 
     events, organizations, abstract concepts).
-    - Undefined: Nouns with multiple possible senses that could not be disambiguated.
-    - Unknown: Nouns not in the nouns_sem_types dataset.
+    - Undefined: Nouns that have both a concrete sense and an abstract sense.
+    - Unknown: Nouns not in the NOUN_DATA.
 
     Examples
     --------
@@ -140,7 +145,7 @@ class SentenceAnalysis:
     --------
     ReadabilityAnalysis : Document-level readability analysis
     WordFeatures : Token-level linguistic feature extraction
-    LintScorer : Core LiNT scoring algorithms
+    LintScorer : LiNT scoring algorithms
     """
 
     def __init__(
@@ -157,6 +162,11 @@ class SentenceAnalysis:
         cls,
         text: str,
     ) -> 'SentenceAnalysis':
+        """
+        Create analysis from text string:
+        (a) Load spaCy model
+        (b) Pre-process text (clean-up) and create spaCy Doc object
+        """
         from lint_ii.linguistic_data.nlp_model import NLP_MODEL
         clean_text = preprocess_text(text)
         doc = NLP_MODEL(clean_text)
@@ -169,7 +179,10 @@ class SentenceAnalysis:
 
     @cached_property
     def sdls(self) -> list[SDLInfo]:
-        """The dependency length (number of intervening tokens) between a token and its syntactic head, for each token in the sentence."""
+        """
+        The dependency length (number of intervening tokens) 
+        between a token and its syntactic head, for each token in the sentence.
+        """
         return [
             {
                 'token': feat.text,
@@ -269,7 +282,11 @@ class SentenceAnalysis:
 
     @cached_property
     def proportion_of_concrete_nouns(self) -> float:
-        """Proportion of concrete nouns out of all nouns in the sentence."""
+        """
+        Proportion of concrete nouns out of all nouns in the sentence.
+        Nouns of type `undefined` (have both a concrete and an abstract meaning)
+        and `unknown` (not in the list) are excluded from the totals count.
+        """
         n_concrete_nouns = len(self.concrete_nouns)
         n_abstract_nouns = len(self.abstract_nouns)
         total_nouns = n_concrete_nouns + n_abstract_nouns

@@ -1,10 +1,12 @@
 class LintScorer:
     """
-    Core LiNT-II scoring algorithms for Dutch text readability assessment.
+    LiNT-II scoring algorithms for Dutch text readability assessment.
 
     This class implements the LiNT-II readability formula, which combines four 
-    linguistic features to produce a readability score and difficulty level. The 
-    formula is based on regression analysis of Dutch comprehension studies.
+    linguistic features to produce a readability score and a difficulty level. 
+    
+    The formula's coefficients were estimated using a linear regression model fitted on
+    empirical reading comprehension data from Dutch highschool students.
 
     Attributes
     ----------
@@ -37,9 +39,7 @@ class LintScorer:
 
         LiNT = 100 - clamp(raw_score, 0, 100)
 
-    Higher scores indicate more difficult texts. The formula coefficients were derived 
-    from regression analysis to actual comprehension scores in Dutch readability 
-    studies.
+    Higher scores indicate more difficult texts.
 
     **Difficulty Level Interpretation**:
 
