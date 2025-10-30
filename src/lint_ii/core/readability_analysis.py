@@ -31,7 +31,105 @@ class ReadabilityAnalysisDict(TypedDict):
 
 
 class ReadabilityAnalysis(LintIIVisualizer):
-    """Readability analysis for a given text."""
+    """
+    Document-level readability analysis for Dutch texts using the LiNT-II formula.
+
+    This class analyzes entire documents by aggregating sentence-level features and 
+    computing readability scores based on four linguistic features: word frequency, 
+    proportion of concrete nouns, syntactic dependency length, and content words per clause.
+
+    Parameters
+    ----------
+    sentences : list[SentenceAnalysis]
+        List of sentence-level analysis objects. Each sentence must be a 
+        SentenceAnalysis instance containing linguistic features and metadata.
+
+    Attributes
+    ----------
+    sentences : list[SentenceAnalysis]
+        The input sentence analyses.
+    document_lint_score : float
+        Overall LiNT readability score for the document (0-100, higher=more difficult).
+        Cached property computed from document-level features.
+    document_difficulty_level : int
+        Difficulty level (1-4) derived from document_lint_score. Cached property.
+    lint_scores_per_sentence : list[float]
+        Individual LiNT scores for each sentence. Cached property.
+    min_lint_score : float
+        Lowest sentence-level score in the document. Cached property.
+    max_lint_score : float
+        Highest sentence-level score in the document. Cached property.
+
+    Methods
+    -------
+    from_text(text: str) -> ReadabilityAnalysis
+        Create analysis from raw text string. Preprocesses text and applies NLP 
+        pipeline.
+    calculate_lint_score() -> float
+        Compute document LiNT score using aggregated linguistic features.
+    get_difficulty_level() -> int
+        Convert LiNT score to difficulty level (1-4, where 4=most difficult).
+    calculate_document_stats() -> DocumentStatsDict
+        Generate summary statistics including sentence count, mean/min/max scores.
+    get_detailed_analysis() -> dict[str, Any]
+        Return comprehensive analysis with both document and sentence-level details.
+    as_dict() -> ReadabilityAnalysisDict
+        Serialize analysis to dictionary format (used in the LiNT-II visualizer).
+
+    Properties
+    ----------
+    word_features : list[WordFeatures]
+        Flattened list of all word features across sentences.
+    concrete_nouns : list[str]
+        All concrete nouns found in the document.
+    abstract_nouns : list[str]
+        All abstract nouns found in the document.
+    mean_log_word_frequency : float
+        Document-level mean log frequency of content words (excluding proper nouns).
+    mean_max_sdl : float
+        Mean of maximum syntactic dependency lengths across sentences.
+    mean_content_words_per_clause : float
+        Mean content words per clause across sentences.
+    proportion_of_concrete_nouns : float
+        Ratio of concrete nouns to total nouns (0.0-1.0).
+
+    Notes
+    -----
+    The LiNT-II formula computes readability as:
+
+    .. code-block:: text
+
+        raw score = constant 
+                  + (coefficient_freq * mean_log_word_frequency)
+                  + (coefficient_sdl * max_syntactic_dependency_length)
+                  + (coefficient_cwc * content_words_per_clause)
+                  + (coefficient_concrete * proportion_concrete_nouns)
+
+        LiNT = 100 - clamp(raw_score, 0, 100)
+
+    Higher scores indicate more difficult texts. The formula coefficients were derived 
+    from regression analysis to actual comprehension scores in Dutch readability 
+    studies.
+
+    Examples
+    --------
+    >>> from lint_ii import ReadabilityAnalysis
+    >>> text = "Jip zit bij de kapper. Knip, knap, zegt de schaar."
+    >>> analysis = ReadabilityAnalysis.from_text(text)
+    >>> analysis.document_lint_score
+    30.1
+    >>> analysis.get_difficulty_level()
+    1
+    >>> stats = analysis.calculate_document_stats()
+    >>> stats['sentence_count']
+    2
+
+    See Also
+    --------
+    SentenceAnalysis : Sentence-level readability analysis
+    WordFeatures : Token-level linguistic feature extraction
+    LintScorer : Core LiNT scoring algorithms
+    """
 
     def __init__(self, sentences: list[SentenceAnalysis]) -> None:
         self.sentences = sentences

@@ -2,7 +2,6 @@ from functools import cached_property
 from typing import TypedDict, NotRequired
 
 from spacy.tokens import Token
-from wordfreq import zipf_frequency
 
 from lint_ii import linguistic_data
 from lint_ii.linguistic_data import SuperSemTypes
@@ -17,7 +16,128 @@ class WordFeaturesDict(TypedDict):
 
 
 class WordFeatures:
-    """Linguistic features for individual words."""
+    """
+    Token-level linguistic feature extraction for Dutch text analysis.
+
+    This class wraps a spaCy Token and computes linguistic features used in the 
+    LiNT-II readability formula, including word frequency, syntactic dependency length, 
+    part-of-speech classification, and semantic categorization of nouns.
+
+    Parameters
+    ----------
+    token : Token
+        A spaCy Token object with NLP annotations (lemma, POS tag, dependencies, 
+        named entity type).
+
+    Attributes
+    ----------
+    token : Token
+        The input spaCy token.
+    text : str
+        Lowercase form of the token.
+    head : Token
+        Syntactic head of the token, with special handling for conjunctions.
+    word_frequency : float | None
+        Zipf frequency score (0-8 scale) for content words. Cached property.
+        Returns None for function words and proper nouns.
+        Unknown words default to 1.3555.
+    dep_length : int
+        Syntactic dependency length (number of intervening tokens between token and 
+        head).
+    super_sem_type : SuperSemTypes | None
+        Semantic type for nouns: 'concrete', 'abstract', 'undefined', or 'unknown'.
+    punct_placement : str | None
+        Punctuation placement: 'embedded', 'trailing', 'leading', or 'standalone'.
+
+    Methods
+    -------
+    from_text(text: str) -> WordFeatures
+        Create feature extractor from a single word string.
+        Note: this method is added for convenience and testing. Beware that spaCy may 
+        be unable to correctly parse the word from a single word string context.
+    as_dict() -> WordFeaturesDict
+        Serialize features to dictionary format (used in the LiNT-II visualizer).
+
+    Properties
+    ----------
+    is_content_word_excl_propn : bool
+        True if token is a content word (NOUN, VERB, ADJ, ADV), excluding proper nouns.
+    is_content_word_excl_adv : bool
+        True if token is a content word (NOUN, PROPN, VERB, ADJ) or manner adverb.
+    is_noun : bool
+        True if token is a noun or proper noun.
+    is_finite_verb : bool
+        True if token is a finite verb (shows tense).
+    is_abstract : bool
+        True if noun is semantically abstract.
+    is_concrete : bool
+        True if noun is semantically concrete.
+    is_undefined : bool
+        True if noun is neither concrete nor abstract.
+    is_unknown : bool
+        True if noun is not found in the lexicon.
+
+    Notes
+    -----
+    **Word Frequency**: Uses the wordfreq library's Zipf scale (0-8), where higher 
+    values indicate more common words. The frequency is computed on the Zipf scale:
+        - 6-8: Very common words (de, het, is)
+        - 4-6: Common words
+        - 2-4: Uncommon words
+        - 0-2: Rare words
+    Only content words (excluding proper nouns) have frequency scores. Unknown words 
+    receive a default zero count frequency.
+
+    **Dependency Length**: The number of tokens between a word and its syntactic head. 
+    Punctuation is excluded from counting. For example:
+        - "de kat": dep_length = 0 (adjacent)
+        - "de gelaarsde kat": dep_length for "de" = 1
+
+    Special handling for conjunctions: The head of coordinated elements is determined 
+    by following the conjunction chain to find the true syntactic head, rather than 
+    using spaCy's default behavior where the first conjunct heads the second.
+
+    **Noun Categorization**: 
+    - Concrete: Nouns referring to tangible entities (persons, animals, plants, 
+    objects, substances, food, concrete events) or spatiotemporal referents (places, 
+    times, measures).
+    - Abstract: Nouns referring to intangible entities (abstract substances, abstract 
+    events, organizations, abstract concepts).
+    - Undefined: Nouns with multiple possible senses that could not be disambiguated.
+    - Unknown: Nouns not in the nouns_sem_types dataset.
+
+    **Content Words**: Different metrics use different definitions:
+    - `is_content_word_excl_propn`: Excludes proper nouns 
+        (used for frequency calculation)
+    - `is_content_word_excl_adv`: Excludes most adverbs except manner adverbs 
+        (used for content words per clause)
+
+    **Finite Verbs**: Identified using Dutch CGN part-of-speech tags. A verb is finite 
+    if its tag contains "WW|pv" (werkwoord, persoonsvorm).
+
+    Examples
+    --------
+    >>> from lint_ii import WordFeatures
+    >>> word = WordFeatures.from_text("slaapt")
+    >>> word.word_frequency
+    4.26
+    >>> word.is_finite_verb
+    True
+    >>> word.is_content_word_excl_adv
+    True
+
+    >>> noun = WordFeatures.from_text("vrijheid")
+    >>> noun.super_sem_type
+    <SuperSemTypes.ABSTRACT: 'abstract'>
+    >>> noun.is_abstract
+    True
+
+    See Also
+    --------
+    SentenceAnalysis : Sentence-level readability analysis
+    ReadabilityAnalysis : Document-level readability analysis
+    SuperSemTypes : Enum for semantic noun categorization
+    """
 
     def __init__(
         self,
@@ -38,7 +158,7 @@ class WordFeatures:
         return cls(doc[0])
 
     @property
-    def _NOUN_DATA(self) -> dict[str, dict[str, str|bool]]:
+    def _NOUN_DATA(self) -> dict[str, dict[str, str]]:
         import lint_ii.linguistic_data.wordlists as wordlists
         return wordlists.NOUN_DATA
 
@@ -48,7 +168,7 @@ class WordFeatures:
         return wordlists.FREQ_DATA
 
     @property
-    def _MANNER_ADVERBS(self) -> dict[str, dict[str, str|bool]]:
+    def _MANNER_ADVERBS(self) -> list[str]:
         import lint_ii.linguistic_data.wordlists as wordlists
         return wordlists.MANNER_ADVERBS
 
@@ -61,8 +181,8 @@ class WordFeatures:
         """
         Head of the token.
 
-        Special cases:
-        =============
+        Special cases
+        -------------
         - Conjunctions: If a token is in a conjunction then the head of the last conjunct is taken recursively from the first. This is necessary since spaCy considers the first conjunct as the head of the second (which we consider incorrect).
         """
         current_token = self.token
@@ -89,8 +209,8 @@ class WordFeatures:
         """
         Dependency length (number of intervening tokens) between a word and its syntactic head. The dep_length is 0 if the words are adjacent.
 
-        Special cases:
-        =============
+        Special cases
+        -------------
         - Punctuation: (a) punctuation marks are not counted as intervening tokens, (b) for a punctuation mark, the dependency length is always 0.
         - Conjunctions: If a token is in a conjunction then the head of the second conjunct is taken from the first. This is necessary since spaCy considers the first conjunct as the head of the second (which we consider incorrect).
         """
