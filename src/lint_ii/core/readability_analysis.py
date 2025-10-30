@@ -16,9 +16,9 @@ class DocumentStatsDict(TypedDict):
     sentence_count: int
     document_lint_score: float
     document_difficulty_level: int
-    mean_lint_score: float
     min_lint_score: float
     max_lint_score: float
+    word_freq_compound_adjustment: bool
 
 
 class ReadabilityAnalysisDict(TypedDict):
@@ -26,7 +26,6 @@ class ReadabilityAnalysisDict(TypedDict):
     document_lint_score: float
     document_difficulty_level: int
     sentence_count: int
-    mean_lint_score: float
     min_lint_score: float
     max_lint_score: float
 
@@ -88,6 +87,10 @@ class ReadabilityAnalysis(LintIIVisualizer):
     @cached_property
     def document_lint_score(self) -> float:
         return self.calculate_lint_score()
+    
+    @cached_property
+    def document_difficulty_level(self) -> int:
+        return self.get_difficulty_level()
 
     @cached_property
     def mean_log_word_frequency(self) -> float:
@@ -140,7 +143,7 @@ class ReadabilityAnalysis(LintIIVisualizer):
         return {
             'sentence_count': len(self.sentences),
             'document_lint_score': self.document_lint_score,
-            'document_difficulty_level': self.get_difficulty_level(),
+            'document_difficulty_level': self.document_difficulty_level,
             'min_lint_score': self.min_lint_score,
             'max_lint_score': self.max_lint_score,
             'word_freq_compound_adjustment': linguistic_data.WORD_FREQ_COMPOUND_ADJUSTMENT,
@@ -165,7 +168,12 @@ class ReadabilityAnalysis(LintIIVisualizer):
         }
 
     def as_dict(self) -> ReadabilityAnalysisDict:
+        doc_stats = self.calculate_document_stats()
         return {
             'sentences': [sent.as_dict() for sent in self.sentences],
-            **self.calculate_document_stats(),
+            'document_lint_score': doc_stats['document_lint_score'],
+            'document_difficulty_level': doc_stats['document_difficulty_level'],
+            'sentence_count': doc_stats['sentence_count'],
+            'min_lint_score': doc_stats['min_lint_score'],
+            'max_lint_score': doc_stats['max_lint_score'],
         }

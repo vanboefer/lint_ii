@@ -19,8 +19,8 @@ class SDLInfo(TypedDict):
 
 class SentenceAnalysisDict(TypedDict):
     word_features: list[WordFeaturesDict]
-    score: float
-    level: int
+    lint_score: float
+    difficulty_level: int
     mean_log_word_frequency: float
     max_sdl: int
     proportion_of_concrete_nouns: float
@@ -130,6 +130,14 @@ class SentenceAnalysis:
         values = {sdl['dep_length'] for sdl in self.sdls}
         return max(values, default=0)
 
+    @cached_property
+    def lint_score(self) -> float:
+        return self.calculate_lint_score()
+    
+    @cached_property
+    def difficulty_level(self) -> int:
+        return self.get_difficulty_level()
+
     def count_content_words_excluding_adverbs(self) -> int:
         """Count content words (excluding adverbs) in the sentence."""
         return sum(feat.is_content_word_excl_adv for feat in self.word_features)
@@ -182,8 +190,8 @@ class SentenceAnalysis:
         """Get detailed analysis for the sentence."""
         return {
             'text': self.doc.text,
-            'score': self.calculate_lint_score(),
-            'level': self.get_difficulty_level(),
+            'score': self.lint_score,
+            'level': self.difficulty_level,
             'top_n_least_freq_words': self.get_top_n_least_frequent(n=n),
             'mean_log_word_frequency': self.mean_log_word_frequency,
             'concrete_nouns': self.concrete_nouns,
@@ -200,8 +208,8 @@ class SentenceAnalysis:
     def as_dict(self) -> SentenceAnalysisDict:
         return {
             'word_features': [feat.as_dict() for feat in self.word_features],
-            'score': self.calculate_lint_score(),
-            'level': self.get_difficulty_level(),
+            'lint_score': self.lint_score,
+            'difficulty_level': self.difficulty_level,
             'mean_log_word_frequency': self.mean_log_word_frequency,
             'max_sdl': self.max_sdl,
             'proportion_of_concrete_nouns': self.proportion_of_concrete_nouns,

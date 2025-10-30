@@ -167,7 +167,7 @@ export class LintIIVisualizer extends HTMLElement {
 
     renderSentence(sentence, idx) {
         const tokens = this.groupTokensWithPunctuation(sentence.word_features)
-        return `<span class="sentence" data-level="${sentence.level}">
+        return `<span class="sentence" data-level="${sentence.difficulty_level}">
             <span class="sent-start-group">
                 <span class="sent-idx">${idx + 1}</span>
                 <span class="sent-start"></span>
@@ -177,11 +177,11 @@ export class LintIIVisualizer extends HTMLElement {
                 <span class="sent-end"></span>
                 <span class="level-badge"
                     data-length="${sentence.word_features.length}"
-                    data-score="${sentence.score}"
+                    data-score="${sentence.lint_score}"
                     data-max-sdl="${sentence.max_sdl}"
                     data-mean-freq="${sentence.mean_log_word_frequency}"
                     data-concrete-prop="${sentence.proportion_of_concrete_nouns}">
-                    ${sentence.level}
+                    ${sentence.difficulty_level}
                 </span>
             </span>
         </span>`
