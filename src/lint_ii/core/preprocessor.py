@@ -2,7 +2,7 @@ import mistune
 import re
 
 
-def extract_text_from_node(node):
+def extract_text_from_node(node: dict | str) -> str:
     """Recursively extract all text from a node."""
     if isinstance(node, dict):
         if node.get('type') == 'text':
@@ -23,9 +23,10 @@ def fix_quotemarks(text) -> str:
 def preprocess_text(text: str) -> str:
     """Extract text from paragraphs, blockquotes, and lists. Remove redundant whitespaces."""
     markdown = mistune.create_markdown(renderer='ast')
+    nodes: list[dict] = markdown(text)  # type: ignore
     paragraphs = []
 
-    for node in markdown(text):
+    for node in nodes:
         if node['type'] in ['paragraph', 'block_quote', 'list']:
             paragraph = extract_text_from_node(node)
             if ' ' in paragraph:  # filter out one word sentences
