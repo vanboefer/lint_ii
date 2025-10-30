@@ -12,15 +12,7 @@ class WordFeaturesDict(TypedDict):
     text: str
     word_frequency: NotRequired[float]
     dep_length: NotRequired[int]
-    # is_content_word_excl_propn: bool
-    # is_content_word_excl_adv: bool
-    # is_noun: bool
-    # is_finite_verb: bool
     super_sem_type: NotRequired[str]
-    # is_abstract: bool
-    # is_concrete: bool
-    # is_undefined: bool
-    # is_unknown: bool
     punct_placement: NotRequired[str]
 
 
@@ -51,6 +43,11 @@ class WordFeatures:
         return wordlists.NOUN_DATA
 
     @property
+    def _FREQ_DATA(self) -> dict[str, float]:
+        import lint_ii.linguistic_data.wordlists as wordlists
+        return wordlists.FREQ_DATA
+
+    @property
     def _MANNER_ADVERBS(self) -> dict[str, dict[str, str|bool]]:
         import lint_ii.linguistic_data.wordlists as wordlists
         return wordlists.MANNER_ADVERBS
@@ -75,7 +72,7 @@ class WordFeatures:
 
     @cached_property
     def word_frequency(self) -> float|None:
-        """Word frequency using zipf scale."""
+        """Word frequency from the SUBTLEX-NL corpus."""
         if not self.is_content_word_excl_propn:
             return None
 
@@ -84,8 +81,8 @@ class WordFeatures:
         if self.is_noun and linguistic_data.WORD_FREQ_COMPOUND_ADJUSTMENT:
             text = self._NOUN_DATA.get(text, {}).get('head', text)
 
-        freq = zipf_frequency(text, "nl")
-        return freq if freq > 0 else 1.3555 # Default frequency for unknown words
+        zero_count_freq = 1.359228547196266  # log10(1 / total_count * 1e9)
+        return self._FREQ_DATA.get(text, zero_count_freq) 
 
     @property
     def dep_length(self) -> int:
@@ -161,7 +158,6 @@ class WordFeatures:
         return self.super_sem_type == SuperSemTypes.UNKNOWN
 
     @property
-
     def punct_placement(self) -> str | None:
         """Placement of punctuation relative to adjacent tokens."""
         if not self.token.is_punct:
@@ -178,7 +174,6 @@ class WordFeatures:
             return 'leading'
         else:
             return 'standalone'
-
 
     def as_dict(self) -> WordFeaturesDict:
         result: WordFeaturesDict = {'text': self.text}
