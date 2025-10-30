@@ -38,6 +38,3 @@ def preprocess_text(text: str) -> str:
     clean_text, _ = regex.subn(' ', combined_text)
     clean_text_without_quotemarks = fix_quotemarks(clean_text)
     return clean_text_without_quotemarks
-
-
-    
