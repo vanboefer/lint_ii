@@ -108,8 +108,8 @@ LiNT-II outputs a readability score based on 4 features:
 Feature | Description
 --- | ---
 **word frequency** | Mean word frequency of all the content words in the text (excluding proper nouns). <br>➡ Less frequent words make a text more difficult.
-**syntactic dependency length** | The biggest syntactic dependency length (SDL) in each sentence, averaged over all sentences in the text. SDL is calculated as the number of words between a syntactic head and its dependent (e.g., verb-subject). <br>➡ Bigger SDL's make a text more difficult.
-**content words per clause** | Mean number of content words (excluding adverbs) per clause. <br>➡ Larger number of content words indicates dense information and makes a text more difficult.
+**syntactic dependency length** | Syntactic dependency length (SDL) is the number of words between a syntactic head and its dependent (e.g., verb-subject). We take the biggest SDL in each sentence, and calculate their mean value for the whole text. <br>➡ Bigger SDL's make a text more difficult.
+**content words per clause** | Mean number of content words per clause. <br>➡ Larger number of content words indicates dense information and makes a text more difficult.
 **proportion concrete nouns** | Mean proportion of concrete nouns out of all the nouns in the text. <br>➡ Smaller proportion of concrete nouns (i.e. many abstract nouns) makes a text more difficult.
 
 #### Definitions
