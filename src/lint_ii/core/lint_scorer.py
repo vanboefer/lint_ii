@@ -12,7 +12,7 @@ class LintScorer:
     @staticmethod
     def calculate_lint_score(
         freq_log: float,
-        max_sdl: int,
+        max_sdl: int | float,
         content_words_per_clause: float,
         proportion_concrete: float,
     ) -> float:
