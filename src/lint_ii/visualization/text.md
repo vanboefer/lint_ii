@@ -79,4 +79,24 @@ Feature | Description
 - ***Content words*** are words that possess semantic content and contribute to the meaning of the sentence. In this library content words are defined based on their [part-of-speech (POS)](https://universaldependencies.org/u/pos/): nouns (NOUN), proper nouns (PROPN), lexical verb (VERB), adjective (ADJ), adverb (ADV).
 - ***Clause***: A clause is a group of words that contains a subject and a verb, functioning as a part of a sentence. In this library, the number of clauses is determined by the number of finite verbs (= verbs that show tense) in the sentence.
 
+### Word Frequency
+
+Words that are not common in spoken language tend to be less familiar to people and therefore more difficult to process and understand. We can estimate how familiar a certain word is by measuring its frequency, i.e. counting its occurences in a big text corpus (dataset).
+
+LiNT-II calculates word frequencies from [SUBTLEX-NL (Keuleers et al. 2010)](https://link.springer.com/article/10.3758/brm.42.3.643): a corpus of Dutch subtitles, which contains about 40 million words. [...more about the coice of corpus...]
+
+We present the frequencies on a Zipf scale ([Van Heuven et al. 2014](https://journals.sagepub.com/doi/full/10.1080/17470218.2013.850521)):
+
+```
+Zipf value = log₁₀(frequency per billion words)
+```
+
+A Zipf value of 1 corresponds to words with frequencies of 1 per 100 million words, a Zipf value of 2 corresponds to words with frequencies of 1 per 10 million words, a Zipf value of 3 corresponds to words with frequencies of 1 per million words, and so on.
+
+### Syntactic Dependency Length (SDL)
+
+### Content Words per Clause
+
+### Proportion of Concrete Nouns
+
 ## Scores and Diffculty Levels
