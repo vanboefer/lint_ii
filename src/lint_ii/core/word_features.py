@@ -171,6 +171,11 @@ class WordFeatures:
         return wordlists.FREQ_DATA
 
     @property
+    def _FREQ_SKIPLIST(self) -> list[str]:
+        import lint_ii.linguistic_data.wordlists as wordlists
+        return wordlists.FREQ_SKIPLIST
+
+    @property
     def _MANNER_ADVERBS(self) -> list[str]:
         import lint_ii.linguistic_data.wordlists as wordlists
         return wordlists.MANNER_ADVERBS
@@ -197,6 +202,8 @@ class WordFeatures:
     def word_frequency(self) -> float|None:
         """Word frequency from the SUBTLEX-NL corpus."""
         if not self.is_content_word_excl_propn:
+            return None
+        if self.text in self._FREQ_SKIPLIST:
             return None
 
         text = self.text
