@@ -187,7 +187,7 @@ class SentenceAnalysis:
             {
                 'token': feat.text,
                 'dep_length': feat.dep_length,
-                'head': feat.head.text,
+                'heads': [head.text for head in feat.heads],
             }
             for feat in self.word_features
         ]

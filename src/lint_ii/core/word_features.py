@@ -184,10 +184,10 @@ class WordFeatures:
     def text(self) -> str:
         return self.token.lower_
 
-    @property
-    def head(self) -> Token:
+    @cached_property
+    def heads(self) -> list[Token]:
         """
-        Head of the token.
+        Heads of the token.
 
         Special cases
         -------------
@@ -196,7 +196,12 @@ class WordFeatures:
         current_token = self.token
         while current_token.dep_ == 'conj':
             current_token = current_token.head
-        return current_token.head
+        if current_token.dep_ == 'nsubj' and len(current_token.head.conjuncts) > 0:
+            return [
+                current_token.head,
+                *[conj for conj in current_token.head.conjuncts]
+            ]
+        return [current_token.head]
 
     @cached_property
     def word_frequency(self) -> float|None:
@@ -214,7 +219,7 @@ class WordFeatures:
         zero_count_freq = 1.359228547196266  # log10(1 / total_count * 1e9)
         return self._FREQ_DATA.get(text, zero_count_freq) 
 
-    @property
+    @cached_property
     def dep_length(self) -> int:
         """
         Dependency length (number of intervening tokens) between a word and its syntactic head. The dep_length is 0 if the words are adjacent.
@@ -224,10 +229,13 @@ class WordFeatures:
         - Punctuation: (a) punctuation marks are not counted as intervening tokens, (b) for a punctuation mark, the dependency length is always 0.
         - Conjunctions: If a token is in a conjunction then the head of the second conjunct is taken from the first. This is necessary since spaCy considers the first conjunct as the head of the second (which we consider incorrect).
         """
+        return max(self._calculate_dep_length(head) for head in self.heads)
+
+    def _calculate_dep_length(self, head: Token) -> int:
         if self.token.dep_ == 'punct':
             return 0
 
-        span = sorted([self.token.i, self.head.i])
+        span = sorted([self.token.i, head.i])
         part = self.token.doc[slice(*span)]
 
         dep_length = len([t for t in part if t.dep_ != 'punct']) - 1
