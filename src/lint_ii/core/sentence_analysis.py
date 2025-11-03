@@ -314,6 +314,8 @@ class SentenceAnalysis:
             for feat in self.word_features
             if (freq := feat.word_frequency) is not None
         }
+        if n == -1:
+            return sorted(frequencies.items(), key=itemgetter(1))
         return sorted(frequencies.items(), key=itemgetter(1))[:n]
 
     def get_detailed_analysis(self, n: int = 5) -> dict[str, Any]:

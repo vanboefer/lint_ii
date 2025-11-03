@@ -268,12 +268,12 @@ class ReadabilityAnalysis(LintIIVisualizer):
         """Highest sentence-level score in the document."""
         return max(self.lint_scores_per_sentence)
 
-    def get_detailed_analysis(self) -> dict[str, Any]:
+    def get_detailed_analysis(self, n: int = 5) -> dict[str, Any]:
         """Get detailed readability analysis per sentence in the document."""
         return {
             'document_stats': self.calculate_document_stats(),
             'sentence_stats': [
-                sent.get_detailed_analysis()
+                sent.get_detailed_analysis(n=n)
                 for sent in self.sentences
             ],
         }
