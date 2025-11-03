@@ -74,7 +74,7 @@ Feature | Description
 
 #### Definitions
 
-- ***Content words*** are words that possess semantic content and contribute to the meaning of the sentence. In this library content words are defined based on their [part-of-speech (POS)](https://universaldependencies.org/u/pos/): nouns (NOUN), proper nouns (PROPN), lexical verb (VERB), adjective (ADJ), adverb (ADV).
+- ***Content words*** are words that possess semantic content and contribute to the meaning of the sentence. In this library content words are defined based on their [part-of-speech (POS)](https://universaldependencies.org/u/pos/): nouns (NOUN), proper nouns (PROPN), lexical verbs (VERB), adjectives (ADJ), adverbs (ADV).
 - ***Clause***: A clause is a group of words that contains a subject and a verb, functioning as a part of a sentence. In this library, the number of clauses is determined by the number of finite verbs (= verbs that show tense) in the sentence.
 
 ### Word Frequency
@@ -123,15 +123,15 @@ To calculate the SDLs in the sentence, we use the [dependency parsing](https://s
 
 For each token in the sentence, we identify its head(s) and then count the number of intervening tokens between them. The head is generally taken from the spaCy parser, except for the two cases described [below](#corrections-and-exceptions-1). In each sentence, we take the longest SDL as an indicator of difficulty. For the document-level readability analysis, we take the mean of all the sentence-level max SDLs.
 
-**Example**: In the sentence *De Oudegracht is het sfeervolle hart van de stad.*, the longest SDL is between the subject of the sentence *Oudegracht* and the root (main predicate) of the sentence *hart*; the max SDL is 3 ( three intervening tokens *is, het, sfeervolle*).
+**Example**: In the sentence *"De Oudegracht is het sfeervolle hart van de stad."*, the longest SDL is between the subject of the sentence *Oudegracht* and the root (main predicate) of the sentence *hart*; the max SDL is 3 ( three intervening tokens *is, het, sfeervolle*).
 
 #### Corrections and exceptions
 
 There are three cases in which we do not follow spaCy analysis:
 
 - Punctuation: spaCy parser considers punctuation marks as tokens and assigns a head to them. In our analysis, we override this behavior: (a) punctuation marks are not counted as intervening tokens for SDL calculation, (b) for a punctuation mark, the dependency length is always set to 0 (instead of counting the distance to the head).
-- Conjunctions (1): In a conjunction relation, spaCy considers the first conjunct as the head of the second. For example, in the sentence *Je zoekt informatie in naslagwerken via trefwoorden in de **index** of het **register**.*, where the words *index* and *register* are connected with the conjuction *of*, spaCy considers *index* as the head of *register*. We override this behavior: if a token is in a conjunction then the head of the last conjunct is taken recursively from the first, i.e. the head of both *index* and *register* is *trefwoorden* in our analysis.
-- Conjunctions (2): When the main predicate of the sentence (ROOT) is in a conjunction relation, spaCy connects only the first conjunct to the subject. For example, in the sentence *Dat geluid **klinkt** in het midden- en kleinbedrijf en moet worden **gehoord**.*, the subject *geluid* is connected to its head *klinkt* but not to *gehoord*. We override this behavior: if a token is the subject, we check whether its head (ROOT) has conjuncts. If so, we consider the conjuncts as the heads of the subject as well. In our example, this means that the subject *geluid* has two heads [*klinkt*, *gehoord*]. Since the dependency length between *geluid* and *gehoord* is bigger than the one between *geluid* and *klinkt*, we take the former into account for the SDL calculation.
+- Conjunctions (1): In a conjunction relation, spaCy considers the first conjunct as the head of the second. For example, in the sentence *"Je zoekt informatie in naslagwerken via trefwoorden in de **index** of het **register**."*, where the words *index* and *register* are connected with the conjuction *of*, spaCy considers *index* as the head of *register*. We override this behavior: if a token is in a conjunction then the head of the last conjunct is taken recursively from the first, i.e. the head of both *index* and *register* is *trefwoorden* in our analysis.
+- Conjunctions (2): When the main predicate of the sentence (ROOT) is in a conjunction relation, spaCy connects only the first conjunct to the subject. For example, in the sentence *"Dat geluid **klinkt** in het midden- en kleinbedrijf en moet worden **gehoord**."*, the subject *geluid* is connected to its head *klinkt* but not to *gehoord*. We override this behavior: if a token is the subject, we check whether its head (ROOT) has conjuncts. If so, we consider the conjuncts as the heads of the subject as well. In our example, this means that the subject *geluid* has two heads [*klinkt*, *gehoord*]. Since the dependency length between *geluid* and *gehoord* is bigger than the one between *geluid* and *klinkt*, we take the former into account for the SDL calculation.
 
 These exceptions and corrections were done based on a manual analysis of a sample of 200 sentences performed by Henk Pander Maat, one of the creators of the original LiNT. He identified these 3 issues as the main systematic differences between the spaCy parser and the parser used in the original LiNT.
 
@@ -139,7 +139,15 @@ These exceptions and corrections were done based on a manual analysis of a sampl
 
 #### Why content words per clause?
 
-A clause is a group of words that contains a subject and a verb. A simple sentence contains one clause; longer sentences may contain additional clauses, for example subordinate clauses () or clauses connected with words like "and" or "because" ().
+A clause is a group of words that contains a subject and a verb. A simple sentence contains one clause; longer sentences may contain additional clauses, for example subordinate clauses or clauses connected with words like "and" or "because". For this metric, the number of clauses is not important; what we analyze is the number of content words in each clause.
+
+A clause with a lot of content words is dense in information and is therefore more difficult to process and understand. For example, compare the sentence *"Ik verknalde het proefwerk."* with the sentence *"Ik verknalde het proefwerk Wiskunde gisteren bij het laatste schoolexamen."*. In both cases, the sentence contains one clause (one subject and one verb), but in the second sentence there is a lot more information, which is introduced through four extra content words (*Wiskunde, gisteren, laatste, laatste*).
+
+#### Calculating content words per clause
+
+We calculate the number of clauses in the sentence by counting the number of finite verbs, i.e., verbs that show tense. This is done using the spaCy fine-grained part-of-speech tag "WW|pv" (*werkwoord, persoonsvorm*).
+
+We claculate the number of content words by counting all words that have the following [parts-of-speech (POS)](https://universaldependencies.org/u/pos/): nouns (NOUN), proper nouns (PROPN), lexical verbs (VERB), adjectives (ADJ). To these, we also add a list of 70 manner adverbs, which we consider content words; other adverbs are not included since they are considered function words, in line with the original LiNT. For more information, see the [T-Scan manual](https://raw.githubusercontent.com/CentreForDigitalHumanities/tscan/master/docs/tscanhandleiding.pdf).
 
 ### Proportion of Concrete Nouns
 
