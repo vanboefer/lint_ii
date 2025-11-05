@@ -7,6 +7,7 @@
 3. [LiNT and LiNT-II](#lint-and-lint-ii)
 4. [Linguistic Features](#linguistic-features)
 5. [Scores and Diffculty Levels](#scores-and-diffculty-levels)
+6. [References and Credits](#references-and-credits)
 
 ## Introduction
 
@@ -103,13 +104,15 @@ A Zipf value of 1 means that a word appears once per 100 million words, a Zipf v
 
 In line with the original LiNT and [Van Heuven et al. 2014](https://journals.sagepub.com/doi/full/10.1080/17470218.2013.850521), we consider words with a Zipf value **smaller than 3 as "uncommon"**; these words appear in the SUBTLEX-NL corpus less  than once per million words. Examples: *afdwaling*: 1.66, *napraterij*: 1.66.
 
+The SUBTLEX-NL corpus with our calculated Zipf values can be found [here](https://github.com/vanboefer/lint_ii/blob/main/src/lint_ii/linguistic_data/data/subtlex_wordfreq.parquet).
+
 #### Corrections and exceptions
 
 The corrections and exceptions applied in LiNT-II are the same ones as in the original LiNT.
 
 - We calculate word frequencies only for [content words](#definitions), since function words are generally frequent (for example, *dat*: 7.34, *de*: 7.38, *en*: 7.14) and do not contribute to the diffuculty of the text. From the content words, we exclude proper nouns (names of people, places, etc.) since their frequency does not influence the difficulty of the text.
-- For transparent compounds (e.g., *duwboot* "towboat"), we use the frequency of the base word (*boot* "boat"), rather than the frequency of the compound as a whole. Previous research shows that this provides a better estimate of word difficulty; for more details, see [Pander Maat \& Dekker 2016](https://lint.hum.uu.nl/assets/pander-maat-en-dekker-2016.pdf).
-- As mentioned above, some words that are missing or infrequent in the SUBTLEX-NL corpus are actually pretty common in the spoken language. This includes new words that entered the Dutch language after 2010 (e.g., *appen* "to send a message on WhatsApp"), and words that are common in a Dutch-speaking context but might be not common in English-speaking TV shows (e.g., *knutselen* "to craft", *fietser* "cyclist"). To address the most obvious discrepancies of this sort in the corpus, the makers of the original LiNT manually created a list of words that should be skipped when calculating frequencies. So instead of incorrectly getting a low frequency, these words don't get any frequency value at all, and so do not mistakenly affect the difficulty score. For more details on how this was done, see the [T-Scan manual](https://raw.githubusercontent.com/CentreForDigitalHumanities/tscan/master/docs/tscanhandleiding.pdf).
+- For transparent compounds (e.g., *duwboot* "towboat"), we use the frequency of the base word (*boot* "boat"), rather than the frequency of the compound as a whole. Previous research shows that this provides a better estimate of word difficulty; for more details, see [Pander Maat \& Dekker 2016](https://lint.hum.uu.nl/assets/pander-maat-en-dekker-2016.pdf). The compounds and their base words are identified based on a manually-annotated [list](https://github.com/vanboefer/lint_ii/blob/main/src/lint_ii/linguistic_data/data/nouns_sem_types_20251017.parquet). The list contains 123,136 compounds: 63,225 singular forms and 59,911 plural forms; for the plural forms, the base word is given in singular (for example, the base word of both *integriteitstoets* "integrity test" and *integriteitstoetsen* "integrity tests" is *toets* "test").
+- As mentioned above, some words that are missing or infrequent in the SUBTLEX-NL corpus are actually pretty common in the spoken language. This includes new words that entered the Dutch language after 2010 (e.g., *appen* "to send a message on WhatsApp"), and words that are common in a Dutch-speaking context but might be not common in English-speaking TV shows (e.g., *knutselen* "to craft", *fietser* "cyclist"). To address the most obvious discrepancies of this sort in the corpus, the makers of the original LiNT manually created a list of words that should be skipped when calculating frequencies. So instead of incorrectly getting a low frequency, these words don't get any frequency value at all, and so do not mistakenly affect the difficulty score. For more details on how this was done, see the [T-Scan manual](https://raw.githubusercontent.com/CentreForDigitalHumanities/tscan/master/docs/tscanhandleiding.pdf). The list can be found [here](https://github.com/vanboefer/lint_ii/blob/main/src/lint_ii/linguistic_data/data/subtlex_wordfreq_skiplist.parquet).
 
 ### Syntactic Dependency Length (SDL)
 
@@ -147,8 +150,108 @@ A clause with a lot of content words is dense in information and is therefore mo
 
 We calculate the number of clauses in the sentence by counting the number of finite verbs, i.e., verbs that show tense. This is done using the spaCy fine-grained part-of-speech tag "WW|pv" (*werkwoord, persoonsvorm*).
 
-We claculate the number of content words by counting all words that have the following [parts-of-speech (POS)](https://universaldependencies.org/u/pos/): nouns (NOUN), proper nouns (PROPN), lexical verbs (VERB), adjectives (ADJ). To these, we also add a list of 70 manner adverbs, which we consider content words; other adverbs are not included since they are considered function words, in line with the original LiNT. For more information, see the [T-Scan manual](https://raw.githubusercontent.com/CentreForDigitalHumanities/tscan/master/docs/tscanhandleiding.pdf).
+We claculate the number of content words by counting all words that have the following [parts-of-speech (POS)](https://universaldependencies.org/u/pos/): nouns (NOUN), proper nouns (PROPN), lexical verbs (VERB), adjectives (ADJ). To these, we also add a [list of 69 manner adverbs](https://github.com/vanboefer/lint_ii/blob/main/src/lint_ii/linguistic_data/data/manner_adverbs_20251017.parquet), which we consider content words; other adverbs are not included since they are considered function words, in line with the original LiNT. For more information, see the [T-Scan manual](https://raw.githubusercontent.com/CentreForDigitalHumanities/tscan/master/docs/tscanhandleiding.pdf).
 
 ### Proportion of Concrete Nouns
 
+#### Why concrete and abstract nouns?
+
+Concrete nouns refer to specific, tangible items that can be perceived through the senses, like "apple" or "car". Abstract nouns, on the other hand, represent general ideas or concepts that cannot be physically touched, such as "freedom" or "happiness". Research suggests that a more concrete text is easier to understand; for example, adding examples helps understanding because examples make ideas more specific and concrete.
+
+#### LiNT-II noun list
+
+The [noun list](https://github.com/vanboefer/lint_ii/blob/main/src/lint_ii/linguistic_data/data/nouns_sem_types_20251017.parquet) was created for the original LiNT and further revised and updated for LiNT-II. The original annotation work was done by H. Pander Maat, N. Dekker and N. van Houten; the revisions and additions for LiNT-II were done by H. Pander Maat.
+
+The list contains 164,458 nouns, annotated for their semantic type (e.g., "human", "place") and class ("abstract", "concrete", "undefined"); the full annotation scheme is described [below](#semantic-types-annotation). The annotations are based on an existing lexicon -- [Referentiebestand Nederlands (Martin & Maks 2005)](https://taalmaterialen.ivdnt.org/download/tstc-referentiebestand-nederlands/) -- which was expanded and revised. For more information about how the original list was created, see the [T-Scan manual](https://raw.githubusercontent.com/CentreForDigitalHumanities/tscan/master/docs/tscanhandleiding.pdf).
+
+Descriptive statistics of the LiNT-II noun list:
+
+- The list contains 164,458 nouns in total.
+- The list contains both the **singular** and the **plural** forms of the nouns, unlike the original list, which contained singular forms only. The plural forms are needed because LiNT-II does not lemmatize the words (our experimentation with spaCy lemmatizer showed inadequate results). There are 85,762 singular forms and 78,696 plural forms in the list.
+- 123,136 nouns in the list are compounds (e.g., *duwboot* "towboat"). For compounds, the base word (*boot* "boat") and the modifier (*duw* "tow") are annotated. This information is used in the word frequency feature, as described [above](#corrections-and-exceptions). For plural form compounds (N=59,911), the base word is given in singular (for example, the base word of both *integriteitstoets* "integrity test" and *integriteitstoetsen* "integrity tests" is *toets* "test").
+- The distribution of semantic classes in the list is as follows:
+    - concrete: 84,006
+    - abstract: 77,939
+    - undefined: 2,513
+
+#### Semantic types scheme
+
+The nouns in the list are divided into 14 semantic types (see the table below), which are in turn classified into two classes: **abstract** and **concrete**. Ambiguous words that have both an abstract and a concrete meaning are classified as **undefined**.
+
+Semantic type | Semantic class | Examples
+--- | --- | ---
+human | concrete | *economiedocenten*, *assistent*
+nonhuman | concrete | *sardine*, *eik*
+artefact | concrete | *stoel*, *barometers*
+concrete substance | concrete | *modder*, *lichaamsvloeistoffen*
+food and care | concrete | *melk*, *lettertjesvermicelli*
+measure | concrete | *euro*, *kwartje*
+place | concrete | *amsterdam*, *voorkamer*
+time | concrete | *kerstavond*, *periode*
+concrete event | concrete | *ademhaling*, *stakingsacties*
+miscellaneous concrete | concrete | *galblaas*, *vulkaan*
+abstract substance | abstract | *fosfor*, *tumorcellen*
+abstract event | abstract | *crisis*, *status-update*
+organization | abstract | *nato*, *warenautoriteit*
+miscellaneous abstract (nondynamic) | abstract | *motto*, *woordfrequentie*
+*ambiguous words that belong to more than one type* | undefined | *steun*, *underground*
+
 ## Scores and Diffculty Levels
+
+[...TBA..]
+
+## References and Credits
+
+### LiNT-II
+
+LiNT-II was developed by [Jenia Kim](https://www.linkedin.com/in/jeniakim/) (Hogeschool Utrecht, VU Amsterdam), in collaboration with [Henk Pander Maat](https://www.uu.nl/medewerkers/HLWPanderMaat) (Utrecht University).
+
+If you use this library, please cite as follows:
+
+```
+@software{lint_ii,
+  author = {Kim, Jenia and Pander Maat, Henk},
+  title = {{LiNT-II: readability assessment for Dutch}},
+  year = {2025},
+  url = {https://github.com/vanboefer/lint_ii},
+  version = {1.0.0},
+  note = {Python package}
+}
+```
+
+- The code for LiNT-II was inspired by a spaCy implementation of LiNT by the City of Amsterdam: [alletaal-lint](https://github.com/Amsterdam/alletaal-lint).
+- Special thanks to [Lawrence Vriend](https://github.com/lcvriend) for his work on the **LiNT-II Visualizer** and other help with the code.
+- Special thanks to [Antal van den Bosch](https://www.uu.nl/staff/APJvandenBosch) (Utrecht University) for setting up and facilitating the collaboration.
+
+### Original LiNT
+
+The first version of LiNT was developed in the NWO project *Toward a validated reading level tool for Dutch* (2012-2017). Later versions were developed in the *Digital Humanities Lab* of Utrecht University.
+
+More details about the original LiNT can be found on:
+
+- [LiNT (Utrecht University)](https://lint.hum.uu.nl/home)
+- [LiNT (Gebruiker Centraal)](https://www.gebruikercentraal.nl/hulpmiddelen/lint-leesbaarheidsinstrument-voor-nederlandse-teksten/)
+
+The readability research on which LiNT is based is described in the [PhD thesis of Suzanne Kleijn](https://lint.hum.uu.nl/assets/kleijn-2018.pdf) (English) and in [Pander Maat et al. 2023](https://www.aup-online.com/content/journals/10.5117/TVT2023.3.002.MAAT) (Dutch). Please cite as follows:
+
+```
+@article{pander2023lint,
+  title={{LiNT}: een leesbaarheidsformule en een leesbaarheidsinstrument},
+  author={Pander Maat, Henk and Kleijn, Suzanne and Frissen, Servaas},
+  journal={Tijdschrift voor Taalbeheersing},
+  volume={45},
+  number={1},
+  pages={2--39},
+  year={2023},
+  publisher={Amsterdam University Press Amsterdam}
+}
+```
+
+```
+@phdthesis{kleijn2018clozing,
+  title={Clozing in on readability: How linguistic features affect and predict text comprehension and on-line processing},
+  author={Kleijn, Suzanne},
+  year={2018},
+  school={Utrecht University}
+}
+```

@@ -158,13 +158,13 @@ For more information about how the estimation was adapted for LiNT-II, please re
 
 ### LiNT-II
 
-LiNT-II was developed by [Jenia Kim](https://www.linkedin.com/in/jeniakim/) (Hogeschool Utrecht), in collaboration with Henk Pander Maat (Utrecht University) and Antal van den Bosch (Utrecht University).
+LiNT-II was developed by [Jenia Kim](https://www.linkedin.com/in/jeniakim/) (Hogeschool Utrecht, VU Amsterdam), in collaboration with [Henk Pander Maat](https://www.uu.nl/medewerkers/HLWPanderMaat) (Utrecht University).
 
 If you use this library, please cite as follows:
 
 ```
 @software{lint_ii,
-  author = {Kim, Jenia},
+  author = {Kim, Jenia and Pander Maat, Henk},
   title = {{LiNT-II: readability assessment for Dutch}},
   year = {2025},
   url = {https://github.com/vanboefer/lint_ii},
@@ -175,6 +175,7 @@ If you use this library, please cite as follows:
 
 - The code for LiNT-II was inspired by a spaCy implementation of LiNT by the City of Amsterdam: [alletaal-lint](https://github.com/Amsterdam/alletaal-lint).
 - Special thanks to [Lawrence Vriend](https://github.com/lcvriend) for his work on the **LiNT-II Visualizer** and other help with the code.
+- Special thanks to [Antal van den Bosch](https://www.uu.nl/staff/APJvandenBosch) (Utrecht University) for setting up and facilitating the collaboration.
 
 ### Original LiNT
 
