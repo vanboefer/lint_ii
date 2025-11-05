@@ -184,20 +184,6 @@ class WordFeatures:
     def text(self) -> str:
         return self.token.lower_
 
-    @property
-    def head(self) -> Token:
-        """
-        Head of the token.
-
-        Special cases
-        -------------
-        - Conjunctions: If a token is in a conjunction then the head of the last conjunct is taken recursively from the first. This is necessary since spaCy considers the first conjunct as the head of the second (which we consider incorrect).
-        """
-        current_token = self.token
-        while current_token.dep_ == 'conj':
-            current_token = current_token.head
-        return current_token.head
-
     @cached_property
     def word_frequency(self) -> float|None:
         """Word frequency from the SUBTLEX-NL corpus."""
@@ -213,21 +199,47 @@ class WordFeatures:
 
         zero_count_freq = 1.359228547196266  # log10(1 / total_count * 1e9)
         return self._FREQ_DATA.get(text, zero_count_freq) 
+    
+    @cached_property
+    def heads(self) -> list[Token]:
+        """
+        Heads of the token. The head is generally taken from spaCy, except for the two special cases below. 
 
-    @property
+        Special cases
+        -------------
+        - Conjunctions: If a token is in a conjunction then the head of the last conjunct is taken recursively from the first. This is necessary since spaCy considers the first conjunct as the head of the second (which we consider incorrect).
+        - If a token is the subject, we check whether its head (ROOT) has conjuncts. If so, we consider the conjuncts as the heads of the subject as well. For example, in the sentence 'Dat geluid klinkt in het midden- en kleinbedrijf en moet worden gehoord.', the subject 'geluid' has two heads ['klinkt', 'gehoord'].
+        """
+        current_token = self.token
+        while current_token.dep_ == 'conj':
+            current_token = current_token.head
+        if current_token.dep_ == 'nsubj' and len(current_token.head.conjuncts) > 0:
+            return [
+                current_token.head,
+                *[conj for conj in current_token.head.conjuncts]
+            ]
+        return [current_token.head]
+
+    @cached_property
     def dep_length(self) -> int:
         """
         Dependency length (number of intervening tokens) between a word and its syntactic head. The dep_length is 0 if the words are adjacent.
+        
+        If a word has multiple heads (see the special case for subjects below), we calculate all dep_lengths and take the biggest one.
 
         Special cases
         -------------
         - Punctuation: (a) punctuation marks are not counted as intervening tokens, (b) for a punctuation mark, the dependency length is always 0.
-        - Conjunctions: If a token is in a conjunction then the head of the second conjunct is taken from the first. This is necessary since spaCy considers the first conjunct as the head of the second (which we consider incorrect).
+        - Conjunctions: If a token is in a conjunction then the head of the last conjunct is taken recursively from the first. This is necessary since spaCy considers the first conjunct as the head of the second (which we consider incorrect).
+        - If a token is the subject, we check whether its head (ROOT) has conjuncts. If so, we consider the conjuncts as the heads of the subject as well. For example, in the sentence 'Dat geluid klinkt in het midden- en kleinbedrijf en moet worden gehoord.', the subject 'geluid' has two heads ['klinkt', 'gehoord']. Since the dependency length between 'geluid' and 'gehoord' is bigger than the one between 'geluid' and 'klinkt', we return the former.
         """
+        return max(self._calculate_dep_length(head) for head in self.heads)
+
+    def _calculate_dep_length(self, head: Token) -> int:
         if self.token.dep_ == 'punct':
             return 0
 
-        span = sorted([self.token.i, self.head.i])
+        span = sorted([self.token.i, head.i])
         part = self.token.doc[slice(*span)]
 
         dep_length = len([t for t in part if t.dep_ != 'punct']) - 1
