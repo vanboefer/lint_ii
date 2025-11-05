@@ -4,7 +4,7 @@ export class StatsData {
     }
 
     getSentenceScores() {
-        return this._data.sentences.map(s => s.score)
+        return this._data.sentences.map(s => s.lint_score)
     }
 
     getWordFrequencies() {
