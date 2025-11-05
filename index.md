@@ -25,11 +25,6 @@ Select one of the 4 texts below to see the detailed LiNT-II analysis:
 - On the text itself, you can see the difficulty level per sentence; hover above it to see additional sentence-level statistics.
 - Hover above each word to see the word-level linguistic features, like word frequency, semantic type, etc. To understand the features and how they are calculated, see [Linguistic Features](#linguistic-features).
 
-**Notes for the design**:
-- Upper bar: sentences, document score, document level
-- Hover on sent stats: OK
-- Hover on word stats: freq < 3 is considered low
-
 ## LiNT and LiNT-II
 
 ### Background and motivation
@@ -219,9 +214,9 @@ If you use this library, please cite as follows:
 }
 ```
 
-- The code for LiNT-II was inspired by a spaCy implementation of LiNT by the City of Amsterdam: [alletaal-lint](https://github.com/Amsterdam/alletaal-lint).
-- Special thanks to [Lawrence Vriend](https://github.com/lcvriend) for his work on the **LiNT-II Visualizer** and other help with the code.
 - Special thanks to [Antal van den Bosch](https://www.uu.nl/staff/APJvandenBosch) (Utrecht University) for setting up and facilitating the collaboration.
+- Special thanks to [Lawrence Vriend](https://github.com/lcvriend) for his work on the **LiNT-II Visualizer** and other help with the code.
+- The code for LiNT-II was inspired by a spaCy implementation of LiNT by the City of Amsterdam: [alletaal-lint](https://github.com/Amsterdam/alletaal-lint).
 
 ### Original LiNT
 
