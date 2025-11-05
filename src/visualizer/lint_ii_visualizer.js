@@ -146,16 +146,8 @@ export class LintIIVisualizer extends HTMLElement {
                 <dd>${this._data.sentences.length}</dd>
             </div>
             <div class="doc-stat">
-                <dt>tokens</dt>
-                <dd>${totalWords}</dd>
-            </div>
-            <div class="doc-stat">
                 <dt>lint score</dt>
                 <dd>${this._data.document_lint_score.toFixed(1)}</dd>
-            </div>
-            <div class="doc-stat">
-                <dt>max score</dt>
-                <dd>${this._data.max_lint_score.toFixed(1)}</dd>
             </div>
             ${this.renderDocumentLevel()}
         </dl>`

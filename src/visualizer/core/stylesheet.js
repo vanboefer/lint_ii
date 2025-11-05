@@ -22,8 +22,8 @@ export const css = `
     header {
         --gap: 3em;
         position: relative;
-        display: grid;
-        grid-template-columns: max-content 1fr auto;
+        display: flex;
+        justify-content: space-between;
         align-items: center;
         border-bottom: 1px solid currentColor;
         gap: var(--gap);
@@ -33,6 +33,7 @@ export const css = `
             line-height: 1.5em;
             padding-left: .35em;
             letter-spacing: 0.2em;
+            white-space: nowrap;
             font-family: arial;
             :nth-child(4) {
                 letter-spacing: 0.125em;
@@ -44,15 +45,13 @@ export const css = `
                 font-size: calc(1em + var(--index) * 0.1em);
             }
             margin-block: .25em;
+            margin-left: 1rem;
         }
 
         .document-scores {
-            justify-content: end;
-            display: grid;
+            display: flex;
             align-items: center;
-            column-gap: var(--gap);
-            grid-auto-flow: column;
-            grid-template-rows: repeat(2, 1fr);
+            gap: var(--gap);
 
             .doc-stat {
                 display: flex;
@@ -71,9 +70,6 @@ export const css = `
                     font-family: monospace;
                     font-size: 1.25em;
                 }
-            }
-            [data-level] {
-                grid-row: 1 / -1;
             }
         }
     }
