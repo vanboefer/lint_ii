@@ -15,7 +15,7 @@
 
 **LiNT-II** is a new implementation of the original **LiNT** tool (see [here](#original-lint)). There are two differences between **LiNT** and **LiNT-II**:
 
-- The **NLP tools** used to extract linguistic features from the text. LiNT has [T-Scan](https://github.com/CentreForDigitalHumanities/tscan) under the hood, while LiNT-II uses the [spaCy](https://spacy.io/) and [wordfreq](https://github.com/rspeer/wordfreq) libraries.
+- The **NLP tools** used to extract linguistic features from the text. LiNT has [T-Scan](https://github.com/CentreForDigitalHumanities/tscan) under the hood, while LiNT-II uses [spaCy](https://spacy.io/).
 - The **coefficients** (weights) used in the formula. Since the features are calculated differently, the coefficients are also different.
 
 For more information, please refer to ['What is LiNT-II?'](#what-is-lint-ii) and [LiNT-II documentation]().
@@ -40,6 +40,8 @@ python -m spacy download nl_core_news_lg
 >>> ra = ReadabilityAnalysis.from_text(text)
 Loading Dutch language model from spaCy... ✓ nl_core_news_lg
 ```
+
+**NOTE**: LiNT-II can process plain text or markdown. Other formats (e.g.. html) or very "unclean" text might produce inaccurate results due to segmentation issues.
 
 #### Get LiNT-II scores
 
@@ -98,6 +100,10 @@ dict_keys(['document_stats', 'sentence_stats'])
  'content_words': ['oudegracht', 'sfeervolle', 'hart', 'stad'],
  'finite_verbs': ['is']}
 ```
+
+#### Visualization in Jupyter Notebook
+
+[...TBA...]
 
 ## What is LiNT-II?
 
