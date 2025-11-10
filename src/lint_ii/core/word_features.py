@@ -280,16 +280,33 @@ class WordFeatures:
 
     @property
     def super_sem_type(self) -> SuperSemTypes|None:
-        """Get the semantic type of a noun from NOUN_DATA."""
+        """
+        Get the semantic type of a noun from NOUN_DATA.
+
+        - If the word is not on the list, try to look for the lemma (e.g., "paardje" is not on the list, but its lemma "paard" is)
+        - If neither word nor lemma is on the list, try to resolve based on named entity type: names of people and locations are set to "concrete", names of organizations are set to "abstract".
+        """
         if not self.is_noun:
             return None
+        
+        result = None
 
-        result = self._NOUN_DATA.get(self.text, {}).get('super_sem_type')
+        if self.text in self._NOUN_DATA:
+            result = self._NOUN_DATA[self.text].get('super_sem_type')
+        # if word not in list then try to resolve on lemma
+        elif self.token.lemma_ in self._NOUN_DATA:
+            result = self._NOUN_DATA[self.token.lemma_].get('super_sem_type')
 
-        if result is None:
-            return SuperSemTypes('unknown')
+        if result is not None:
+            return SuperSemTypes(result)
 
-        return SuperSemTypes(result)
+        # if word and lemma not in list then try to resolve on entity type
+        if self.token.ent_type_ in ('PERSON', 'GPE'):
+            return SuperSemTypes('concrete')
+        if self.token.ent_type_ == 'ORG':
+            return SuperSemTypes('abstract')
+        
+        return SuperSemTypes('unknown')
 
     @property
     def is_abstract(self) -> bool:
