@@ -55,7 +55,7 @@ class SentenceAnalysis:
     max_sdl : int
         Maximum syntactic dependency length in the sentence. Cached property.
     content_words_per_clause : float
-        Ratio of content words (excluding adverbs) to clauses. Cached property.
+        Ratio of content words to clauses. Cached property.
     proportion_of_concrete_nouns : float
         Ratio of concrete nouns to all nouns (0.0-1.0). Cached property.
     lint_score : float
@@ -72,8 +72,8 @@ class SentenceAnalysis:
         Compute LiNT score for the sentence using extracted linguistic features.
     get_difficulty_level() -> int
         Convert LiNT score to difficulty level (1-4, where 4 = most difficult).
-    count_content_words_excluding_adverbs() -> int
-        Count content words excluding adverbs.
+    count_content_words() -> int
+        Count content words.
     count_clauses() -> int
         Count clauses by counting finite verbs (minimum 1).
     get_top_n_least_frequent(n: int = 5) -> list[tuple[str, float]]
@@ -94,7 +94,7 @@ class SentenceAnalysis:
     unknown_nouns : list[str]
         Nouns not found in NOUN_DATA.
     content_words : list[str]
-        All content words excluding adverbs (nouns, proper nouns, verbs, adjectives).
+        All content words.
     finite_verbs : list[str]
         All finite verbs (verbs showing tense) in the sentence.
 
@@ -106,13 +106,15 @@ class SentenceAnalysis:
     **Clauses**: Counted by identifying finite verbs (verbs showing tense). If no 
     finite verbs are detected, the sentence is treated as containing one clause.
 
-    **Content Words**: Generally, content words belong to one of the following parts-of-speech:
-    nouns (NOUN), proper nouns (PROPN), lexical verb (VERB), adjective (ADJ), adverb (ADV).
-    In this library, different metrics use different subsets of content words:
-    - `is_content_word_excl_propn`: Excludes proper nouns 
-        (used for frequency calculation)
-    - `is_content_word_excl_adv`: Excludes most adverbs except manner adverbs (from MANNER_ADVERBS list)
-        (used for content words per clause)
+    **Content Words**: Content words are defined as follows:
+
+    Parts of speech      | Additional corrections
+    ---------------------|-----------------------------
+    nouns (NOUN)         | -
+    proper nouns (PROPN) | -
+    lexical verbs (VERB) | exclude copulas
+    adjectives (ADJ)     | exclude numerical adjectives
+    adverbs (ADV)        | include only MANNER_ADVERBS list
 
     **Noun Categorization**: 
     The noun categorizarion is based on the annotations in NOUN_DATA:
@@ -226,10 +228,10 @@ class SentenceAnalysis:
 
     @property
     def content_words(self) -> list[str]:
-        """All content words (excluding adverbs) in the sentence."""
+        """All content words in the sentence."""
         return [
             feat.text for feat in self.word_features
-            if feat.is_content_word_excl_adv
+            if feat.is_content_word
         ]
 
     @property
@@ -264,9 +266,9 @@ class SentenceAnalysis:
     def difficulty_level(self) -> int:
         return self.get_difficulty_level()
 
-    def count_content_words_excluding_adverbs(self) -> int:
-        """Count content words (excluding adverbs) in the sentence."""
-        return sum(feat.is_content_word_excl_adv for feat in self.word_features)
+    def count_content_words(self) -> int:
+        """Count content words in the sentence."""
+        return sum(feat.is_content_word for feat in self.word_features)
 
     def count_clauses(self) -> int:
         """Count clauses (= finite verbs) in the sentence."""
@@ -275,8 +277,8 @@ class SentenceAnalysis:
 
     @cached_property
     def content_words_per_clause(self) -> float:
-        """Number of content words (excluding adverbs) per clause."""
-        content_count = self.count_content_words_excluding_adverbs()
+        """Number of content words per clause."""
+        content_count = self.count_content_words()
         clause_count = self.count_clauses()
         return content_count / clause_count
 

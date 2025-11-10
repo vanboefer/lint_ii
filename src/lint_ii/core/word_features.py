@@ -61,32 +61,31 @@ class WordFeatures:
     Properties
     ----------
     is_content_word_excl_propn : bool
-        True if token has one of the parts-of-speech: NOUN, VERB, ADJ, ADV.
-    is_content_word_excl_adv : bool
-        True if token has one of the parts-of-speech: NOUN, PROPN, VERB, ADJ or is a manner adverb (from MANNER_ADVERBS list).
+        True if token is content word but not a PROPN.
+    is_content_word : bool
+        True if token has one of the parts-of-speech: NOUN, PROPN, VERB, ADJ or is a
+        manner adverb (from MANNER_ADVERBS list). Special cases: copulas and numerical 
+        adjectives are excluded.
     is_noun : bool
         True if token has one of the parts-of-speech: NOUN, PROPN.
     is_finite_verb : bool
-        True if token has the tag (fine-grained part-of-speech): WW|pv (verb that shows tense).
+        True if token has the tag (fine-grained part-of-speech): WW|pv (verb that shows
+        tense).
     is_abstract : bool
         True if noun is semantically abstract (based on the annotations in NOUN_DATA).
     is_concrete : bool
         True if noun is semantically concrete (based on the annotations in NOUN_DATA).
     is_undefined : bool
-        True if noun has both a concrete and an abstract meaning (based on the annotations in NOUN_DATA).
+        True if noun has both a concrete and an abstract meaning (based on the 
+        annotations in NOUN_DATA).
     is_unknown : bool
         True if noun is not found in NOUN_DATA.
 
     Notes
     -----
-    **Word Frequency**: Uses the log frequency calculated from the SUBTLEX-NL corpus (FREQ_DATA).
-    Higher values indicate more common words:
-        - 6-8: Very common words (de, het, is)
-        - 4-6: Common words
-        - 2-4: Uncommon words
-        - 0-2: Rare words
-    Only content words (excluding proper nouns) get frequency scores. Unknown words 
-    receive a default zero count frequency.
+    **Word Frequency**: Uses the log frequency calculated from the SUBTLEX-NL corpus 
+    (FREQ_DATA). Only content words (excluding proper nouns) get frequency scores. 
+    Unknown words receive a default zero count frequency.
 
     **Dependency Length**: The number of tokens between a word and its syntactic head. 
     Punctuation is excluded from counting. For example:
@@ -107,13 +106,15 @@ class WordFeatures:
     - Undefined: Nouns that have both a concrete sense and an abstract sense.
     - Unknown: Nouns not in the NOUN_DATA.
 
-    **Content Words**: Generally, content words belong to one of the following parts-of-speech:
-    nouns (NOUN), proper nouns (PROPN), lexical verb (VERB), adjective (ADJ), adverb (ADV).
-    In this library, different metrics use different subsets of content words:
-    - `is_content_word_excl_propn`: Excludes proper nouns 
-        (used for frequency calculation)
-    - `is_content_word_excl_adv`: Excludes most adverbs except manner adverbs (from MANNER_ADVERBS list)
-        (used for content words per clause)
+    **Content Words**: Content words are defined as follows:
+
+    Parts of speech      | Additional corrections
+    ---------------------|-----------------------------
+    nouns (NOUN)         | -
+    proper nouns (PROPN) | -
+    lexical verbs (VERB) | exclude copulas
+    adjectives (ADJ)     | exclude numerical adjectives
+    adverbs (ADV)        | include only MANNER_ADVERBS list
 
     **Finite Verbs**: Identified using Dutch CGN part-of-speech tags. A verb is finite 
     if its tag contains "WW|pv" (werkwoord, persoonsvorm).
@@ -126,7 +127,7 @@ class WordFeatures:
     4.26
     >>> word.is_finite_verb
     True
-    >>> word.is_content_word_excl_adv
+    >>> word.is_content_word
     True
 
     >>> noun = WordFeatures.from_text("vrijheid")
@@ -248,14 +249,20 @@ class WordFeatures:
     @property
     def is_content_word_excl_propn(self) -> bool:
         """Check if word is a content word, excluding proper nouns."""
-        return self.token.pos_ in ["NOUN", "VERB", "ADJ", "ADV"]
+        return False if self.token.pos_ == 'PROPN' else self.is_content_word
 
     @property
-    def is_content_word_excl_adv(self) -> bool:
+    def is_content_word(self) -> bool:
         """
         Check if word is a content word.
-        Adverbs are excluded except for manner adverbs.
+        - Numerical adjectives are excluded
+        - Copulas are excluded
+        - Adverbs are excluded except for manner adverbs
         """
+        if 'TW' in self.token.tag_:
+            return False
+        if self.token.dep_ == 'cop':
+            return False
         return (
             self.token.pos_ in ["NOUN", "PROPN", "VERB", "ADJ"]
             or self.token.text in self._MANNER_ADVERBS
