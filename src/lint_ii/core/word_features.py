@@ -167,6 +167,11 @@ class WordFeatures:
         return wordlists.NOUN_DATA
 
     @property
+    def _MEASUREMENT_UNITS(self) -> list[str]:
+        import lint_ii.linguistic_data.wordlists as wordlists
+        return wordlists.MEASUREMENT_UNITS
+
+    @property
     def _FREQ_DATA(self) -> dict[str, float]:
         import lint_ii.linguistic_data.wordlists as wordlists
         return wordlists.FREQ_DATA
@@ -248,13 +253,13 @@ class WordFeatures:
 
     @property
     def is_content_word_excl_propn(self) -> bool:
-        """Check if word is a content word, excluding proper nouns."""
+        """Indicator whether word is a content word, excluding proper nouns."""
         return False if self.token.pos_ == 'PROPN' else self.is_content_word
 
     @property
     def is_content_word(self) -> bool:
         """
-        Check if word is a content word.
+        Indicator whether word is a content word:
         - Numerical adjectives are excluded
         - Copulas are excluded
         - Adverbs are excluded except for manner adverbs
@@ -270,59 +275,78 @@ class WordFeatures:
 
     @property
     def is_noun(self) -> bool:
-        """Check if word is a noun."""
+        """Indicator whether word is a noun."""
         return self.token.pos_ in ["NOUN", "PROPN"]
 
     @property
     def is_finite_verb(self) -> bool:
-        """Check if word is a finite verb."""
+        """Indicator whether word is a finite verb."""
         return "WW|pv" in self.token.tag_
 
     @property
     def super_sem_type(self) -> SuperSemTypes|None:
-        """
-        Get the semantic type of a noun from NOUN_DATA.
-
-        - If the word is not on the list, try to look for the lemma (e.g., "paardje" is not on the list, but its lemma "paard" is)
-        - If neither word nor lemma is on the list, try to resolve based on named entity type: names of people and locations are set to "concrete", names of organizations are set to "abstract".
-        """
+        """The semantic type of a noun or measurement unit symbol."""
         # take nouns and 'SPEC' tokens (accounts for cm, km, etc.)
         if not self.is_noun and 'SPEC' not in self.token.tag_:
             return None
         
-        result = None
+        if self.is_noun:
+            return self._get_super_sem_type_for_noun(self.token)
 
-        if self.text in self._NOUN_DATA:
-            result = self._NOUN_DATA[self.text].get('super_sem_type')
+        return (
+            SuperSemTypes('concrete')
+            if self.text in self._MEASUREMENT_UNITS
+            else None
+        )
+
+    def _get_super_sem_type_for_noun(self, token: Token) -> SuperSemTypes:
+        """
+        Get the semantic type of a noun from NOUN_DATA.
+
+        - If the word is not on the list, try to look for the lemma (e.g., "paardje" is 
+        not on the list, but its lemma "paard" is)
+        - If neither word nor lemma is on the list, try to resolve based on named 
+        entity type: names of people and locations are set to "concrete", names of 
+        organizations are set to "abstract".
+        """
+        # get word from noun list
+        result = self._NOUN_DATA.get(token.text)
+
         # if word not in list then try to resolve on lemma
-        elif self.token.lemma_ in self._NOUN_DATA:
-            result = self._NOUN_DATA[self.token.lemma_].get('super_sem_type')
+        if result is None:
+            result = self._NOUN_DATA.get(token.lemma_)
 
+        # if result was found then return the semantic type
         if result is not None:
-            return SuperSemTypes(result)
+            return SuperSemTypes(result.get('super_sem_type'))
 
-        # if word and lemma not in list then try to resolve on entity type
-        if self.token.ent_type_ in ('PERSON', 'GPE'):
+        # if word and lemma not in list then try to resolve based on entity type
+        if token.ent_type_ in ('PERSON', 'GPE'):
             return SuperSemTypes('concrete')
-        if self.token.ent_type_ == 'ORG':
+        if token.ent_type_ == 'ORG':
             return SuperSemTypes('abstract')
         
+        # resolve as unknown if all else fails
         return SuperSemTypes('unknown')
 
     @property
     def is_abstract(self) -> bool:
+        """Indicator whether semantic type is abstract."""
         return self.super_sem_type == SuperSemTypes.ABSTRACT
 
     @property
     def is_concrete(self) -> bool:
+        """Indicator whether semantic type is concrete."""
         return self.super_sem_type == SuperSemTypes.CONCRETE
 
     @property
     def is_undefined(self) -> bool:
+        """Indicator whether semantic type is undefined."""
         return self.super_sem_type == SuperSemTypes.UNDEFINED
 
     @property
     def is_unknown(self) -> bool:
+        """Indicator whether semantic type is unknown."""
         return self.super_sem_type == SuperSemTypes.UNKNOWN
 
     @property
