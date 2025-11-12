@@ -162,29 +162,30 @@ class WordFeatures:
         return cls(doc[0])
 
     @property
-    def _NOUN_DATA(self) -> dict[str, dict[str, str]]:
+    def _wordlists(self):
+        """Lazy-load wordlists module."""
         import lint_ii.linguistic_data.wordlists as wordlists
-        return wordlists.NOUN_DATA
+        return wordlists
+
+    @property
+    def _NOUN_DATA(self) -> dict[str, dict[str, str]]:
+        return self._wordlists.NOUN_DATA
 
     @property
     def _MEASUREMENT_UNITS(self) -> list[str]:
-        import lint_ii.linguistic_data.wordlists as wordlists
-        return wordlists.MEASUREMENT_UNITS
+        return self._wordlists.MEASUREMENT_UNITS
 
     @property
     def _FREQ_DATA(self) -> dict[str, float]:
-        import lint_ii.linguistic_data.wordlists as wordlists
-        return wordlists.FREQ_DATA
+        return self._wordlists.FREQ_DATA
 
     @property
     def _FREQ_SKIPLIST(self) -> list[str]:
-        import lint_ii.linguistic_data.wordlists as wordlists
-        return wordlists.FREQ_SKIPLIST
+        return self._wordlists.FREQ_SKIPLIST
 
     @property
     def _MANNER_ADVERBS(self) -> list[str]:
-        import lint_ii.linguistic_data.wordlists as wordlists
-        return wordlists.MANNER_ADVERBS
+        return self._wordlists.MANNER_ADVERBS
 
     @property
     def text(self) -> str:
