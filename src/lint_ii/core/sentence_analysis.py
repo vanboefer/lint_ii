@@ -286,12 +286,12 @@ class SentenceAnalysis:
     def proportion_of_concrete_nouns(self) -> float:
         """
         Proportion of concrete nouns out of all nouns in the sentence.
-        Nouns of type `undefined` (have both a concrete and an abstract meaning)
-        and `unknown` (not in the list) are excluded from the totals count.
+        Nouns of type `unknown` (not in the list) are excluded from the totals count.
         """
         n_concrete_nouns = len(self.concrete_nouns)
         n_abstract_nouns = len(self.abstract_nouns)
-        total_nouns = n_concrete_nouns + n_abstract_nouns
+        n_undefined_nouns = len(self.undefined_nouns)
+        total_nouns = n_concrete_nouns + n_abstract_nouns + n_undefined_nouns
         if total_nouns == 0:
             return 0
         return n_concrete_nouns / total_nouns
