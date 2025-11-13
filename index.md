@@ -6,13 +6,13 @@
 2. [Demo](#demo)
 3. [LiNT and LiNT-II](#lint-and-lint-ii)
 4. [Linguistic Features](#linguistic-features)
-5. [Scores and Diffculty Levels](#scores-and-diffculty-levels)
+5. [Formula, Scores and Diffculty Levels](#formula-scores-and-diffculty-levels)
 6. [References and Credits](#references-and-credits)
 
 ## Introduction
 
 - **LiNT-II** analyzes Dutch text readability using four linguistic features: word frequency, syntactic dependency length, information density (number content words per clause), and proportion of concrete vs abstract nouns. [*Read more*](#linguistic-features)
-- **LiNT-II** outputs a readability score between 0-100; the higher the score is, the more difficult the text is. The scores can be mapped to four difficulty levels: a text of Level 1 is understandable for about 85\% of adult Dutch readers, while a text of Level 4 is understandable for about 18\% of adult Dutch readers. [*Read more*](#scores-and-diffculty-levels)
+- **LiNT-II** outputs a readability score between 0-100; the higher the score is, the more difficult the text is. The scores can be mapped to four difficulty levels: a text of Level 1 is understandable for about 85\% of adult Dutch readers, while a text of Level 4 is understandable for about 18\% of adult Dutch readers. [*Read more*](#formula-scores-and-diffculty-levels)
 - **LiNT-II** scores and levels are based on an empirical comprehension study, where understanding of different texts was assessed using a *cloze test* (fill-in missing words). The study involved 120 texts; 2700 Dutch high-school students participated. [*Read more*](#lint-and-lint-ii)
 - For code and usage, please refer to the [GitHub repo](https://github.com/vanboefer/lint_ii).
 
@@ -35,7 +35,7 @@ The original LiNT utilizes the legacy NLP pipeline [T-Scan](https://github.com/C
 
 LiNT-II is a modern Python package, with [spaCy](https://spacy.io/) under the hood. It can be easily installed with [`pip`](https://pypi.org/project/pip/), and integrated into other software; it is fast and therefore suitable for production setups.
 
-In order to preserve the scientific integrity, we worked in close collaboration with Henk Pander Maat, one of the researchers who developed the original LiNT.
+In order to preserve the scientific integrity of LiNT-II, we worked in close collaboration with **Henk Pander Maat**, one of the researchers who developed the original LiNT.
 
 ### Original LiNT
 
@@ -55,11 +55,13 @@ The research on which LiNT is based, including the empirical comprehension study
 
 In LiNT-II, the linguistic analysis of the text is done with [spaCy](https://spacy.io/), instead of the original [T-Scan](https://github.com/CentreForDigitalHumanities/tscan). This includes, for example, splitting the text into sentences and tokens, tagging the part-of-speech of each token (noun, verb, etc.), and parsing the syntactic structure of the sentence. We use the spaCy model [`nl_core_news_lg`](https://spacy.io/models/nl#nl_core_news_lg).
 
-Doing the linguistic analysis with a different software affects the values of the [linguistic features](#linguistic-features). Therefore, we fitted a **new model** on the comprehension data that was collected for the original LiNT. The new model leads to a new [LiNT-II formula](#scores-and-diffculty-levels) for calculating the readability score, which is different from the original LiNT formula.
+Doing the linguistic analysis with a different software affects the values of the [linguistic features](#linguistic-features). Therefore, we fitted a **new model** on the comprehension data that was collected for the original LiNT. The new model leads to a new LiNT-II formula for calculating the readability score, which is different from the original LiNT formula. For more information, read [here](#formula-scores-and-diffculty-levels).
 
 ## Linguistic Features
 
-The readability score of LiNT-II is calculated based on 4 features:
+### Overview
+
+The readability analysis of LiNT-II is based on 4 features:
 
 Feature | Description
 --- | ---
@@ -70,7 +72,7 @@ Feature | Description
 
 #### Definitions
 
-- ***Content words*** are words that possess semantic content and contribute to the meaning of the sentence. In this library content words are defined based on their [part-of-speech (POS)](https://universaldependencies.org/u/pos/): nouns (NOUN), proper nouns (PROPN), lexical verbs (VERB), adjectives (ADJ), adverbs (ADV).
+- ***Content words*** are words that possess semantic content and contribute to the meaning of the sentence. We consider a word as a content word if it belongs to one of the following [part-of-speech (POS)](https://universaldependencies.org/u/pos/): nouns (NOUN), proper nouns (PROPN), lexical verbs (VERB), adjectives (ADJ), or if it's a manner adverb (based on a [custom list](https://github.com/vanboefer/lint_ii/blob/main/src/lint_ii/linguistic_data/data/manner_adverbs_20251017.parquet)).
 - ***Clause***: A clause is a group of words that contains a subject and a verb, functioning as a part of a sentence. In this library, the number of clauses is determined by the number of finite verbs (= verbs that show tense) in the sentence.
 
 ### Word Frequency
@@ -81,11 +83,11 @@ Words that are not common in spoken language tend to be less familiar to people 
 
 #### Choice of corpus
 
-LiNT-II calculates word frequencies from [SUBTLEX-NL (Keuleers et al. 2010)](https://link.springer.com/article/10.3758/brm.42.3.643): a corpus of Dutch subtitles, which contains about 40 million words. This corpus was chosen for the original LiNT after elaborate analysis and consideration; for details, please refer to the [T-Scan manual](https://raw.githubusercontent.com/CentreForDigitalHumanities/tscan/master/docs/tscanhandleiding.pdf) and [Pander Maat \& Dekker 2016](https://lint.hum.uu.nl/assets/pander-maat-en-dekker-2016.pdf).
+LiNT-II calculates word frequencies from [SUBTLEX-NL](https://github.com/vanboefer/lint_ii/blob/main/src/lint_ii/linguistic_data/data/subtlex_wordfreq.parquet) ([Keuleers et al. 2010](https://link.springer.com/article/10.3758/brm.42.3.643)): a corpus of Dutch subtitles, which contains about 40 million words. This corpus was chosen for the original LiNT after elaborate analysis and consideration; for details, please refer to the [T-Scan manual](https://raw.githubusercontent.com/CentreForDigitalHumanities/tscan/master/docs/tscanhandleiding.pdf) and [Pander Maat \& Dekker 2016](https://lint.hum.uu.nl/assets/pander-maat-en-dekker-2016.pdf).
 
-For LiNT-II, we also experimented with using frequencies from [wordfreq](https://github.com/rspeer/wordfreq) instead of SUBTLEX-NL. The [wordfreq](https://github.com/rspeer/wordfreq) corpus is a lot bigger and contains multiple genres: SUBTLEX-NL, OpenSubtitles, Wikipedia, NewsCrawl, GlobalVoices, Web text (OSCAR), Twitter. However, [wordfreq](https://github.com/rspeer/wordfreq) frequencies gave lower results when [fitting the model]() on comprehension data. This suggests that SUBTLEX-NL might be a better approximation of spoken language than a bigger corpus that contains a lot of written language like news and Wikipedia.
+> During the development of LiNT-II, we also experimented with using frequencies from [wordfreq](https://github.com/rspeer/wordfreq) instead of SUBTLEX-NL. The [wordfreq](https://github.com/rspeer/wordfreq) corpus is a lot bigger and contains multiple genres: SUBTLEX-NL, OpenSubtitles, Wikipedia, NewsCrawl, GlobalVoices, Web text (OSCAR), Twitter. However, [wordfreq](https://github.com/rspeer/wordfreq) frequencies gave lower results when [fitting the model](#formula-scores-and-diffculty-levels) on comprehension data. This suggests that SUBTLEX-NL might be a better approximation of spoken language than a bigger corpus that contains a lot of written language like news and Wikipedia.
 
-It is important to note that any corpus captures language use only partially. Since the SUBTLEX-NL corpus is based on Dutch subtitles for English-speaking shows, some words that are common in a Dutch-speaking context might be a lot less frequent there (e.g., *fietser* "cyclist"). In addition, the shows are from the years 2000-2010; new words from the last 15 years (*Instagram*, *covid*) are not in the corpus. Additional corrections were applied to address some of these issues, as described [below](#corrections-and-exceptions).
+It is important to note that any corpus captures language use only partially. Since the SUBTLEX-NL corpus is based on Dutch subtitles for English-speaking shows, some words that are common in a Dutch-speaking context might be less frequent there (e.g., *fietser* "cyclist"). In addition, the shows are from the years 2000-2010; new words from the last 15 years (*Instagram*, *covid*) are not in the corpus. Additional corrections were applied to address some of these issues, as described [below](#corrections-and-exceptions).
 
 #### What do the values mean?
 
@@ -107,7 +109,7 @@ The corrections and exceptions applied in LiNT-II are the same ones as in the or
 
 - We calculate word frequencies only for [content words](#definitions), since function words are generally frequent (for example, *dat*: 7.34, *de*: 7.38, *en*: 7.14) and do not contribute to the diffuculty of the text. From the content words, we exclude proper nouns (names of people, places, etc.) since their frequency does not influence the difficulty of the text.
 - For transparent compounds (e.g., *duwboot* "towboat"), we use the frequency of the base word (*boot* "boat"), rather than the frequency of the compound as a whole. Previous research shows that this provides a better estimate of word difficulty; for more details, see [Pander Maat \& Dekker 2016](https://lint.hum.uu.nl/assets/pander-maat-en-dekker-2016.pdf). The compounds and their base words are identified based on a manually-annotated [list](https://github.com/vanboefer/lint_ii/blob/main/src/lint_ii/linguistic_data/data/nouns_sem_types_20251017.parquet). The list contains 123,136 compounds: 63,225 singular forms and 59,911 plural forms; for the plural forms, the base word is given in singular (for example, the base word of both *integriteitstoets* "integrity test" and *integriteitstoetsen* "integrity tests" is *toets* "test").
-- As mentioned above, some words that are missing or infrequent in the SUBTLEX-NL corpus are actually pretty common in the spoken language. This includes new words that entered the Dutch language after 2010 (e.g., *appen* "to send a message on WhatsApp"), and words that are common in a Dutch-speaking context but might be not common in English-speaking TV shows (e.g., *knutselen* "to craft", *fietser* "cyclist"). To address the most obvious discrepancies of this sort in the corpus, the makers of the original LiNT manually created a list of words that should be skipped when calculating frequencies. So instead of incorrectly getting a low frequency, these words don't get any frequency value at all, and so do not mistakenly affect the difficulty score. For more details on how this was done, see the [T-Scan manual](https://raw.githubusercontent.com/CentreForDigitalHumanities/tscan/master/docs/tscanhandleiding.pdf). The list can be found [here](https://github.com/vanboefer/lint_ii/blob/main/src/lint_ii/linguistic_data/data/subtlex_wordfreq_skiplist.parquet).
+- As mentioned above, some words that are missing or infrequent in the SUBTLEX-NL corpus are actually pretty common in the spoken language. This includes new words that entered the Dutch language after 2010 (e.g., *appen* "to send a message on WhatsApp"), and words that are common in a Dutch-speaking context but might be not common in English-speaking TV shows (e.g., *knutselen* "to craft", *fietser* "cyclist"). To address the most obvious discrepancies of this sort, the makers of the original LiNT manually created a list of words that should be skipped when calculating frequencies. So instead of incorrectly getting a low frequency, these words don't get any frequency value at all, and so do not mistakenly affect the difficulty score. For more details on how this was done, see the [T-Scan manual](https://raw.githubusercontent.com/CentreForDigitalHumanities/tscan/master/docs/tscanhandleiding.pdf). The list can be found [here](https://github.com/vanboefer/lint_ii/blob/main/src/lint_ii/linguistic_data/data/subtlex_wordfreq_skiplist.parquet).
 
 ### Syntactic Dependency Length (SDL)
 
@@ -119,13 +121,13 @@ Syntactic dependency length (SDL) is the number of words between a syntactic hea
 
 To calculate the SDLs in the sentence, we use the [dependency parsing](https://spacy.io/api/dependencyparser) of spaCy. The parser of the [Dutch model](https://spacy.io/models/nl#nl_core_news_lg) that we use was trained on the [Alpino UD corpus](https://github.com/UniversalDependencies/UD_Dutch-Alpino).
 
-For each token in the sentence, we identify its head(s) and then count the number of intervening tokens between them. The head is generally taken from the spaCy parser, except for the two cases described [below](#corrections-and-exceptions-1). In each sentence, we take the longest SDL as an indicator of difficulty. For the document-level readability analysis, we take the mean of all the sentence-level max SDLs.
+For each token in the sentence, we identify its head(s) and then count the number of intervening tokens between the token and its head. The head is generally taken from the spaCy parser, except for the two cases described [below](#corrections-and-exceptions-1). In each sentence, we take the longest SDL as an indicator of difficulty. For the document-level readability analysis, we take the mean of all the sentence-level max SDLs.
 
 **Example**: In the sentence *"De Oudegracht is het sfeervolle hart van de stad."*, the longest SDL is between the subject of the sentence *Oudegracht* and the root (main predicate) of the sentence *hart*; the max SDL is 3 ( three intervening tokens *is, het, sfeervolle*).
 
 #### Corrections and exceptions
 
-There are three cases in which we do not follow spaCy analysis:
+There are three cases in which we do not follow spaCy's dependency analysis:
 
 - Punctuation: spaCy parser considers punctuation marks as tokens and assigns a head to them. In our analysis, we override this behavior: (a) punctuation marks are not counted as intervening tokens for SDL calculation, (b) for a punctuation mark, the dependency length is always set to 0 (instead of counting the distance to the head).
 - Conjunctions (1): In a conjunction relation, spaCy considers the first conjunct as the head of the second. For example, in the sentence *"Je zoekt informatie in naslagwerken via trefwoorden in de **index** of het **register**."*, where the words *index* and *register* are connected with the conjuction *of*, spaCy considers *index* as the head of *register*. We override this behavior: if a token is in a conjunction then the head of the last conjunct is taken recursively from the first, i.e. the head of both *index* and *register* is *trefwoorden* in our analysis.
@@ -137,9 +139,9 @@ These exceptions and corrections were done based on a manual analysis of a sampl
 
 #### Why content words per clause?
 
-A clause is a group of words that contains a subject and a verb. A simple sentence contains one clause; longer sentences may contain additional clauses, for example subordinate clauses or clauses connected with words like "and" or "because". For this metric, the number of clauses is not important; what we analyze is the number of content words in each clause.
+A clause is a group of words that contains a subject and a verb. A simple sentence contains one clause; longer sentences may contain additional clauses, for example subordinate clauses or clauses connected with words like "and" or "because". For this metric, the number of clauses is not important; what we analyze is the number of content words **in each clause**.
 
-A clause with a lot of content words is dense in information and is therefore more difficult to process and understand. For example, compare the sentence *"Ik verknalde het proefwerk."* with the sentence *"Ik verknalde het proefwerk Wiskunde gisteren bij het laatste schoolexamen."*. In both cases, the sentence contains one clause (one subject and one verb), but in the second sentence there is a lot more information, which is introduced through four extra content words (*Wiskunde, gisteren, laatste, laatste*).
+A clause with a lot of content words is dense in information and is therefore more difficult to process and understand. For example, compare the sentence *"Ik verknalde het proefwerk."* with the sentence *"Ik verknalde het proefwerk Wiskunde gisteren bij het laatste schoolexamen."*. In both cases, the sentence contains one clause (one subject and one verb), but in the second sentence there is a lot more information, which is introduced through four extra content words (*Wiskunde, gisteren, laatste, schoolexamen*).
 
 #### Calculating content words per clause
 
@@ -155,9 +157,9 @@ Concrete nouns refer to specific, tangible items that can be perceived through t
 
 #### LiNT-II noun list
 
-The [noun list](https://github.com/vanboefer/lint_ii/blob/main/src/lint_ii/linguistic_data/data/nouns_sem_types_20251017.parquet) was created for the original LiNT and further revised and updated for LiNT-II. The original annotation work was done by H. Pander Maat, N. Dekker and N. van Houten; the revisions and additions for LiNT-II were done by H. Pander Maat.
+The [noun list](https://github.com/vanboefer/lint_ii/blob/main/src/lint_ii/linguistic_data/data/nouns_sem_types_20251017.parquet) was created for the original LiNT and further revised and updated for LiNT-II. The original annotation work was done by Henk Pander Maat, Nick Dekker and N. van Houten; the revisions and additions for LiNT-II were done by Henk Pander Maat.
 
-The list contains 164,458 nouns, annotated for their semantic type (e.g., "human", "place") and class ("abstract", "concrete", "undefined"); the full annotation scheme is described [below](#semantic-types-annotation). The annotations are based on an existing lexicon -- [Referentiebestand Nederlands (Martin & Maks 2005)](https://taalmaterialen.ivdnt.org/download/tstc-referentiebestand-nederlands/) -- which was expanded and revised. For more information about how the original list was created, see the [T-Scan manual](https://raw.githubusercontent.com/CentreForDigitalHumanities/tscan/master/docs/tscanhandleiding.pdf).
+The list contains 164,458 nouns, annotated for their semantic type (e.g., "human", "place") and semantic class ("abstract", "concrete", "undefined"); the full annotation scheme is described [below](#semantic-types-annotation). The annotations are based on an existing lexicon -- [Referentiebestand Nederlands (Martin & Maks 2005)](https://taalmaterialen.ivdnt.org/download/tstc-referentiebestand-nederlands/) -- which was expanded and revised. For more information about how the original list was created, see the [T-Scan manual](https://raw.githubusercontent.com/CentreForDigitalHumanities/tscan/master/docs/tscanhandleiding.pdf).
 
 Descriptive statistics of the LiNT-II noun list:
 
@@ -191,9 +193,74 @@ organization | abstract | *nato*, *warenautoriteit*
 miscellaneous abstract (nondynamic) | abstract | *motto*, *woordfrequentie*
 *ambiguous words that belong to more than one type* | undefined | *steun*, *underground*
 
-## Scores and Diffculty Levels
+#### Calculating the proportion of concrete nouns
 
-[...TBA..]
+We calculate the proportion of concrete nouns in the document as follows:
+
+```
+N-concrete / (N-concrete + N-abstract + N-undefined)
+```
+
+## Formula, Scores and Diffculty Levels
+
+### Where does LiNT-II Formula Come from?
+
+#### Original LiNT: data and model
+
+For the development of the original LiNT, an empirical comprehension study was done. In this study, 2700 Dutch high-school students read 120 texts; their understanding of the texts was assessed using a *cloze test* (fill-in missing words). This comprehension dataset was then used by the researchers to fit a [linear regression model](https://en.wikipedia.org/wiki/Linear_regression); the model expresses which features of the text best predict the students' performance in the cloze test.
+
+The developers of LiNT started with 12 different text features; step-by-step, they eliminated features which were not predictive enough or were highly correlated with other features. By the end of this process, they were left with the 4 features: word frequency, syntactic dependency length, number of content words per clause, and proportion of concrete nouns. These features predict 74% of the variation in the comprehension dataset (`Adjusted R^2 = 0.74`). The regression model assigns each of these features a weight (coefficient) and this is the formula used to asses text readability.
+
+The research on which LiNT is based, including the empirical comprehension study and the development of the model, is described in:
+
+- [PhD thesis of Suzanne Kleijn (2018)](https://lint.hum.uu.nl/assets/kleijn-2018.pdf) (English)
+- [Pander Maat et al. 2023](https://www.aup-online.com/content/journals/10.5117/TVT2023.3.002.MAAT) (Dutch)
+
+#### LiNT-II model
+
+For the development of LiNT-II, we used the same comprehension dataset and the same 4 features as in the original LiNT.
+
+Since LiNT-II uses a different software for the linguistic analysis, the values of the features are different from LiNT; therefore, a new model was fitted on the comprehension data. LiNT-II model predicts 73% of the variation in the comprehension dataset (`Adjusted R^2 = 0.73`); very similar to the original LiNT's results. Below, additional details about the model are shown.
+
+Parameter | Coefficient | Standardized Coefficient (Beta) | Correlation (zero-order) | Partial Correlation | Variance Inflation Factor
+--- | --- | --- | --- | --- | ---
+constant | xxx |  |  |  | 
+word frequency | xxx | xxx | xxx | xxx | xxx
+syntactic dependency length | xxx | xxx | xxx | xxx | xxx
+content words per clause | xxx | xxx | xxx | xxx | xxx
+proportion concrete nouns | xxx | xxx | xxx | xxx | xxx
+
+- ***Standardized Coefficients (Beta)*** indicate how many standard deviations the dependent variable will change for a one standard deviation change in each independent variable. This makes it easier to compare the relative importance of different predictors.
+- ***Zero-order Correlation***: Simple Pearson correlation between each predictor and the dependent variable (ignoring all other variables).
+- ***Partial Correlation***: Correlation between each predictor and the dependent variable, controlling for all other predictors in the model; i.e., its unique contribution after controlling for other variables.
+- ***Variance Inflation Factor (VIF)*** is a measure of multicollinearity; a high VIF (> 5)indicates that the variable is highly correlated with others, which can make the model less reliable and harder to interpret.
+
+### LiNT-II Formula & Score
+
+The readability score is calculated based on the following formula:
+
+```
+LiNT-II score = 
+
+  100 - (
+      - xxx
+      + (xxx * word frequency)
+      - (xxx  * syntactic dependency length)
+      - (xxx  * content words per clause)
+      + (xxx * proportion concrete nouns)
+  )
+```
+
+### LiNT-II Difficulty Levels
+
+LiNT-II scores are mapped to 4 difficulty levels. For each level, it is estimated how many adult Dutch readers have difficulty understanding texts on this level.
+
+Score | Difficulty level | Proportion of adults who have diffuculty understanding this level
+--- | --- | ---
+0-34 | 1 | 15%
+35-46 | 2 | 31%
+47-60 | 3 | 55%
+60-100 | 4 | 82%
 
 ## References and Credits
 
