@@ -200,7 +200,7 @@ class WordFeatures:
         """Word frequency from the SUBTLEX-NL corpus."""
         if not self.is_content_word_excl_propn:
             return None
-        if self.text in self._FREQ_SKIPLIST:
+        if self.lemma in self._FREQ_SKIPLIST or self.text in self._FREQ_SKIPLIST:
             return None
 
         text = self.text
