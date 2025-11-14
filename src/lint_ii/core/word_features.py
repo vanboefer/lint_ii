@@ -191,6 +191,10 @@ class WordFeatures:
     def text(self) -> str:
         return self.token.lower_
 
+    @property
+    def lemma(self) -> str:
+        return self.token.lemma_.lower()
+
     @cached_property
     def word_frequency(self) -> float|None:
         """Word frequency from the SUBTLEX-NL corpus."""
@@ -271,7 +275,7 @@ class WordFeatures:
             return False
         return (
             self.token.pos_ in ["NOUN", "PROPN", "VERB", "ADJ"]
-            or self.token.text in self._MANNER_ADVERBS
+            or self.text in self._MANNER_ADVERBS
         )
 
     @property
@@ -292,7 +296,7 @@ class WordFeatures:
             return None
         
         if self.is_noun:
-            return self._get_super_sem_type_for_noun(self.token)
+            return self._get_super_sem_type_for_noun()
 
         return (
             SuperSemTypes('concrete')
@@ -300,7 +304,7 @@ class WordFeatures:
             else None
         )
 
-    def _get_super_sem_type_for_noun(self, token: Token) -> SuperSemTypes:
+    def _get_super_sem_type_for_noun(self) -> SuperSemTypes:
         """
         Get the semantic type of a noun from NOUN_DATA.
 
@@ -310,21 +314,23 @@ class WordFeatures:
         entity type: names of people and locations are set to "concrete", names of 
         organizations are set to "abstract".
         """
+        assert self.is_noun, "Token is not a noun."
+
         # get word from noun list
-        result = self._NOUN_DATA.get(token.text)
+        result = self._NOUN_DATA.get(self.text)
 
         # if word not in list then try to resolve on lemma
         if result is None:
-            result = self._NOUN_DATA.get(token.lemma_)
-
+            result = self._NOUN_DATA.get(self.lemma)
+  
         # if result was found then return the semantic type
         if result is not None:
             return SuperSemTypes(result.get('super_sem_type'))
 
         # if word and lemma not in list then try to resolve based on entity type
-        if token.ent_type_ in ('PERSON', 'GPE'):
+        if self.token.ent_type_ in ('PERSON', 'GPE'):
             return SuperSemTypes('concrete')
-        if token.ent_type_ == 'ORG':
+        if self.token.ent_type_ == 'ORG':
             return SuperSemTypes('abstract')
         
         # resolve as unknown if all else fails
