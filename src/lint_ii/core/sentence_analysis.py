@@ -14,7 +14,7 @@ from lint_ii.core.word_features import WordFeatures, WordFeaturesDict
 class SDLInfo(TypedDict):
     token: str
     dep_length: int
-    head: str
+    heads: list[str]
 
 
 class SentenceAnalysisDict(TypedDict):
