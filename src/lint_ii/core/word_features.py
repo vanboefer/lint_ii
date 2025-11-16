@@ -9,10 +9,12 @@ from lint_ii.linguistic_data import SuperSemTypes
 
 class WordFeaturesDict(TypedDict):
     text: str
+    pos: str
+    tag: str
     word_frequency: NotRequired[float]
     dep_length: NotRequired[int]
     super_sem_type: NotRequired[str]
-    punct_placement: NotRequired[str]
+    punctuation: NotRequired[dict[str, str]]
 
 
 class WordFeatures:
@@ -357,25 +359,50 @@ class WordFeatures:
         return self.super_sem_type == SuperSemTypes.UNKNOWN
 
     @property
-    def punct_placement(self) -> str | None:
-        """Placement of punctuation relative to adjacent tokens."""
-        if not self.token.is_punct:
+    def punctuation(self) -> dict[str, str] | None:
+        """Attached punctuation to a token."""
+        from collections import defaultdict
+
+        punctuation = defaultdict(str)
+        if self.token.is_punct:
+            is_left_edge = self.token.i == 0
+            is_right_edge = self.token.i == len(self.token.doc) - 1
+
+            isolated = (
+                (is_left_edge or self.token.nbor(-1).whitespace_)
+                and (is_right_edge or self.token.whitespace_)
+            )
+            if isolated:
+                punctuation['standalone'] = self.token.text
+                return punctuation
             return None
 
-        has_space_before = self.token.i > 0 and self.token.nbor(-1).whitespace_
-        has_space_after = self.token.whitespace_
+        token = self.token
+        while (
+            token.i > 0
+            and token.nbor(-1).is_punct
+            and not token.nbor(-1).whitespace_
+        ):
+            token = token.nbor(-1)
+            punctuation['leading'] = token.text + punctuation['leading']
 
-        if not has_space_before and not has_space_after:
-            return 'embedded'
-        elif not has_space_before:
-            return 'trailing'
-        elif not has_space_after:
-            return 'leading'
-        else:
-            return 'standalone'
+        token = self.token
+        while (
+            token.i < len(token.doc) - 1
+            and token.nbor(1).is_punct
+            and not token.whitespace_
+        ):
+            token = token.nbor(1)
+            punctuation['trailing'] += token.text
+
+        return punctuation if punctuation else None
 
     def as_dict(self) -> WordFeaturesDict:
-        result: WordFeaturesDict = {'text': self.text}
+        result: WordFeaturesDict = {
+            'text': self.text,
+            'tag': self.token.tag_,
+            'pos': self.token.pos_,
+        }
 
         if (freq := self.word_frequency) is not None:
             result['word_frequency'] = freq
@@ -383,7 +410,7 @@ class WordFeatures:
             result['dep_length'] = dep
         if (sem := self.super_sem_type) is not None:
             result['super_sem_type'] = sem.value
-        if (punct := self.punct_placement) is not None:
-            result['punct_placement'] = punct
+        if (punct := self.punctuation) is not None:
+            result['punctuation'] = punct
 
         return result

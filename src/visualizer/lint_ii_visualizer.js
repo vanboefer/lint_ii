@@ -158,17 +158,20 @@ export class LintIIVisualizer extends HTMLElement {
     }
 
     renderSentence(sentence, idx) {
-        const tokens = this.groupTokensWithPunctuation(sentence.word_features)
+        const tokens = sentence.word_features.filter(token => {
+            if (token.pos !== 'PUNCT') return true
+            return 'punctuation' in token
+        })
         return `<span class="sentence" data-level="${sentence.difficulty_level}">
             <span class="sent-start-group">
                 <span class="sent-idx">${idx + 1}</span>
                 <span class="sent-start"></span>
             </span>
-            ${tokens.map(item => this.renderTokenGroup(item)).join('')}
+            ${tokens.map(item => this.renderWord(item)).join('')}
             <span class="sent-end-group">
                 <span class="sent-end"></span>
                 <span class="level-badge"
-                    data-length="${sentence.word_features.length}"
+                    data-length="${tokens.length}"
                     data-score="${sentence.lint_score}"
                     data-max-sdl="${sentence.max_sdl}"
                     data-mean-freq="${sentence.mean_log_word_frequency}"
@@ -180,6 +183,10 @@ export class LintIIVisualizer extends HTMLElement {
     }
 
     renderWord(wf) {
+        const leading = wf.punctuation?.leading || ''
+        const trailing = wf.punctuation?.trailing || ''
+        const displayText = leading + wf.text + trailing
+
         const freqTier = wf.word_frequency ?
             wf.word_frequency < 3
             ? 'uncommon'
@@ -187,62 +194,15 @@ export class LintIIVisualizer extends HTMLElement {
             : null
 
         const attrs = [
+            `data-pos="${wf.pos}"`,
+            `data-tag="${wf.tag}"`,
             wf.super_sem_type && `data-sem-type="${wf.super_sem_type}"`,
             wf.word_frequency && `data-freq="${wf.word_frequency}"`,
             freqTier && `data-freq-tier="${freqTier}"`,
             wf.dep_length > 0 && `data-dep-length="${wf.dep_length}"`
         ].filter(Boolean).join(' ')
 
-        return `<span class="word" ${attrs}>${wf.text}</span>`
-    }
-
-    renderTokenGroup(group) {
-        if (group.standalone) {
-            return `<span class="punct standalone">${group.standalone.text}</span>`
-        }
-
-        const leading = group.leading.map(p => p.text).join('')
-        const trailing = group.trailing.map(p => p.text).join('')
-        group.main.text = `${leading}${group.main.text}${trailing}`
-
-        return this.renderWord(group.main)
-    }
-
-    groupTokensWithPunctuation(wordFeatures) {
-        const groups = []
-        let currentGroup = { main: null, leading: [], trailing: [] }
-
-        for (const wf of wordFeatures) {
-            if (!wf.punct_placement) {
-                // It's a word
-                if (currentGroup.main) {
-                    groups.push(currentGroup)
-                }
-                currentGroup = { main: wf, leading: [], trailing: [] }
-            } else {
-                switch (wf.punct_placement) {
-                    case 'leading':
-                        currentGroup.leading.push(wf)
-                        break
-                    case 'trailing':
-                    case 'embedded':
-                        currentGroup.trailing.push(wf)
-                        break
-                    case 'standalone':
-                        if (currentGroup.main) {
-                            groups.push(currentGroup)
-                            currentGroup = { main: null, leading: [], trailing: [] }
-                        }
-                        groups.push({ standalone: wf })
-                        break
-                }
-            }
-        }
-
-        if (currentGroup.main) {
-            groups.push(currentGroup)
-        }
-        return groups
+        return `<span class="word" ${attrs}>${displayText}</span>`
     }
 
     async renderStats() {
