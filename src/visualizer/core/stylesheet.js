@@ -268,7 +268,10 @@ export const css = `
             font-size: 1.25em;
         }
         &.visible {
-            display: block;
+            display: grid;
+            column-gap: 1rem;
+            grid-template-columns: auto 1fr;
+            align-items: center;
         }
     }
 `

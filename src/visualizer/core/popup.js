@@ -33,13 +33,16 @@ export class PopupController {
                 this.formatAttribute(key, value)
             )
         ]
-        return parts.join(' • ')
+        return parts.join('')
     }
 
     formatAttribute(key, value) {
         const label = key.replace(/([A-Z])/g, '-$1').toLowerCase()
         const formattedValue = this.formatValue(value)
-        return `<span class="label">${label}</span> <span class="value">${formattedValue}</span>`
+        return `
+            <div class="label">${label}</div>
+            <div class="value">${formattedValue}</div>
+        `
     }
 
     formatValue(value) {
