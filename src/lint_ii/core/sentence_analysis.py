@@ -19,10 +19,10 @@ class SDLInfo(TypedDict):
 
 class SentenceAnalysisDict(TypedDict):
     word_features: list[WordFeaturesDict]
-    lint_score: float
-    difficulty_level: int
+    lint_score: float | None
+    difficulty_level: int | None
     mean_log_word_frequency: float
-    max_sdl: int
+    max_sdl: int | None
     proportion_of_concrete_nouns: float
     content_words_per_clause: float
 
@@ -185,6 +185,8 @@ class SentenceAnalysis:
         The dependency length (number of intervening tokens) 
         between a token and its syntactic head, for each token in the sentence.
         """
+        if len([wf for wf in self.word_features if wf.token.pos_ != 'PUNCT']) < 2:
+            return []
         return [
             {
                 'token': feat.text,
@@ -256,14 +258,14 @@ class SentenceAnalysis:
     def max_sdl(self) -> int:
         """Maximum dependency length in the sentence."""
         values = {sdl['dep_length'] for sdl in self.sdls}
-        return max(values, default=0)
+        return max(values, default=None)
 
     @cached_property
-    def lint_score(self) -> float:
+    def lint_score(self) -> float | None:
         return self.calculate_lint_score()
     
     @cached_property
-    def difficulty_level(self) -> int:
+    def difficulty_level(self) -> int | None:
         return self.get_difficulty_level()
 
     def count_content_words(self) -> int:
@@ -296,8 +298,10 @@ class SentenceAnalysis:
             return 0
         return n_concrete_nouns / total_nouns
 
-    def calculate_lint_score(self) -> float:
+    def calculate_lint_score(self) -> float | None:
         """Calculate LiNT readability score for the sentence."""
+        if self.max_sdl is None:
+            return None
         return LintScorer.calculate_lint_score(
             freq_log = self.mean_log_word_frequency,
             max_sdl = self.max_sdl,
@@ -305,9 +309,11 @@ class SentenceAnalysis:
             proportion_concrete = self.proportion_of_concrete_nouns,
         )
 
-    def get_difficulty_level(self) -> int:
+    def get_difficulty_level(self) -> int | None:
         """Get difficulty level for the sentence."""
-        return LintScorer.get_difficulty_level(self.calculate_lint_score())
+        if self.lint_score is None:
+            return None
+        return LintScorer.get_difficulty_level(self.lint_score)
 
     def get_top_n_least_frequent(self, n: int = 5) -> list[tuple[str, float]]:
         """Get the top n least frequent words in the sentence."""

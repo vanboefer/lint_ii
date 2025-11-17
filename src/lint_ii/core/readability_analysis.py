@@ -193,7 +193,11 @@ class ReadabilityAnalysis(LintIIVisualizer):
 
     @cached_property
     def lint_scores_per_sentence(self) -> list[float]:
-        return [sent.calculate_lint_score() for sent in self.sentences]
+        return [
+            sent.lint_score
+            for sent in self.sentences
+            if sent.lint_score is not None
+        ]
     
     @cached_property
     def document_lint_score(self) -> float:
@@ -216,7 +220,11 @@ class ReadabilityAnalysis(LintIIVisualizer):
     @cached_property
     def mean_max_sdl(self) -> float:
         """Mean value of sentence-level maximum dependency lengths."""
-        return statistics.mean(s.max_sdl for s in self.sentences)
+        return statistics.mean(
+            s.max_sdl
+            for s in self.sentences
+            if s.max_sdl is not None
+        )
 
     @cached_property
     def mean_content_words_per_clause(self) -> float:
