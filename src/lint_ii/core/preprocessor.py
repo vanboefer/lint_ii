@@ -29,8 +29,7 @@ def preprocess_text(text: str) -> str:
     for node in nodes:
         if node['type'] in ['paragraph', 'block_quote', 'list']:
             paragraph = extract_text_from_node(node)
-            if ' ' in paragraph:  # filter out one word sentences
-                paragraphs.append(paragraph)
+            paragraphs.append(paragraph)
 
     combined_text = ' '.join(paragraphs)
     regex = re.compile(r'\s+')
