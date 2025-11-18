@@ -73,11 +73,11 @@ class LintScorer:
     """
 
     COEFFICIENTS = {
-        'constant': 3.619097,
-        'freq_log': 15.567581,
-        'max_sdl': -1.354119,
-        'content_words_per_clause': -2.970755,
-        'proportion_concrete': 16.772538,
+        'constant': -7.685068,
+        'freq_log': 17.9624031,
+        'max_sdl': -1.665068,
+        'content_words_per_clause': -2.553523,
+        'proportion_concrete': 16.512606,
     }
 
     @staticmethod
