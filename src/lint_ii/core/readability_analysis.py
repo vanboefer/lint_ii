@@ -257,7 +257,6 @@ class ReadabilityAnalysis(LintIIVisualizer):
             'document_difficulty_level': self.lint.level,
             'min_lint_score': self.min_lint_score,
             'max_lint_score': self.max_lint_score,
-            'word_freq_compound_adjustment': linguistic_data.WORD_FREQ_COMPOUND_ADJUSTMENT,
         }
 
     @cached_property
