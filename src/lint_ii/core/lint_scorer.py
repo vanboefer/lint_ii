@@ -1,3 +1,6 @@
+from functools import cached_property
+
+
 class LintScorer:
     """
     LiNT-II scoring algorithms for Dutch text readability assessment.
@@ -80,16 +83,14 @@ class LintScorer:
         'proportion_concrete': 16.512606,
     }
 
-    @staticmethod
-    def calculate_lint_score(
-        freq_log: float,
-        max_sdl: int | float,
-        content_words_per_clause: float,
-        proportion_concrete: float,
-    ) -> float:
+    def __init__(
+        self,
+        freq_log: float | None,
+        max_sdl: int | float | None,
+        content_words_per_clause: float | None,
+        proportion_concrete: float | None,
+    ) -> None:
         """
-        Calculate LiNT-II readability score using the formula.
-
         Parameters
         ----------
         freq_log : float
@@ -106,6 +107,37 @@ class LintScorer:
         proportion_concrete : float
             Proportion of concrete nouns out of all nouns (0.0-1.0). Higher 
             values indicate more concrete language.
+        """
+        self.freq_log = freq_log
+        self.max_sdl = max_sdl
+        self.content_words_per_clause = content_words_per_clause
+        self.proportion_concrete = proportion_concrete
+
+    @cached_property
+    def score(self) -> float | None:
+        if self._meets_guard_rail_requirements:
+            return self._calculate_lint_score()
+        return None
+
+    @cached_property
+    def level(self) -> int | None:
+        if self._meets_guard_rail_requirements:
+            return self._get_difficulty_level()
+        return None
+
+    @property
+    def _meets_guard_rail_requirements(self):
+        features = [
+            self.freq_log,
+            self.max_sdl,
+            self.content_words_per_clause,
+            self.proportion_concrete,
+        ]
+        return all(f is not None for f in features)
+
+    def _calculate_lint_score(self) -> float:
+        """
+        Calculate LiNT-II readability score using the formula.
 
         Returns
         -------
@@ -113,24 +145,19 @@ class LintScorer:
             LiNT readability score (0-100). Higher scores indicate more difficult, 
             less readable text. Scores are clamped to the [0, 100] range.
         """
-        score = (
-            + LintScorer.COEFFICIENTS['constant']
-            + LintScorer.COEFFICIENTS['freq_log'] * freq_log
-            + LintScorer.COEFFICIENTS['max_sdl'] * max_sdl
-            + LintScorer.COEFFICIENTS['content_words_per_clause'] * content_words_per_clause
-            + LintScorer.COEFFICIENTS['proportion_concrete'] * proportion_concrete
+        result = (
+            + self.COEFFICIENTS['constant']
+            + self.COEFFICIENTS['freq_log'] * self.freq_log
+            + self.COEFFICIENTS['max_sdl'] * self.max_sdl
+            + self.COEFFICIENTS['content_words_per_clause'] * self.content_words_per_clause
+            + self.COEFFICIENTS['proportion_concrete'] * self.proportion_concrete
         )
-        return min(100.0, max(0.0, 100 - score))
+        score = min(100.0, max(0.0, 100 - result))
+        return score
 
-    @staticmethod
-    def get_difficulty_level(score: float) -> int:
+    def _get_difficulty_level(self) -> int:
         """
         Convert LiNT score to difficulty level.
-
-        Parameters
-        ----------
-        score : float
-            LiNT readability score (0-100). Higher scores indicate more difficult text.
 
         Returns
         -------
@@ -142,11 +169,13 @@ class LintScorer:
             - Level 3 (47-60): Difficult text, 55% of adults struggle
             - Level 4 (61+): Very difficult text, 82% of adults struggle
         """
-        if score <= 34:
-            return 1
-        elif score <= 46:
-            return 2
-        elif score <= 60:
-            return 3
+        if self.score <= 34:
+            level = 1
+        elif self.score <= 46:
+            level = 2
+        elif self.score <= 60:
+            level = 3
         else:
-            return 4
+            level = 4
+
+        return level

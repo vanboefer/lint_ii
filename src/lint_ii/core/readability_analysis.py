@@ -192,50 +192,39 @@ class ReadabilityAnalysis(LintIIVisualizer):
         ]
 
     @cached_property
-    def lint_scores_per_sentence(self) -> list[float]:
-        return [
-            sent.lint_score
-            for sent in self.sentences
-            if sent.lint_score is not None
-        ]
-    
-    @cached_property
-    def document_lint_score(self) -> float:
-        return self.calculate_lint_score()
-    
-    @cached_property
-    def document_difficulty_level(self) -> int:
-        return self.get_difficulty_level()
-
-    @cached_property
-    def mean_log_word_frequency(self) -> float:
+    def mean_log_word_frequency(self) -> float | None:
         """Mean log word frequency for the document."""
         frequencies = [
             freq
             for feat in self.word_features
             if (freq := feat.word_frequency) is not None
         ]
-        return statistics.mean(frequencies) if frequencies else 0
+        if not frequencies:
+            return None
+        return statistics.mean(frequencies)
 
     @cached_property
-    def mean_max_sdl(self) -> float:
+    def mean_max_sdl(self) -> float | None:
         """Mean value of sentence-level maximum dependency lengths."""
-        return statistics.mean(
-            s.max_sdl
-            for s in self.sentences
-            if s.max_sdl is not None
-        )
+        sdls = [s.max_sdl for s in self.sentences if s.max_sdl is not None]
+        if not sdls:
+            return None
+        return statistics.mean(sdls)
 
     @cached_property
-    def mean_content_words_per_clause(self) -> float:
+    def mean_content_words_per_clause(self) -> float | None:
         """Mean value of sentence-level content words per clause."""
-        return statistics.mean(
+        content_words_per_clause = [
             s.content_words_per_clause
             for s in self.sentences
-        )
+            if s.content_words_per_clause is not None
+        ]
+        if not content_words_per_clause:
+            return None
+        return statistics.mean(content_words_per_clause)
 
     @cached_property
-    def proportion_of_concrete_nouns(self) -> float:
+    def proportion_of_concrete_nouns(self) -> float | None:
         """
         Proportion of concrete nouns out of all nouns in the document.
         Nouns of type `unknown` (not in the list) are excluded from the totals count.
@@ -245,21 +234,17 @@ class ReadabilityAnalysis(LintIIVisualizer):
         n_undefined_nouns = len(self.undefined_nouns)
         total_nouns = n_concrete_nouns + n_abstract_nouns + n_undefined_nouns
         if total_nouns == 0:
-            return 0
+            return None
         return n_concrete_nouns / total_nouns
 
-    def calculate_lint_score(self) -> float:
-        """Calculate LiNT readability score for the document."""
-        return LintScorer.calculate_lint_score(
+    @cached_property
+    def lint(self) -> LintScorer:
+        return LintScorer(
             freq_log = self.mean_log_word_frequency,
             max_sdl = self.mean_max_sdl,
             content_words_per_clause = self.mean_content_words_per_clause,
             proportion_concrete = self.proportion_of_concrete_nouns,
         )
-
-    def get_difficulty_level(self) -> int:
-        """Get difficulty level for the document."""
-        return LintScorer.get_difficulty_level(self.calculate_lint_score())
 
     def calculate_document_stats(self) -> DocumentStatsDict:
         """
@@ -268,12 +253,20 @@ class ReadabilityAnalysis(LintIIVisualizer):
         """
         return {
             'sentence_count': len(self.sentences),
-            'document_lint_score': self.document_lint_score,
-            'document_difficulty_level': self.document_difficulty_level,
+            'document_lint_score': self.lint.score,
+            'document_difficulty_level': self.lint.level,
             'min_lint_score': self.min_lint_score,
             'max_lint_score': self.max_lint_score,
             'word_freq_compound_adjustment': linguistic_data.WORD_FREQ_COMPOUND_ADJUSTMENT,
         }
+
+    @cached_property
+    def lint_scores_per_sentence(self) -> list[float]:
+        return [
+            sent.lint.score
+            for sent in self.sentences
+            if sent.lint.score is not None
+        ]
 
     @cached_property
     def min_lint_score(self) -> float:

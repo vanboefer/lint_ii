@@ -245,47 +245,32 @@ class SentenceAnalysis:
         ]
 
     @cached_property
-    def mean_log_word_frequency(self) -> float:
+    def mean_log_word_frequency(self) -> float | None:
         """Mean log word frequency for the sentence."""
         frequencies = [
             freq
             for feat in self.word_features
             if (freq := feat.word_frequency) is not None
         ]
-        return statistics.mean(frequencies) if frequencies else 0
+        if not frequencies:
+            return None
+        return statistics.mean(frequencies)
 
     @cached_property
-    def max_sdl(self) -> int:
+    def max_sdl(self) -> int | None:
         """Maximum dependency length in the sentence."""
         values = {sdl['dep_length'] for sdl in self.sdls}
         return max(values, default=None)
 
     @cached_property
-    def lint_score(self) -> float | None:
-        return self.calculate_lint_score()
-    
-    @cached_property
-    def difficulty_level(self) -> int | None:
-        return self.get_difficulty_level()
-
-    def count_content_words(self) -> int:
-        """Count content words in the sentence."""
-        return sum(feat.is_content_word for feat in self.word_features)
-
-    def count_clauses(self) -> int:
-        """Count clauses (= finite verbs) in the sentence."""
-        finite_verb_counts = sum(feat.is_finite_verb for feat in self.word_features)
-        return finite_verb_counts if finite_verb_counts > 0 else 1
-
-    @cached_property
-    def content_words_per_clause(self) -> float:
+    def content_words_per_clause(self) -> float | None:
         """Number of content words per clause."""
-        content_count = self.count_content_words()
-        clause_count = self.count_clauses()
-        return content_count / clause_count
+        if not self.finite_verbs:
+            return None
+        return len(self.content_words) / len(self.finite_verbs)
 
     @cached_property
-    def proportion_of_concrete_nouns(self) -> float:
+    def proportion_of_concrete_nouns(self) -> float | None:
         """
         Proportion of concrete nouns out of all nouns in the sentence.
         Nouns of type `unknown` (not in the list) are excluded from the totals count.
@@ -295,25 +280,17 @@ class SentenceAnalysis:
         n_undefined_nouns = len(self.undefined_nouns)
         total_nouns = n_concrete_nouns + n_abstract_nouns + n_undefined_nouns
         if total_nouns == 0:
-            return 0
+            return None
         return n_concrete_nouns / total_nouns
 
-    def calculate_lint_score(self) -> float | None:
-        """Calculate LiNT readability score for the sentence."""
-        if self.max_sdl is None:
-            return None
-        return LintScorer.calculate_lint_score(
+    @cached_property
+    def lint(self) -> LintScorer:
+        return LintScorer(
             freq_log = self.mean_log_word_frequency,
             max_sdl = self.max_sdl,
             content_words_per_clause = self.content_words_per_clause,
             proportion_concrete = self.proportion_of_concrete_nouns,
         )
-
-    def get_difficulty_level(self) -> int | None:
-        """Get difficulty level for the sentence."""
-        if self.lint_score is None:
-            return None
-        return LintScorer.get_difficulty_level(self.lint_score)
 
     def get_top_n_least_frequent(self, n: int = 5) -> list[tuple[str, float]]:
         """Get the top n least frequent words in the sentence."""
@@ -330,10 +307,11 @@ class SentenceAnalysis:
         """Get detailed analysis for the sentence."""
         return {
             'text': self.doc.text,
-            'score': self.lint_score,
-            'level': self.difficulty_level,
-            'top_n_least_freq_words': self.get_top_n_least_frequent(n=n),
+            'score': self.lint.score,
+            'level': self.lint.level,
             'mean_log_word_frequency': self.mean_log_word_frequency,
+            'top_n_least_freq_words': self.get_top_n_least_frequent(n=n),
+            'proportion_concrete_nouns': self.proportion_of_concrete_nouns,
             'concrete_nouns': self.concrete_nouns,
             'abstract_nouns': self.abstract_nouns,
             'undefined_nouns': self.undefined_nouns,
@@ -348,8 +326,8 @@ class SentenceAnalysis:
     def as_dict(self) -> SentenceAnalysisDict:
         return {
             'word_features': [feat.as_dict() for feat in self.word_features],
-            'lint_score': self.lint_score,
-            'difficulty_level': self.difficulty_level,
+            'lint_score': self.lint.score,
+            'difficulty_level': self.lint.level,
             'mean_log_word_frequency': self.mean_log_word_frequency,
             'max_sdl': self.max_sdl,
             'proportion_of_concrete_nouns': self.proportion_of_concrete_nouns,
