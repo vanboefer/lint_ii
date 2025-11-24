@@ -76,11 +76,11 @@ class LintScorer:
     """
 
     COEFFICIENTS = {
-        'constant': -7.685068,
-        'freq_log': 17.9624031,
-        'max_sdl': -1.665068,
-        'content_words_per_clause': -2.553523,
-        'proportion_concrete': 16.512606,
+        'constant': -4.20782,
+        'freq_log': 17.283729,
+        'max_sdl': -1.624415,
+        'content_words_per_clause': -2.536780,
+        'proportion_concrete': 16.001231,
     }
 
     def __init__(
