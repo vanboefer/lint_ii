@@ -269,14 +269,14 @@ class ReadabilityAnalysis(LintIIVisualizer):
         ]
 
     @cached_property
-    def min_lint_score(self) -> float:
+    def min_lint_score(self) -> float | None:
         """Lowest sentence-level score in the document."""
-        return min(self.lint_scores_per_sentence)
+        return min(self.lint_scores_per_sentence, default=None)
 
     @cached_property
-    def max_lint_score(self) -> float:
+    def max_lint_score(self) -> float | None:
         """Highest sentence-level score in the document."""
-        return max(self.lint_scores_per_sentence)
+        return max(self.lint_scores_per_sentence, default=None)
 
     def get_detailed_analysis(self, n: int = 5) -> dict[str, Any]:
         """Get detailed readability analysis per sentence in the document."""
