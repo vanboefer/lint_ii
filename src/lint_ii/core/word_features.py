@@ -22,8 +22,8 @@ class WordFeatures:
     Token-level linguistic feature extraction for Dutch text analysis.
 
     This class wraps a spaCy Token and computes linguistic features used in the 
-    LiNT-II readability formula, including word frequency, syntactic dependency length, 
-    part-of-speech classification, and semantic categorization of nouns.
+    LiNT-II readability analysis, including word frequency, syntactic dependency
+    length, part-of-speech classification, and semantic categorization of nouns.
 
     Parameters
     ----------
@@ -31,25 +31,50 @@ class WordFeatures:
         A spaCy Token object with NLP annotations (lemma, POS tag, dependencies, 
         named entity type).
 
-    Attributes
-    ----------
+    Attributes & Properties
+    -----------------------
     token : Token
         The input spaCy token.
     text : str
         Lowercase form of the token.
-    head : Token
-        Syntactic head of the token, with special handling for conjunctions.
+    lemma : str
+        Lowercase lemma of the token.
     word_frequency : float | None
-        Log frequency for content words. Cached property.
-        Returns None for function words and proper nouns.
-        Unknown words (not in SUBTLEX-NL) default to 1.359.
+        Word frequency from the SUBTLEX-NL corpus.
+        - Frequency is calculated for content words only.
+        - For compounds listed in NOUN_DATA, the frequency of the base word is returned.
+        - Unknown words (not in SUBTLEX-NL) default to 1.359 (zero count frequency).
+        - Returns None for function words and proper nouns.
+        - Returns None if the token or its lemma are in the SKIPLIST.
+    heads : list[Token]
+        Syntactic heads of the token, with special handling for conjunctions.
     dep_length : int
-        Syntactic dependency length (number of intervening tokens between token and 
-        head).
+        The number of intervening tokens between the token and its syntactic head.
+    is_content_word : bool
+        True if token has one of the parts-of-speech: NOUN, PROPN, VERB, ADJ or is a
+        manner adverb (from MANNER_ADVERBS list). Special cases: copulas and numerals 
+        are excluded.
+    is_content_word_excl_propn : bool
+        True if token is content word but not a PROPN.
+    is_noun : bool
+        True if token has one of the parts-of-speech: NOUN, PROPN.
     super_sem_type : SuperSemTypes | None
         Semantic type for nouns: 'concrete', 'abstract', 'undefined', or 'unknown'.
-    punct_placement : str | None
-        Punctuation placement: 'embedded', 'trailing', 'leading', or 'standalone'.
+        Measurement unit symbols (e.g. km) are considered nouns as well.
+    is_abstract : bool
+        True if noun is semantically abstract (based on the annotations in NOUN_DATA or based on entity type heuristics).
+    is_concrete : bool
+        True if noun is semantically concrete (based on the annotations in NOUN_DATA or based on entity type heuristics).
+    is_undefined : bool
+        True if noun has both a concrete and an abstract meaning (based on the 
+        annotations in NOUN_DATA).
+    is_unknown : bool
+        True if noun is not found in NOUN_DATA and could not be resolved based on entity type heuristics.
+    is_finite_verb : bool
+        True if token has the tag (fine-grained part-of-speech): WW|pv (verb that shows
+        tense).
+    punctuation : dict[str, str] | None
+        Attached punctuation to a token.
 
     Methods
     -------
@@ -60,44 +85,8 @@ class WordFeatures:
     as_dict() -> WordFeaturesDict
         Serialize features to dictionary format (used in the LiNT-II visualizer).
 
-    Properties
-    ----------
-    is_content_word_excl_propn : bool
-        True if token is content word but not a PROPN.
-    is_content_word : bool
-        True if token has one of the parts-of-speech: NOUN, PROPN, VERB, ADJ or is a
-        manner adverb (from MANNER_ADVERBS list). Special cases: copulas and numerical 
-        adjectives are excluded.
-    is_noun : bool
-        True if token has one of the parts-of-speech: NOUN, PROPN.
-    is_finite_verb : bool
-        True if token has the tag (fine-grained part-of-speech): WW|pv (verb that shows
-        tense).
-    is_abstract : bool
-        True if noun is semantically abstract (based on the annotations in NOUN_DATA).
-    is_concrete : bool
-        True if noun is semantically concrete (based on the annotations in NOUN_DATA).
-    is_undefined : bool
-        True if noun has both a concrete and an abstract meaning (based on the 
-        annotations in NOUN_DATA).
-    is_unknown : bool
-        True if noun is not found in NOUN_DATA.
-
     Notes
     -----
-    **Word Frequency**: Uses the log frequency calculated from the SUBTLEX-NL corpus 
-    (FREQ_DATA). Only content words (excluding proper nouns) get frequency scores. 
-    Unknown words receive a default zero count frequency.
-
-    **Dependency Length**: The number of tokens between a word and its syntactic head. 
-    Punctuation is excluded from counting. For example:
-        - "de kat": dep_length = 0 (adjacent)
-        - "de gelaarsde kat": dep_length for "de" = 1
-
-    Special handling for conjunctions: The head of coordinated elements is determined 
-    by following the conjunction chain to find the true syntactic head, rather than 
-    using spaCy's default behavior where the first conjunct heads the second.
-
     **Noun Categorization**: 
     The noun categorizarion is based on the annotations in NOUN_DATA:
     - Concrete: Nouns referring to tangible entities (persons, animals, plants, 
@@ -107,6 +96,7 @@ class WordFeatures:
     events, organizations, abstract concepts).
     - Undefined: Nouns that have both a concrete sense and an abstract sense.
     - Unknown: Nouns not in the NOUN_DATA.
+    If a noun is not found in the NOUN_DATA, we try to resolve based on named entity type: names of people and locations are set to "concrete", names of organizations are set to "abstract".
 
     **Content Words**: Content words are defined as follows:
 
@@ -115,27 +105,24 @@ class WordFeatures:
     nouns (NOUN)         | -
     proper nouns (PROPN) | -
     lexical verbs (VERB) | exclude copulas
-    adjectives (ADJ)     | exclude numerical adjectives
+    adjectives (ADJ)     | exclude numerals
     adverbs (ADV)        | include only MANNER_ADVERBS list
-
-    **Finite Verbs**: Identified using Dutch CGN part-of-speech tags. A verb is finite 
-    if its tag contains "WW|pv" (werkwoord, persoonsvorm).
 
     Examples
     --------
     >>> from lint_ii import WordFeatures
     >>> word = WordFeatures.from_text("slaapt")
     >>> word.word_frequency
-    4.26
+    4.756
     >>> word.is_finite_verb
     True
     >>> word.is_content_word
     True
 
-    >>> noun = WordFeatures.from_text("vrijheid")
-    >>> noun.super_sem_type
+    >>> word = WordFeatures.from_text("vrijheid")
+    >>> word.super_sem_type
     <SuperSemTypes.ABSTRACT: 'abstract'>
-    >>> noun.is_abstract
+    >>> word.is_abstract
     True
 
     See Also
@@ -198,15 +185,21 @@ class WordFeatures:
         return self.token.lemma_.lower()
 
     @cached_property
-    def word_frequency(self) -> float|None:
-        """Word frequency from the SUBTLEX-NL corpus."""
+    def word_frequency(self) -> float | None:
+        """
+        Word frequency from the SUBTLEX-NL corpus.
+        - Frequency is calculated for content words only.
+        - For compounds listed in NOUN_DATA, the frequency of the base word is returned.
+        - Unknown words (not in SUBTLEX-NL) default to 1.359 (zero count frequency).
+        - Returns None for function words and proper nouns.
+        - Returns None if the token or its lemma are in the SKIPLIST.
+        """
         if not self.is_content_word_excl_propn:
             return None
         if self.lemma in self._FREQ_SKIPLIST or self.text in self._FREQ_SKIPLIST:
             return None
 
         text = self.text
-        # because PROPN was filtered out above here we only get NOUN
         if self.is_noun and linguistic_data.WORD_FREQ_COMPOUND_ADJUSTMENT:
             text = self._NOUN_DATA.get(text, {}).get('head', text)
 
@@ -216,7 +209,7 @@ class WordFeatures:
     @cached_property
     def heads(self) -> list[Token]:
         """
-        Heads of the token. The head is generally taken from spaCy, except for the two special cases below. 
+        Syntactic heads of the token. The head is generally taken from spaCy, except for the two special cases below. 
 
         Special cases
         -------------
@@ -236,7 +229,7 @@ class WordFeatures:
     @cached_property
     def dep_length(self) -> int:
         """
-        Dependency length (number of intervening tokens) between a word and its syntactic head. The dep_length is 0 if the words are adjacent.
+        Dependency length is the number of intervening tokens between a word and its syntactic head. The dep_length is 0 if the words are adjacent.
         
         If a word has multiple heads (see the special case for subjects below), we calculate all dep_lengths and take the biggest one.
 
@@ -259,19 +252,18 @@ class WordFeatures:
         return dep_length if dep_length >= 0 else 0
 
     @property
-    def is_content_word_excl_propn(self) -> bool:
-        """Indicator whether word is a content word, excluding proper nouns."""
-        return False if self.token.pos_ == 'PROPN' else self.is_content_word
-
-    @property
     def is_content_word(self) -> bool:
         """
-        Indicator whether word is a content word:
-        - Numerical adjectives are excluded
-        - Copulas are excluded
+        Indicator whether token is a content word.
+        True if token has one of the parts-of-speech: NOUN, PROPN, VERB, ADJ or is a manner adverb (from MANNER_ADVERBS list).
+
+        Special cases
+        -------------
+        - Numerals are excluded (sometimes tagged as ADJ)
+        - Copulas are excluded (sometimes tagged as VERB)
         - Adverbs are excluded except for manner adverbs
         """
-        if 'TW' in self.token.tag_:
+        if 'TW' in self.token.tag_: # TW = telwoord
             return False
         if self.token.dep_ == 'cop':
             return False
@@ -279,20 +271,26 @@ class WordFeatures:
             self.token.pos_ in ["NOUN", "PROPN", "VERB", "ADJ"]
             or self.text in self._MANNER_ADVERBS
         )
+    
+    @property
+    def is_content_word_excl_propn(self) -> bool:
+        """Indicator whether word is a content word, excluding proper nouns."""
+        return False if self.token.pos_ == 'PROPN' else self.is_content_word
 
     @property
     def is_noun(self) -> bool:
-        """Indicator whether word is a noun."""
+        """
+        Indicator whether word is a noun.
+        True if token has one of the parts-of-speech: NOUN, PROPN.
+        """
         return self.token.pos_ in ["NOUN", "PROPN"]
 
     @property
-    def is_finite_verb(self) -> bool:
-        """Indicator whether word is a finite verb."""
-        return "WW|pv" in self.token.tag_
-
-    @property
-    def super_sem_type(self) -> SuperSemTypes|None:
-        """The semantic type of a noun or measurement unit symbol."""
+    def super_sem_type(self) -> SuperSemTypes | None:
+        """
+        The semantic type of a noun.
+        Measurement unit symbols (e.g. km) are considered nouns as well.
+        """
         # take nouns and 'SPEC' tokens (accounts for cm, km, etc.)
         if not self.is_noun and 'SPEC' not in self.token.tag_:
             return None
@@ -358,6 +356,11 @@ class WordFeatures:
         """Indicator whether semantic type is unknown."""
         return self.super_sem_type == SuperSemTypes.UNKNOWN
 
+    @property
+    def is_finite_verb(self) -> bool:
+        """Indicator whether word is a finite verb."""
+        return "WW|pv" in self.token.tag_ # WW|pv = werkwoord, persoonsvorm
+    
     @property
     def punctuation(self) -> dict[str, str] | None:
         """Attached punctuation to a token."""

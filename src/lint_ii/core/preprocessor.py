@@ -1,9 +1,36 @@
+"""Text Preprocessing Utilities
+
+This module provides functions for preprocessing and cleaning text extracted from 
+Markdown documents; it also works for plain text. 
+
+It handles text extraction from Markdown AST nodes, quotemark normalization, and whitespace cleanup.
+
+Functions
+---------
+extract_text_from_node(node: dict | str) -> str
+    Recursively extracts all text content from a Markdown AST node and its children.
+
+fix_quotemarks(text: str) -> str
+    Normalizes various quotemark styles (curly quotes, guillemets, etc.) to 
+    straight double quotes.
+
+preprocess_text(text: str) -> str
+    Main preprocessing function that extracts text from Markdown, normalizes 
+    quotemarks, and removes redundant whitespace.
+
+Notes
+-----
+- Only text from paragraphs, blockquotes, and lists is extracted; other Markdown elements (headers, code blocks, etc.) are ignored.
+- All quotemark variants are converted to ASCII double quotes (").
+- Multiple consecutive whitespace characters are collapsed to a single space.
+"""
+
 import mistune
 import re
 
 
 def extract_text_from_node(node: dict | str) -> str:
-    """Recursively extract all text from a node."""
+    """Recursively extract all text from a Markdown AST node and its children."""
     if isinstance(node, dict):
         if node.get('type') == 'text':
             return node.get('raw', '')
@@ -13,7 +40,9 @@ def extract_text_from_node(node: dict | str) -> str:
 
 
 def fix_quotemarks(text) -> str:
-    """Replace 'weird' quotemarks (e.g. curly) with straight double quotemarks."""
+    """
+    Normalizes various quotemark styles (curly quotes, guillemets, etc.) to straight double quotes.
+    """
     quotemarks = [i for i in "«»‘’‛“”„‟‹›"]
     for quotemark in quotemarks:
         text = text.replace(quotemark, '"')
@@ -21,7 +50,9 @@ def fix_quotemarks(text) -> str:
 
 
 def preprocess_text(text: str) -> str:
-    """Extract text from paragraphs, blockquotes, and lists. Remove redundant whitespaces."""
+    """
+    Main preprocessing function that extracts text from Markdown, normalizes quotemarks, and removes redundant whitespace.
+    """
     markdown = mistune.create_markdown(renderer='ast')
     nodes: list[dict] = markdown(text)  # type: ignore
     paragraphs = []
