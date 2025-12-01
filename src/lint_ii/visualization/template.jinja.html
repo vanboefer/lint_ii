@@ -9,12 +9,12 @@ if (!window.vegaEmbed) {
 }
 
 if (!window.LintIIVisualizer) {
-  const { LintIIVisualizer } = await import("./lint_ii_visualizer.js")
+  const { LintIIVisualizer } = await import("https://vanboefer.github.io/lint_ii/src/visualizer/lint_ii_visualizer.js")
   window.LintIIVisualizer = LintIIVisualizer
 }
 
 // Create this specific viewer instance
 const visualizer = new window.LintIIVisualizer()
 visualizer.data = {{ data | safe }}
-document.getElementById("{{ visualizer_id }}").replaceWith(visualizer);
+document.getElementById("{{ visualizer_id }}").replaceWith(visualizer)
 </script>
