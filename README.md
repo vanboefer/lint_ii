@@ -2,6 +2,7 @@
 
 [![License: EUPL v1.2](https://img.shields.io/badge/License-EUPL%20v1.2-blue.svg)](LICENSE)
 [![Python 3.11](https://img.shields.io/badge/python-3.11-blue.svg)](https://www.python.org/downloads/)
+[![Open In Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/drive/1nq8TXHjdCMqqnxWbmCG4wuDJkRSijJbs)
 
 ## Table of contents
 1. [Introduction](#introduction)
@@ -127,9 +128,9 @@ Getting the list of content words in each sentence:
 
 For a list of available properties, refer to the documentation in [`readability_analysis.py`](https://github.com/vanboefer/lint_ii/blob/main/src/lint_ii/core/readability_analysis.py) and [`sentence_analysis.py`](https://github.com/vanboefer/lint_ii/blob/main/src/lint_ii/core/sentence_analysis.py).
 
-#### Visualization in Jupyter Notebook
+#### Visualization in Colab Notebook
 
-To visualize the readability analysis, similarly to the examples on the [LiNT-II documentation](https://vanboefer.github.io/lint_ii/) page, you can use the Jupyter notebook [...].
+To visualize your readability analysis, similarly to the examples on the [LiNT-II documentation](https://vanboefer.github.io/lint_ii/) page, you can use [this colab notebook](https://colab.research.google.com/drive/1nq8TXHjdCMqqnxWbmCG4wuDJkRSijJbs?usp=sharing).
 
 ## What is LiNT-II?
 
