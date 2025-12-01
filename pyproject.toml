@@ -5,10 +5,24 @@ build-backend = "hatchling.build"
 [tool.hatch.build.targets.wheel]
 packages = ["src/lint_ii"]
 
+[tool.hatch.build.targets.sdist]
+exclude = [
+    "src/visualizer/",
+    "examples_for_visualizer/",
+    "index.html",
+    "uv.lock",
+    "environment.yml",
+]
+
 [project]
 name = "lint_ii"
 version = "0.1.0"
 description = "LiNT-II is a readability assessment tool for Dutch."
+authors = [
+    {name = "Jenia Kim"}
+]
+license = {text = "EUPL"}
+keywords = ["readability", "dutch", "nlp"]
 readme = "README.md"
 requires-python = ">=3.11,<3.12"
 dependencies = [
@@ -20,3 +34,7 @@ dependencies = [
 
 [project.optional-dependencies]
 notebook = ["ipykernel", "jupyter"]
+
+[project.urls]
+homepage = "https://vanboefer.github.io/lint_ii/"
+repository = "https://vanboefer.github.io/lint_ii/"
