@@ -18,7 +18,7 @@
 - The **NLP tools** used to extract linguistic features from the text. LiNT has [T-Scan](https://github.com/CentreForDigitalHumanities/tscan) under the hood, while LiNT-II uses [spaCy](https://spacy.io/).
 - The **coefficients** (weights) used in the formula. Since the features are calculated differently, a new linear regression model was fitted on the original reading comprehension data from LiNT. This resulted in new coefficients. The performance of the LiNT-II model is the same as the original LiNT: **Adjusted R<sup>2</sup> = 0.74**, meaning that the model explains 74% of the variance in the comprehension data.
 
-For more information, please refer to ['What is LiNT-II?'](#what-is-lint-ii) and [LiNT-II documentation]().
+For more information, please refer to [What is LiNT-II?](#what-is-lint-ii) and [LiNT-II documentation]().
 
 ## Quick Start
 
@@ -35,7 +35,9 @@ python -m spacy download nl_core_news_lg
 ```python
 >>> from lint_ii import ReadabilityAnalysis
 
->>> text = "De Oudegracht is het sfeervolle hart van de stad. In de middeleeuwen was het hier een drukte van belang met de aan- en afvoer van goederen. Nu is het een prachtige plek om te winkelen en te lunchen of te dineren in de oude stadskastelen."
+>>> text = """De Oudegracht is het sfeervolle hart van de stad.
+In de middeleeuwen was het hier een drukte van belang met de aan- en afvoer van goederen. 
+Nu is het een prachtige plek om te winkelen en te lunchen of te dineren in de oude stadskastelen."""
 
 >>> analysis = ReadabilityAnalysis.from_text(text)
 Loading Dutch language model from spaCy... ✓ nl_core_news_lg
