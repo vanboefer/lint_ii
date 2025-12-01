@@ -18,7 +18,7 @@
 - The **NLP tools** used to extract linguistic features from the text. LiNT has [T-Scan](https://github.com/CentreForDigitalHumanities/tscan) under the hood, while LiNT-II uses [spaCy](https://spacy.io/).
 - The **coefficients** (weights) used in the formula. Since the features are calculated differently, a new linear regression model was fitted on the original reading comprehension data from LiNT. This resulted in new coefficients. The performance of the LiNT-II model is the same as the original LiNT: **Adjusted R<sup>2</sup> = 0.74**, meaning that the model explains 74% of the variance in the comprehension data.
 
-For more information, please refer to [What is LiNT-II?](#what-is-lint-ii) and [LiNT-II documentation]().
+For more information, please refer to [What is LiNT-II?](#what-is-lint-ii) and [LiNT-II documentation](https://vanboefer.github.io/lint_ii/).
 
 ## Quick Start
 
@@ -129,7 +129,7 @@ For a list of available properties, refer to the documentation in [`readability_
 
 #### Visualization in Jupyter Notebook
 
-To visualize the readability analysis, similarly to the examples on the [LiNT-II documentation]() page, you can use the Jupyter notebook [...].
+To visualize the readability analysis, similarly to the examples on the [LiNT-II documentation](https://vanboefer.github.io/lint_ii/) page, you can use the Jupyter notebook [...].
 
 ## What is LiNT-II?
 
@@ -169,7 +169,7 @@ The formula's coefficients were estimated using a linear regression model fitted
 
 For more information about the empirical study (done for the original LiNT), please refer to the sources listed in [Original LiNT](#original-lint).
 
-For more information about the LiNT-II model, please refer to the [LiNT-II documentation]().
+For more information about the LiNT-II model, please refer to the [LiNT-II documentation](https://vanboefer.github.io/lint_ii/).
 
 ### Difficulty levels
 
@@ -184,7 +184,7 @@ Score | Difficulty level | Proportion of adults who have diffuculty understandin
 
 For more information about how this estimation was done for the original LiNT, please refer to the sources listed in [Original LiNT](#original-lint).
 
-For more information about how the estimation was adapted for LiNT-II, please refer to the [LiNT-II documentation]().
+For more information about how the estimation was adapted for LiNT-II, please refer to the [LiNT-II documentation](https://vanboefer.github.io/lint_ii/).
 
 ## References and Credits
 
