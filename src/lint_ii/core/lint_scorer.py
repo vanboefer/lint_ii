@@ -157,23 +157,23 @@ class LintScorer:
 
     def _get_difficulty_level(self) -> int:
         """
-        Convert LiNT score to difficulty level.
+        Convert LiNT-II score to difficulty level.
 
         Returns
         -------
         int
             Difficulty level from 1 (easiest) to 4 (most difficult):
             
-            - Level 1 (0-34): Easy text, 15% of adults struggle
-            - Level 2 (35-46): Moderate text, 31% of adults struggle
-            - Level 3 (47-60): Difficult text, 55% of adults struggle
-            - Level 4 (61+): Very difficult text, 82% of adults struggle
+            - Level 1 [0-34): Easy text, 14% of adults struggle to understand
+            - Level 2 [34-46): Moderate text, 29% of adults struggle to understand
+            - Level 3 [46-58): Difficult text, 53% of adults struggle to understand
+            - Level 4 [58-100]: Very difficult text, 78% of adults struggle
         """
-        if self.score <= 34:
+        if self.score < 34:
             level = 1
-        elif self.score <= 46:
+        elif self.score < 46:
             level = 2
-        elif self.score <= 60:
+        elif self.score < 58:
             level = 3
         else:
             level = 4
