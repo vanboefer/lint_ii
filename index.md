@@ -243,11 +243,11 @@ The readability score is calculated based on the following formula:
 LiNT-II score = 
 
   100 - (
-      - xxx
-      + (xxx * word frequency)
-      - (xxx  * syntactic dependency length)
-      - (xxx  * content words per clause)
-      + (xxx * proportion concrete nouns)
+      - 4.21
+      + (17.28 * word frequency)
+      - (1.62  * syntactic dependency length)
+      - (2.54  * content words per clause)
+      + (16.00 * proportion concrete nouns)
   )
 ```
 

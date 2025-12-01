@@ -40,16 +40,11 @@ class WordFeatures:
     lemma : str
         Lowercase lemma of the token.
     word_frequency : float | None
-        Word frequency from the SUBTLEX-NL corpus.
-        - Frequency is calculated for content words only.
-        - For compounds listed in NOUN_DATA, the frequency of the base word is returned.
-        - Unknown words (not in SUBTLEX-NL) default to 1.359 (zero count frequency).
-        - Returns None for function words and proper nouns.
-        - Returns None if the token or its lemma are in the SKIPLIST.
+        Word frequency from the SUBTLEX-NL corpus. Cached property.
     heads : list[Token]
-        Syntactic heads of the token, with special handling for conjunctions.
+        Syntactic heads of the token, with special handling for conjunctions. Cached property.
     dep_length : int
-        The number of intervening tokens between the token and its syntactic head.
+        The number of intervening tokens between the token and its syntactic head. Cached property.
     is_content_word : bool
         True if token has one of the parts-of-speech: NOUN, PROPN, VERB, ADJ or is a
         manner adverb (from MANNER_ADVERBS list). Special cases: copulas and numerals 
@@ -74,7 +69,7 @@ class WordFeatures:
         True if token has the tag (fine-grained part-of-speech): WW|pv (verb that shows
         tense).
     punctuation : dict[str, str] | None
-        Attached punctuation to a token.
+        Attached punctuation to a token (used in the LiNT-II visualizer).
 
     Methods
     -------
@@ -87,6 +82,16 @@ class WordFeatures:
 
     Notes
     -----
+    **Content Words**: Content words are defined as follows:
+
+    Parts of speech      | Additional corrections
+    ---------------------|-----------------------------
+    nouns (NOUN)         | -
+    proper nouns (PROPN) | -
+    lexical verbs (VERB) | exclude copulas
+    adjectives (ADJ)     | exclude numerals
+    adverbs (ADV)        | include only MANNER_ADVERBS list
+
     **Noun Categorization**: 
     The noun categorizarion is based on the annotations in NOUN_DATA:
     - Concrete: Nouns referring to tangible entities (persons, animals, plants, 
@@ -97,16 +102,6 @@ class WordFeatures:
     - Undefined: Nouns that have both a concrete sense and an abstract sense.
     - Unknown: Nouns not in the NOUN_DATA.
     If a noun is not found in the NOUN_DATA, we try to resolve based on named entity type: names of people and locations are set to "concrete", names of organizations are set to "abstract".
-
-    **Content Words**: Content words are defined as follows:
-
-    Parts of speech      | Additional corrections
-    ---------------------|-----------------------------
-    nouns (NOUN)         | -
-    proper nouns (PROPN) | -
-    lexical verbs (VERB) | exclude copulas
-    adjectives (ADJ)     | exclude numerals
-    adverbs (ADV)        | include only MANNER_ADVERBS list
 
     Examples
     --------
@@ -363,7 +358,7 @@ class WordFeatures:
     
     @property
     def punctuation(self) -> dict[str, str] | None:
-        """Attached punctuation to a token."""
+        """Attached punctuation to a token. Used in the visualizer."""
         from collections import defaultdict
 
         punctuation = defaultdict(str)

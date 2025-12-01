@@ -44,31 +44,46 @@ class ReadabilityAnalysis(LintIIVisualizer):
         List of sentence-level analysis objects. Each sentence must be a 
         SentenceAnalysis instance containing linguistic features and metadata.
 
-    Attributes
-    ----------
+    Attributes & Properties
+    -----------------------
     sentences : list[SentenceAnalysis]
         The input sentence analyses.
-    document_lint_score : float
-        Overall LiNT readability score for the document (0-100, higher=more difficult).
-        Cached property computed from document-level features.
-    document_difficulty_level : int
-        Difficulty level (1-4) derived from document_lint_score. Cached property.
+    word_features : list[WordFeatures]
+        Flattened list of all word features across sentences.
+    concrete_nouns : list[str]
+        All concrete nouns in the document.
+    abstract_nouns : list[str]
+        All abstract nouns in the document.
+    undefined_nouns : list[str]
+        All undefined nouns in the document (have both a concrete and an abstract meaning).
+    mean_log_word_frequency : float | None
+        Document-level mean log frequency of content words (excluding proper nouns).
+        Returns None if there are no frequencies on the sentence-level. Cached property.
+    mean_max_sdl : float | None
+        Mean of maximum syntactic dependency lengths across sentences.
+        Returns None if there are no SDLs on the sentence-level. Cached property.
+    mean_content_words_per_clause : float | None
+        Mean content words per clause across sentences.
+        Returns None if there are no content words / clause on the sentence-level. Cached property.
+    proportion_of_concrete_nouns : float | None
+        Proportion of concrete nouns out of the total nouns in the document.
+        Nouns of type `unknown` (not in the list) are excluded from the totals count.
+        Returns None if totals are 0, i.e. there are no nouns or only `unknown` nouns in the sentence. Cached property.
+    lint : LintScorer
+        LintScorer object that contains the score (lint.score) and the difficulty level (lint.level) for the document. Cached property.
     lint_scores_per_sentence : list[float]
-        Individual LiNT scores for each sentence. Cached property.
-    min_lint_score : float
-        Lowest sentence-level score in the document. Cached property.
-    max_lint_score : float
-        Highest sentence-level score in the document. Cached property.
+        Individual LiNT scores for each sentence in the document. Cached property.
+    min_lint_score : float | None
+        Lowest sentence-level score in the document.
+        Returns None if there are no sentence-level scores. Cached property.
+    max_lint_score : float | None
+        Highest sentence-level score in the document.
+        Returns None if there are no sentence-level scores. Cached property.
 
     Methods
     -------
     from_text(text: str) -> ReadabilityAnalysis
-        Create analysis from text string. Preprocesses text and applies NLP 
-        pipeline.
-    calculate_lint_score() -> float
-        Compute document LiNT score using aggregated linguistic features.
-    get_difficulty_level() -> int
-        Convert LiNT score to difficulty level (1-4, where 4=most difficult).
+        Create analysis from text string. Preprocesses text and applies spaCy NLP pipeline.
     calculate_document_stats() -> DocumentStatsDict
         Generate summary statistics including sentence count, mean/min/max scores.
     get_detailed_analysis() -> dict[str, Any]
@@ -76,47 +91,14 @@ class ReadabilityAnalysis(LintIIVisualizer):
     as_dict() -> ReadabilityAnalysisDict
         Serialize analysis to dictionary format (used in the LiNT-II visualizer).
 
-    Properties
-    ----------
-    word_features : list[WordFeatures]
-        Flattened list of all word features across sentences.
-    concrete_nouns : list[str]
-        All concrete nouns found in the document.
-    abstract_nouns : list[str]
-        All abstract nouns found in the document.
-    mean_log_word_frequency : float
-        Document-level mean log frequency of content words (excluding proper nouns).
-    mean_max_sdl : float
-        Mean of maximum syntactic dependency lengths across sentences.
-    mean_content_words_per_clause : float
-        Mean content words per clause across sentences.
-    proportion_of_concrete_nouns : float
-        Ratio of concrete nouns to total nouns (0.0-1.0).
-
-    Notes
-    -----
-    The LiNT-II formula computes readability as:
-
-    .. code-block:: text
-
-        raw score = constant 
-                  + (coefficient_freq * mean_log_word_frequency)
-                  + (coefficient_sdl * max_syntactic_dependency_length)
-                  + (coefficient_cwc * content_words_per_clause)
-                  + (coefficient_concrete * proportion_concrete_nouns)
-
-        LiNT = 100 - clamp(raw_score, 0, 100)
-
-    Higher scores indicate more difficult texts.
-
     Examples
     --------
     >>> from lint_ii import ReadabilityAnalysis
     >>> text = "Jip zit bij de kapper. Knip, knap, zegt de schaar."
     >>> analysis = ReadabilityAnalysis.from_text(text)
-    >>> analysis.document_lint_score
-    30.1
-    >>> analysis.get_difficulty_level()
+    >>> analysis.lint.score
+    21.9
+    >>> analysis.lint.level
     1
     >>> stats = analysis.calculate_document_stats()
     >>> stats['sentence_count']
@@ -193,7 +175,10 @@ class ReadabilityAnalysis(LintIIVisualizer):
 
     @cached_property
     def mean_log_word_frequency(self) -> float | None:
-        """Mean log word frequency for the document."""
+        """
+        Mean log word frequency for the document.
+        Returns None if there are no frequencies on the sentence-level.
+        """
         frequencies = [
             freq
             for feat in self.word_features
@@ -205,7 +190,10 @@ class ReadabilityAnalysis(LintIIVisualizer):
 
     @cached_property
     def mean_max_sdl(self) -> float | None:
-        """Mean value of sentence-level maximum dependency lengths."""
+        """
+        Mean value of sentence-level maximum dependency lengths.
+        Returns None if there are no SDLs on the sentence-level.
+        """
         sdls = [s.max_sdl for s in self.sentences if s.max_sdl is not None]
         if not sdls:
             return None
@@ -213,7 +201,10 @@ class ReadabilityAnalysis(LintIIVisualizer):
 
     @cached_property
     def mean_content_words_per_clause(self) -> float | None:
-        """Mean value of sentence-level content words per clause."""
+        """
+        Mean value of sentence-level content words per clause.
+        Returns None if there are no content words / clause on the sentence-level.
+        """
         content_words_per_clause = [
             s.content_words_per_clause
             for s in self.sentences
@@ -226,8 +217,9 @@ class ReadabilityAnalysis(LintIIVisualizer):
     @cached_property
     def proportion_of_concrete_nouns(self) -> float | None:
         """
-        Proportion of concrete nouns out of all nouns in the document.
+        Proportion of concrete nouns out of the total nouns in the document.
         Nouns of type `unknown` (not in the list) are excluded from the totals count.
+        Returns None if totals are 0, i.e. there are no nouns or only `unknown` nouns in the sentence.
         """
         n_concrete_nouns = len(self.concrete_nouns)
         n_abstract_nouns = len(self.abstract_nouns)
@@ -246,19 +238,6 @@ class ReadabilityAnalysis(LintIIVisualizer):
             proportion_concrete = self.proportion_of_concrete_nouns,
         )
 
-    def calculate_document_stats(self) -> DocumentStatsDict:
-        """
-        Statistics on a document level (sentence count, document LiNT score, document difficulty level,
-        min LiNT score, max LiNT score) + the value of `WORD_FREQ_COMPOUND_ADJUSTMENT` (True or False).
-        """
-        return {
-            'sentence_count': len(self.sentences),
-            'document_lint_score': self.lint.score,
-            'document_difficulty_level': self.lint.level,
-            'min_lint_score': self.min_lint_score,
-            'max_lint_score': self.max_lint_score,
-        }
-
     @cached_property
     def lint_scores_per_sentence(self) -> list[float]:
         return [
@@ -269,14 +248,32 @@ class ReadabilityAnalysis(LintIIVisualizer):
 
     @cached_property
     def min_lint_score(self) -> float | None:
-        """Lowest sentence-level score in the document."""
+        """
+        Lowest sentence-level score in the document.
+        Returns None if there are no sentence-level scores.
+        """
         return min(self.lint_scores_per_sentence, default=None)
 
     @cached_property
     def max_lint_score(self) -> float | None:
-        """Highest sentence-level score in the document."""
+        """
+        Highest sentence-level score in the document.
+        Returns None if there are no sentence-level scores.
+        """
         return max(self.lint_scores_per_sentence, default=None)
 
+    def calculate_document_stats(self) -> DocumentStatsDict:
+        """
+        Statistics on a document level (sentence count, document LiNT score, document difficulty level, min LiNT score, max LiNT score).
+        """
+        return {
+            'sentence_count': len(self.sentences),
+            'document_lint_score': self.lint.score,
+            'document_difficulty_level': self.lint.level,
+            'min_lint_score': self.min_lint_score,
+            'max_lint_score': self.max_lint_score,
+        }
+    
     def get_detailed_analysis(self, n: int = 5) -> dict[str, Any]:
         """Get detailed readability analysis per sentence in the document."""
         return {

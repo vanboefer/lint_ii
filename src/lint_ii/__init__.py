@@ -10,7 +10,7 @@ The four linguistic features of LiNT-II are:
 - syntactic dependency length
 - number of content words per clause
 
-For more information about the features and the scientific research behind LiNT-II, please refer to <ADD LINK TO DOCUMENTATION>.
+For more information about the features and the scientific research behind LiNT-II, please refer to https://github.com/vanboefer/lint_ii.
 
 # Example of use
 
@@ -28,6 +28,8 @@ Loading Dutch language model from spaCy... ✓ nl_core_news_lg
 ```python
 >>> ra.lint.score
 48.20593518603563
+>>> ra.lint.level
+3
 >>> ra.lint_scores_per_sentence
 [18.511612982419507, 54.27056340066443, 63.24402181810589]
 ```

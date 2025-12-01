@@ -41,50 +41,18 @@ class SentenceAnalysis:
         A spaCy Doc or Span object representing a single sentence with NLP annotations 
         (tokenization, POS tags, dependencies, named entities).
 
-    Attributes
-    ----------
+    Attributes & Properties
+    -----------------------
     doc : Doc | Span
         The input spaCy sentence object.
     word_features : list[WordFeatures]
         Linguistic features for each token in the sentence. Cached property.
     sdls : list[SDLInfo]
-        Syntactic dependency length information for each token. Cached property.
-        Each entry contains the token text, dependency length, and head text.
-    mean_log_word_frequency : float
-        Mean log frequency of content words (excluding proper nouns). Cached property.
-    max_sdl : int
-        Maximum syntactic dependency length in the sentence. Cached property.
-    content_words_per_clause : float
-        Ratio of content words to clauses. Cached property.
-    proportion_of_concrete_nouns : float
-        Ratio of concrete nouns to all nouns (0.0-1.0). Cached property.
-    lint_score : float
-        LiNT readability score for the sentence (0-100, higher=more difficult).
-        Cached property computed from sentence-level features.
-    difficulty_level : int
-        Difficulty level (1-4) derived from lint_score. Cached property.
-
-    Methods
-    -------
-    from_text(text: str) -> SentenceAnalysis
-        Create analysis from raw text string. Preprocesses text and applies NLP pipeline.
-    calculate_lint_score() -> float
-        Compute LiNT score for the sentence using extracted linguistic features.
-    get_difficulty_level() -> int
-        Convert LiNT score to difficulty level (1-4, where 4 = most difficult).
-    count_content_words() -> int
-        Count content words.
-    count_clauses() -> int
-        Count clauses by counting finite verbs (minimum 1).
-    get_top_n_least_frequent(n: int = 5) -> list[tuple[str, float]]
-        Return the n words with lowest frequency scores.
-    get_detailed_analysis(n: int = 5) -> dict[str, Any]
-        Return comprehensive analysis including all features and noun categorizations.
-    as_dict() -> SentenceAnalysisDict
-        Serialize analysis to dictionary format (used in the LiNT-II visualizer).
-
-    Properties
-    ----------
+        Syntactic dependency length information for each token.
+        Each entry contains the token text, dependency length, and and a list of token's heads. For one-word sentences, an empty list is returned. Cached property.
+    max_sdl : int | None
+        Maximum syntactic dependency length in the sentence. 
+        If there are no SDLs (i.e. one-word sentence), returns None. Cached property.
     concrete_nouns : list[str]
         All concrete nouns in the sentence.
     abstract_nouns : list[str]
@@ -92,20 +60,36 @@ class SentenceAnalysis:
     undefined_nouns : list[str]
         Nouns that have both a concrete and an abstract meaning.
     unknown_nouns : list[str]
-        Nouns not found in NOUN_DATA.
+        All unknown nouns in the sentence: not found in NOUN_DATA and could not be resolved based on entity type heuristics.
+    proportion_of_concrete_nouns : float | None
+        Proportion of concrete nouns out of the total nouns in the sentence.
+        Nouns of type `unknown` (not in the list) are excluded from the totals count.
+        Returns None if totals are 0, i.e. there are no nouns or only `unknown` nouns in the sentence. Cached property.
     content_words : list[str]
-        All content words.
+        All content words in the sentence.
     finite_verbs : list[str]
         All finite verbs (verbs showing tense) in the sentence.
+    content_words_per_clause : float | None
+        Number of content words per clause. Returns None if there are no finite verbs in the sentence (i.e. no clause). Cached property.
+    mean_log_word_frequency : float | None
+        Mean log frequency of content words (excluding proper nouns).
+        Returns None if there are no frequencies in the sentence, i.e. no content words or all the content words are in the SKIPLIST. Cached property.
+    lint : LintScorer
+        LintScorer object that contains the score (lint.score) and the difficulty level (lint.level) for the sentence. Cached property.
+
+    Methods
+    -------
+    from_text(text: str) -> SentenceAnalysis
+        Create analysis from text string. Preprocesses text and applies spaCy NLP pipeline.
+    get_top_n_least_frequent(n: int = 5) -> list[tuple[str, float]]
+        Return the n words with lowest frequency scores.
+    get_detailed_analysis(n: int = 5) -> dict[str, Any]
+        Return comprehensive analysis including all feature values.
+    as_dict() -> SentenceAnalysisDict
+        Serialize analysis to dictionary format (used in the LiNT-II visualizer).
 
     Notes
     -----
-    **Syntactic Dependency Length (SDL)**: The number of intervening tokens between 
-    a word and its syntactic head.
-
-    **Clauses**: Counted by identifying finite verbs (verbs showing tense). If no 
-    finite verbs are detected, the sentence is treated as containing one clause.
-
     **Content Words**: Content words are defined as follows:
 
     Parts of speech      | Additional corrections
@@ -125,6 +109,7 @@ class SentenceAnalysis:
     events, organizations, abstract concepts).
     - Undefined: Nouns that have both a concrete sense and an abstract sense.
     - Unknown: Nouns not in the NOUN_DATA.
+    If a noun is not found in the NOUN_DATA, we try to resolve based on named entity type: names of people and locations are set to "concrete", names of organizations are set to "abstract".
 
     Examples
     --------
@@ -132,16 +117,16 @@ class SentenceAnalysis:
     >>> text = "Dit wordt een pijnlijk en haast onoverkomenlijk moment voor mij: het 
     geremde gemoed prijsgeven aan een onnozel stuk lijntjespapier."
     >>> analysis = SentenceAnalysis.from_text(text)
-    >>> analysis.calculate_lint_score()
-    82.97
-    >>> analysis.get_difficulty_level()
+    >>> analysis.lint.score
+    75.4232676597771
+    >>> analysis.lint.level
     4
     >>> analysis.max_sdl
-    2
+    7
     >>> analysis.content_words_per_clause
     10.0
     >>> analysis.get_top_n_least_frequent(3)
-    [('onoverkomenlijk', 1.3555), ('lijntjespapier', 1.3555), ('geremde', 1.7)]
+    [('onoverkomenlijk', 1.359228547196266), ('lijntjespapier', 1.359228547196266),('geremde', 1.9612885385242282)]
 
     See Also
     --------
@@ -182,8 +167,12 @@ class SentenceAnalysis:
     @cached_property
     def sdls(self) -> list[SDLInfo]:
         """
-        The dependency length (number of intervening tokens) 
-        between a token and its syntactic head, for each token in the sentence.
+        Syntactic dependency length information for each token.
+        Each entry contains the token text, dependency length, and a list of token's heads.
+
+        Special case
+        -------------
+        If the sentence consists of less than 2 tokens (excluding punctuation), an empty list is returned; i.e. there are no SDL's for a one-word sentence.
         """
         if len([wf for wf in self.word_features if wf.token.pos_ != 'PUNCT']) < 2:
             return []
@@ -196,6 +185,15 @@ class SentenceAnalysis:
             for feat in self.word_features
         ]
 
+    @cached_property
+    def max_sdl(self) -> int | None:
+        """
+        Maximum dependency length in the sentence.
+        If there are no SDLs (i.e. one-word sentence), returns None.
+        """
+        values = {sdl['dep_length'] for sdl in self.sdls}
+        return max(values, default=None)
+    
     @property
     def concrete_nouns(self) -> list[str]:
         """All concrete nouns in the sentence."""
@@ -228,6 +226,21 @@ class SentenceAnalysis:
             if feat.is_unknown
         ]
 
+    @cached_property
+    def proportion_of_concrete_nouns(self) -> float | None:
+        """
+        Proportion of concrete nouns out of the total nouns in the sentence.
+        Nouns of type `unknown` (not in the list) are excluded from the totals count.
+        Returns None if totals are 0, i.e. there are no nouns or only `unknown` nouns in the sentence.
+        """
+        n_concrete_nouns = len(self.concrete_nouns)
+        n_abstract_nouns = len(self.abstract_nouns)
+        n_undefined_nouns = len(self.undefined_nouns)
+        total_nouns = n_concrete_nouns + n_abstract_nouns + n_undefined_nouns
+        if total_nouns == 0:
+            return None
+        return n_concrete_nouns / total_nouns
+    
     @property
     def content_words(self) -> list[str]:
         """All content words in the sentence."""
@@ -245,8 +258,21 @@ class SentenceAnalysis:
         ]
 
     @cached_property
+    def content_words_per_clause(self) -> float | None:
+        """
+        Number of content words per clause.
+        Returns None if there are no finite verbs in the sentence (i.e. no clause).
+        """
+        if not self.finite_verbs:
+            return None
+        return len(self.content_words) / len(self.finite_verbs)
+    
+    @cached_property
     def mean_log_word_frequency(self) -> float | None:
-        """Mean log word frequency for the sentence."""
+        """
+        Mean log frequency of content words (excluding proper nouns) in the sentence.
+        Returns None if there are no frequencies in the sentence, i.e. no content words or all the content words are in the SKIPLIST.
+        """
         frequencies = [
             freq
             for feat in self.word_features
@@ -257,34 +283,10 @@ class SentenceAnalysis:
         return statistics.mean(frequencies)
 
     @cached_property
-    def max_sdl(self) -> int | None:
-        """Maximum dependency length in the sentence."""
-        values = {sdl['dep_length'] for sdl in self.sdls}
-        return max(values, default=None)
-
-    @cached_property
-    def content_words_per_clause(self) -> float | None:
-        """Number of content words per clause."""
-        if not self.finite_verbs:
-            return None
-        return len(self.content_words) / len(self.finite_verbs)
-
-    @cached_property
-    def proportion_of_concrete_nouns(self) -> float | None:
-        """
-        Proportion of concrete nouns out of all nouns in the sentence.
-        Nouns of type `unknown` (not in the list) are excluded from the totals count.
-        """
-        n_concrete_nouns = len(self.concrete_nouns)
-        n_abstract_nouns = len(self.abstract_nouns)
-        n_undefined_nouns = len(self.undefined_nouns)
-        total_nouns = n_concrete_nouns + n_abstract_nouns + n_undefined_nouns
-        if total_nouns == 0:
-            return None
-        return n_concrete_nouns / total_nouns
-
-    @cached_property
     def lint(self) -> LintScorer:
+        """
+        LintScorer object that contains the score and the difficulty level for the sentence.
+        """
         return LintScorer(
             freq_log = self.mean_log_word_frequency,
             max_sdl = self.max_sdl,
