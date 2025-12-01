@@ -41,7 +41,7 @@ class LintScorer:
         Returns None if the guardrail requirements are not met, i.e. if one of the four feature values is None.
     level : int | None
         LiNT-II difficulty level, from 1 (easiest) to 4 (most difficult):
-           - Level 1 [0-34): Easy text, 14% of adults struggle to understand
+            - Level 1 [0-34): Easy text, 14% of adults struggle to understand
             - Level 2 [34-46): Moderate text, 29% of adults struggle to understand
             - Level 3 [46-58): Difficult text, 53% of adults struggle to understand
             - Level 4 [58-100]: Very difficult text, 78% of adults struggle

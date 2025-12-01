@@ -13,10 +13,10 @@
 
 **LiNT-II** is a readability assessment tool for Dutch. The library (a) calculates a readability score for a text using the LiNT-II formula, and (b) provides an analysis per sentence, based on the 4 features that are used in the formula.
 
-**LiNT-II** is a new implementation of the original **LiNT** tool (see [here](#original-lint)). There are two differences between **LiNT** and **LiNT-II**:
+**LiNT-II** is a new implementation of the original **LiNT** tool (see [here](#original-lint)). The main differences between **LiNT** and **LiNT-II** are:
 
 - The **NLP tools** used to extract linguistic features from the text. LiNT has [T-Scan](https://github.com/CentreForDigitalHumanities/tscan) under the hood, while LiNT-II uses [spaCy](https://spacy.io/).
-- The **coefficients** (weights) used in the formula. Since the features are calculated differently, the coefficients are also different.
+- The **coefficients** (weights) used in the formula. Since the features are calculated differently, a new linear regression model was fitted on the original reading comprehension data from LiNT. This resulted in new coefficients. The performance of the LiNT-II model is the same as the original LiNT: **Adjusted R<sup>2</sup> = 0.74**, meaning that the model explains 74% of the variance in the comprehension data.
 
 For more information, please refer to ['What is LiNT-II?'](#what-is-lint-ii) and [LiNT-II documentation]().
 
@@ -37,7 +37,7 @@ python -m spacy download nl_core_news_lg
 
 >>> text = "De Oudegracht is het sfeervolle hart van de stad. In de middeleeuwen was het hier een drukte van belang met de aan- en afvoer van goederen. Nu is het een prachtige plek om te winkelen en te lunchen of te dineren in de oude stadskastelen."
 
->>> ra = ReadabilityAnalysis.from_text(text)
+>>> analysis = ReadabilityAnalysis.from_text(text)
 Loading Dutch language model from spaCy... ✓ nl_core_news_lg
 ```
 
@@ -45,14 +45,17 @@ Loading Dutch language model from spaCy... ✓ nl_core_news_lg
 
 #### Get LiNT-II scores
 
-You can see the score for the whole document and/or per sentence:
+You can see the score and difficulty level for the whole document and/or per sentence:
 
 ```python
->>> ra.document_lint_score
-48.924787870674514
+>>> analysis.lint.score
+48.20593518603563
 
->>> ra.lint_scores_per_sentence
-[31.068428969266677, 48.322685595433335, 69.87164005804999]
+>>> analysis.lint.level
+3
+
+>>> analysis.lint_scores_per_sentence
+[18.511612982419507, 54.27056340066443, 63.24402181810589]
 ```
 
 #### Get detailed analysis
@@ -60,50 +63,71 @@ You can see the score for the whole document and/or per sentence:
 For a detailed analysis, use the `get_detailed_analysis()` method:
 
 ```python
->>> detailed_analysis = ra.get_detailed_analysis()
+>>> detailed_analysis = analysis.get_detailed_analysis()
 
 >>> detailed_analysis.keys()
 dict_keys(['document_stats', 'sentence_stats'])
 
 >>> detailed_analysis['document_stats']
 {'sentence_count': 3,
- 'document_lint_score': 48.924787870674514,
+ 'document_lint_score': 48.20593518603563,
  'document_difficulty_level': 3,
- 'min_lint_score': 31.068428969266677,
- 'max_lint_score': 69.87164005804999,
- 'word_freq_compound_adjustment': True}
+ 'min_lint_score': 18.511612982419507,
+ 'max_lint_score': 63.24402181810589}
 
 >>> detailed_analysis['sentence_stats'][0]
 {'text': 'De Oudegracht is het sfeervolle hart van de stad.',
- 'score': 31.068428969266677,
+ 'score': 18.511612982419507,
  'level': 1,
- 'top_n_least_freq_words': [('sfeervolle', 3.21),
-  ('hart', 5.2),
-  ('stad', 5.68)],
- 'mean_log_word_frequency': 4.696666666666666,
+ 'mean_log_word_frequency': 5.364349123825101,
+ 'top_n_least_freq_words': [('hart', 5.293120582960477),
+  ('stad', 5.435577664689725)],
+ 'proportion_concrete_nouns': 0.5,
  'concrete_nouns': ['stad'],
  'abstract_nouns': [],
  'undefined_nouns': ['hart'],
  'unknown_nouns': ['oudegracht'],
  'max_sdl': 3,
- 'sdls': [{'token': 'de', 'dep_length': 0, 'head': 'Oudegracht'},
-  {'token': 'oudegracht', 'dep_length': 3, 'head': 'hart'},
-  {'token': 'is', 'dep_length': 2, 'head': 'hart'},
-  {'token': 'het', 'dep_length': 1, 'head': 'hart'},
-  {'token': 'sfeervolle', 'dep_length': 0, 'head': 'hart'},
-  {'token': 'hart', 'dep_length': 0, 'head': 'hart'},
-  {'token': 'van', 'dep_length': 1, 'head': 'stad'},
-  {'token': 'de', 'dep_length': 0, 'head': 'stad'},
-  {'token': 'stad', 'dep_length': 2, 'head': 'hart'},
-  {'token': '.', 'dep_length': 0, 'head': 'hart'}],
+ 'sdls': [{'token': 'de', 'dep_length': 0, 'heads': ['Oudegracht']},
+  {'token': 'oudegracht', 'dep_length': 3, 'heads': ['hart']},
+  {'token': 'is', 'dep_length': 2, 'heads': ['hart']},
+  {'token': 'het', 'dep_length': 1, 'heads': ['hart']},
+  {'token': 'sfeervolle', 'dep_length': 0, 'heads': ['hart']},
+  {'token': 'hart', 'dep_length': 0, 'heads': ['hart']},
+  {'token': 'van', 'dep_length': 1, 'heads': ['stad']},
+  {'token': 'de', 'dep_length': 0, 'heads': ['stad']},
+  {'token': 'stad', 'dep_length': 2, 'heads': ['hart']},
+  {'token': '.', 'dep_length': 0, 'heads': ['hart']}],
  'content_words_per_clause': 4.0,
  'content_words': ['oudegracht', 'sfeervolle', 'hart', 'stad'],
  'finite_verbs': ['is']}
 ```
 
+#### Access properties on sentence-level and text-level
+
+All the linguistic features used in the analysis can be accessed on a text-level and a sentence-level. For example-- 
+
+Getting the mean word frequency for the whole text:
+
+```python
+>>> analysis.mean_log_word_frequency
+4.208347333820788
+```
+
+Getting the list of content words in each sentence:
+```python
+>>> for sent in analysis.sentences:
+      print(sent.content_words)
+['oudegracht', 'sfeervolle', 'hart', 'stad']
+['middeleeuwen', 'drukte', 'belang', 'afvoer', 'goederen']
+['prachtige', 'plek', 'winkelen', 'lunchen', 'dineren', 'oude', 'stadskastelen']
+```
+
+For a list of available properties, refer to the documentation in [`readability_analysis.py`](https://github.com/vanboefer/lint_ii/blob/main/src/lint_ii/core/readability_analysis.py) and [`sentence_analysis.py`](https://github.com/vanboefer/lint_ii/blob/main/src/lint_ii/core/sentence_analysis.py).
+
 #### Visualization in Jupyter Notebook
 
-[...TBA...]
+To visualize the readability analysis, similarly to the examples on the [LiNT-II documentation]() page, you can use the Jupyter notebook [...].
 
 ## What is LiNT-II?
 
@@ -131,11 +155,11 @@ The readability score is calculated based on the following formula:
 LiNT-II score = 
 
   100 - (
-      - 5.16
-      + (16.13 * word frequency)
-      - (1.28  * syntactic dependency length)
-      - (3.52  * content words per clause)
-      + (16.26 * proportion concrete nouns)
+      - 4.21
+      + (17.28 * word frequency)
+      - (1.62  * syntactic dependency length)
+      - (2.54  * content words per clause)
+      + (16.00 * proportion concrete nouns)
   )
 ```
 
@@ -151,10 +175,10 @@ LiNT-II scores are mapped to 4 difficulty levels. For each level, it is estimate
 
 Score | Difficulty level | Proportion of adults who have diffuculty understanding this level
 --- | --- | ---
-0-34 | 1 | 15%
-35-46 | 2 | 31%
-47-60 | 3 | 55%
-60-100 | 4 | 82%
+[0-34) | 1 | 14%
+[34-46) | 2 | 29%
+[46-58) | 3 | 53%
+[58-100] | 4 | 78%
 
 For more information about how this estimation was done for the original LiNT, please refer to the sources listed in [Original LiNT](#original-lint).
 
