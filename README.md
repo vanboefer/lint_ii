@@ -201,7 +201,7 @@ If you use this library, please cite as follows:
   title = {{LiNT-II: readability assessment for Dutch}},
   year = {2025},
   url = {https://github.com/vanboefer/lint_ii},
-  version = {1.0.0},
+  version = {0.1.0},
   note = {Python package}
 }
 ```
