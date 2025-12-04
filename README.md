@@ -2,7 +2,7 @@
 
 [![License: EUPL v1.2](https://img.shields.io/badge/License-EUPL%20v1.2-blue.svg)](LICENSE)
 [![Python 3.11](https://img.shields.io/badge/python-3.11-blue.svg)](https://www.python.org/downloads/)
-[![Open In Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/drive/1nq8TXHjdCMqqnxWbmCG4wuDJkRSijJbs)
+[![Binder](https://mybinder.org/badge_logo.svg)](https://mybinder.org/v2/gh/vanboefer/lint_ii/HEAD?urlpath=%2Fdoc%2Ftree%2Flint_ii_demo.ipynb)
 
 ## Table of contents
 1. [Introduction](#introduction)
@@ -128,9 +128,11 @@ Getting the list of content words in each sentence:
 
 For a list of available properties, refer to the documentation in [`readability_analysis.py`](https://github.com/vanboefer/lint_ii/blob/main/src/lint_ii/core/readability_analysis.py) and [`sentence_analysis.py`](https://github.com/vanboefer/lint_ii/blob/main/src/lint_ii/core/sentence_analysis.py).
 
-#### Visualization in Colab Notebook
+#### Visualization in Jupyter Notebook (Binder)
 
-To visualize your readability analysis, similarly to the examples on the [LiNT-II documentation](https://vanboefer.github.io/lint_ii/) page, you can use [this colab notebook](https://colab.research.google.com/drive/1nq8TXHjdCMqqnxWbmCG4wuDJkRSijJbs?usp=sharing).
+To visualize your readability analysis, you can use [this notebook](https://mybinder.org/v2/gh/vanboefer/lint_ii/HEAD?urlpath=%2Fdoc%2Ftree%2Flint_ii_demo.ipynb).
+
+*Note: The Binder notebook takes a while to build (~2 minutes). Alternatively, you can download the repo and set up a conda environment to run the notebook locally.*
 
 ## What is LiNT-II?
 
