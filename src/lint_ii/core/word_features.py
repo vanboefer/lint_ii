@@ -2,6 +2,7 @@ from functools import cached_property
 from typing import TypedDict, NotRequired
 
 from spacy.tokens import Token
+from wordfreq import zipf_frequency
 
 from lint_ii import linguistic_data
 from lint_ii.linguistic_data import SuperSemTypes
@@ -179,28 +180,42 @@ class WordFeatures:
     def lemma(self) -> str:
         return self.token.lemma_.lower()
 
+    # @cached_property
+    # def word_frequency(self) -> float | None:
+    #     """
+    #     Word frequency from the SUBTLEX-NL corpus.
+    #     - Frequency is calculated for content words only.
+    #     - For compounds listed in NOUN_DATA, the frequency of the base word is returned.
+    #     - Unknown words (not in SUBTLEX-NL) default to 1.359 (zero count frequency).
+    #     - Returns None for function words and proper nouns.
+    #     - Returns None if the token or its lemma are in the SKIPLIST.
+    #     """
+    #     if not self.is_content_word_excl_propn:
+    #         return None
+    #     if self.lemma in self._FREQ_SKIPLIST or self.text in self._FREQ_SKIPLIST:
+    #         return None
+
+    #     text = self.text
+    #     if self.is_noun and linguistic_data.WORD_FREQ_COMPOUND_ADJUSTMENT:
+    #         text = self._NOUN_DATA.get(text, {}).get('head', text)
+
+    #     zero_count_freq = 1.359228547196266  # log10(1 / total_count * 1e9)
+    #     return self._FREQ_DATA.get(text, zero_count_freq)
+    
     @cached_property
-    def word_frequency(self) -> float | None:
-        """
-        Word frequency from the SUBTLEX-NL corpus.
-        - Frequency is calculated for content words only.
-        - For compounds listed in NOUN_DATA, the frequency of the base word is returned.
-        - Unknown words (not in SUBTLEX-NL) default to 1.359 (zero count frequency).
-        - Returns None for function words and proper nouns.
-        - Returns None if the token or its lemma are in the SKIPLIST.
-        """
+    def word_frequency(self) -> float|None:
+        """Word frequency using zipf scale."""
         if not self.is_content_word_excl_propn:
-            return None
-        if self.lemma in self._FREQ_SKIPLIST or self.text in self._FREQ_SKIPLIST:
             return None
 
         text = self.text
+        # because PROPN was filtered out above here we only get NOUN
         if self.is_noun and linguistic_data.WORD_FREQ_COMPOUND_ADJUSTMENT:
             text = self._NOUN_DATA.get(text, {}).get('head', text)
 
-        zero_count_freq = 1.359228547196266  # log10(1 / total_count * 1e9)
-        return self._FREQ_DATA.get(text, zero_count_freq) 
-    
+        freq = zipf_frequency(text, "nl")
+        return freq if freq > 0 else 1.3555 # Default frequency for unknown words
+
     @cached_property
     def heads(self) -> list[Token]:
         """
