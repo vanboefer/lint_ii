@@ -8,4 +8,4 @@ class SuperSemTypes(StrEnum):
     UNKNOWN = 'unknown'
 
 
-WORD_FREQ_COMPOUND_ADJUSTMENT = True
+WORD_FREQ_COMPOUND_ADJUSTMENT = False
