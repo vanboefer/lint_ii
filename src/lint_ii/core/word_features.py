@@ -195,8 +195,8 @@ class WordFeatures:
             return None
 
         text = self.text
-        if self.is_noun and linguistic_data.WORD_FREQ_COMPOUND_ADJUSTMENT:
-            text = self._NOUN_DATA.get(text, {}).get('head', text)
+        # if self.is_noun and linguistic_data.WORD_FREQ_COMPOUND_ADJUSTMENT:
+        #     text = self._NOUN_DATA.get(text, {}).get('head', text)
 
         zero_count_freq = 1.359228547196266  # log10(1 / total_count * 1e9)
         return self._FREQ_DATA.get(text, zero_count_freq) 
