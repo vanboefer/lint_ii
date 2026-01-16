@@ -67,6 +67,8 @@ class SentenceAnalysis:
         Proportion of concrete nouns out of the total nouns in the sentence.
         Nouns of type `unknown` (not in the list) are excluded from the totals count.
         Returns None if totals are 0, i.e. there are no nouns or only `unknown` nouns in the sentence. Cached property.
+    pronouns : dict[int, list[str]]
+        Pronouns in the sentence categorized by person (first, second, third).
     content_words : list[str]
         All content words in the sentence.
     finite_verbs : list[str]
@@ -247,7 +249,18 @@ class SentenceAnalysis:
         if total_nouns == 0:
             return None
         return n_concrete_nouns / total_nouns
-    
+
+    @property
+    def pronouns(self) -> dict[int, list[str]]:
+        """Pronouns in the sentence categorized by person (first, second, third)."""
+        from collections import defaultdict
+
+        dct = defaultdict(list)
+        for feat in self.word_features:
+            if feat.is_pronoun:
+                dct[feat.pronoun_person].append(feat.text)
+        return dct
+
     @property
     def content_words(self) -> list[str]:
         """All content words in the sentence."""
@@ -331,6 +344,9 @@ class SentenceAnalysis:
             'content_words_per_clause': self.content_words_per_clause,
             'content_words': self.content_words,
             'finite_verbs': self.finite_verbs,
+            'pronouns_first_person': self.pronouns[1],
+            'pronouns_second_person': self.pronouns[2],
+            'pronouns_third_person': self.pronouns[3],
         }
 
     def as_dict(self) -> SentenceAnalysisDict:

@@ -47,6 +47,10 @@ class WordFeatures:
         The number of intervening tokens between the token and its syntactic head. Cached property.
     is_punctuation : bool
         Indicator whether token is punctuation.
+    is_pronoun : bool
+        Indicator whether token is a pronoun.
+    pronoun_person : int
+        Person of the pronoun (first, second, third).
     is_content_word : bool
         True if token has one of the parts-of-speech: NOUN, PROPN, VERB, ADJ or is a
         manner adverb (from MANNER_ADVERBS list). Special cases: copulas and numerals 
@@ -252,6 +256,23 @@ class WordFeatures:
     def is_punctuation(self) -> bool:
         """Indicator whether token is punctuation."""
         return self.token.is_punct
+
+    @cached_property
+    def is_pronoun(self) -> bool:
+        """Indicator whether token is a pronoun."""
+        tag = self.token.tag_
+        pron_types = ['|pers|', '|pr|', '|bez|']
+        return 'VNW' in tag and any(i in tag for i in pron_types)
+
+    @cached_property
+    def pronoun_person(self) -> int:
+        """Person of the pronoun (first, second, third)."""
+        if not self.is_pronoun:
+            return None
+
+        for chr in self.token.tag_:
+            if chr.isdigit():
+                return int(chr)
 
     @property
     def is_content_word(self) -> bool:
