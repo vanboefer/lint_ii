@@ -45,6 +45,8 @@ class WordFeatures:
         Syntactic heads of the token, with special handling for conjunctions. Cached property.
     dep_length : int
         The number of intervening tokens between the token and its syntactic head. Cached property.
+    is_punctuation : bool
+        Indicator whether token is punctuation.
     is_content_word : bool
         True if token has one of the parts-of-speech: NOUN, PROPN, VERB, ADJ or is a
         manner adverb (from MANNER_ADVERBS list). Special cases: copulas and numerals 
@@ -245,6 +247,11 @@ class WordFeatures:
 
         dep_length = len([t for t in part if t.dep_ != 'punct']) - 1
         return dep_length if dep_length >= 0 else 0
+
+    @property
+    def is_punctuation(self) -> bool:
+        """Indicator whether token is punctuation."""
+        return self.token.is_punct
 
     @property
     def is_content_word(self) -> bool:

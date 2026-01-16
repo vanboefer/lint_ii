@@ -47,6 +47,8 @@ class SentenceAnalysis:
         The input spaCy sentence object.
     word_features : list[WordFeatures]
         Linguistic features for each token in the sentence. Cached property.
+    sent_length : int
+        Number of tokens in the sentence (excluding punctuation).
     sdls : list[SDLInfo]
         Syntactic dependency length information for each token.
         Each entry contains the token text, dependency length, and and a list of token's heads. For one-word sentences, an empty list is returned. Cached property.
@@ -165,6 +167,11 @@ class SentenceAnalysis:
         return [WordFeatures(token) for token in self.doc]
 
     @cached_property
+    def sent_length(self) -> int:
+        """Number of tokens in the sentence (excluding punctuation)."""
+        return len([wf for wf in self.word_features if not wf.is_punctuation])
+
+    @cached_property
     def sdls(self) -> list[SDLInfo]:
         """
         Syntactic dependency length information for each token.
@@ -174,7 +181,7 @@ class SentenceAnalysis:
         -------------
         If the sentence consists of less than 2 tokens (excluding punctuation), an empty list is returned; i.e. there are no SDL's for a one-word sentence.
         """
-        if len([wf for wf in self.word_features if wf.token.pos_ != 'PUNCT']) < 2:
+        if len([wf for wf in self.word_features if not wf.is_punctuation]) < 2:
             return []
         return [
             {
@@ -318,6 +325,7 @@ class SentenceAnalysis:
             'abstract_nouns': self.abstract_nouns,
             'undefined_nouns': self.undefined_nouns,
             'unknown_nouns': self.unknown_nouns,
+            'sent_length': self.sent_length,
             'max_sdl': self.max_sdl,
             'sdls': self.sdls,
             'content_words_per_clause': self.content_words_per_clause,
