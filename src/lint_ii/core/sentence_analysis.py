@@ -73,6 +73,10 @@ class SentenceAnalysis:
         All content words in the sentence.
     finite_verbs : list[str]
         All finite verbs (verbs showing tense) in the sentence.
+    has_passive : bool
+        Indicator whether sentence has one or more passive auxiliaries.
+    passives : list[list[str]]
+        List of passive verbs: passive auxiliary plus its head.
     content_words_per_clause : float | None
         Number of content words per clause. Returns None if there are no finite verbs in the sentence (i.e. no clause). Cached property.
     mean_log_word_frequency : float | None
@@ -278,6 +282,23 @@ class SentenceAnalysis:
         ]
 
     @cached_property
+    def has_passive(self) -> bool:
+        """Indicator whether sentence has one or more passive auxiliaries."""
+        for feat in self.word_features:
+            if feat.token.dep_ == 'aux:pass':
+                return True
+        return False 
+
+    @cached_property
+    def passives(self) -> list[list[str]]:
+        """List of passive verbs: passive auxiliary plus its head."""
+        return [
+            [feat.text, *[head.text for head in feat.heads]]
+            for feat in self.word_features
+            if feat.token.dep_ == 'aux:pass'
+        ]
+
+    @cached_property
     def content_words_per_clause(self) -> float | None:
         """
         Number of content words per clause.
@@ -344,6 +365,7 @@ class SentenceAnalysis:
             'content_words_per_clause': self.content_words_per_clause,
             'content_words': self.content_words,
             'finite_verbs': self.finite_verbs,
+            'passives': self.passives,
             'pronouns_first_person': self.pronouns[1],
             'pronouns_second_person': self.pronouns[2],
             'pronouns_third_person': self.pronouns[3],
