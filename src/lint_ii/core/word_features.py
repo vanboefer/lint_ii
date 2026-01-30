@@ -45,9 +45,10 @@ class WordFeatures:
         Syntactic heads of the token, with special handling for conjunctions. Cached property.
     dep_length : int
         The number of intervening tokens between the token and its syntactic head. Cached property.
+    is_passive_auxiliary : bool
+        Indicator whether token is passive auxiliary. Cached property.
     is_in_subordinate_clause : bool
-        Indicator whether token is part of a subordinate clause based on the dependency label.
-        Cached property.
+        Indicator whether token is part of a subordinate clause based on the dependency label. Cached property.
     is_punctuation : bool
         Indicator whether token is punctuation.
     is_pronoun : bool
@@ -254,6 +255,11 @@ class WordFeatures:
 
         dep_length = len([t for t in part if t.dep_ != 'punct']) - 1
         return dep_length if dep_length >= 0 else 0
+
+    @cached_property
+    def is_passive_auxiliary(self) -> bool:
+        """Indicator whether token is passive auxiliary."""
+        return self.token.dep_ == 'aux:pass'
 
     @cached_property
     def is_in_subordinate_clause(self) -> bool:

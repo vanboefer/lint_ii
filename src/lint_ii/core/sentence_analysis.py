@@ -75,8 +75,8 @@ class SentenceAnalysis:
         All finite verbs (verbs showing tense) in the sentence.
     has_passive : bool
         Indicator whether sentence has one or more passive auxiliaries. Cached property.
-    passives : list[list[str]]
-        List of passive verbs: passive auxiliary plus its head. Cached property.
+    passives : list[Span]
+        List of passive verbal phrases. Cached property.
     has_subordinate_clause : bool
         Indicator whether sentence has one or more subordinate clauses. Cached property.
     subordinate_clauses : list[Span]
@@ -288,20 +288,27 @@ class SentenceAnalysis:
     @cached_property
     def has_passive(self) -> bool:
         """Indicator whether sentence has one or more passive auxiliaries."""
-        for feat in self.word_features:
-            if feat.token.dep_ == 'aux:pass':
-                return True
-        return False 
+        return any(feat.is_passive_auxiliary for feat in self.word_features)
 
     @cached_property
-    def passives(self) -> list[list[str]]:
-        """List of passive verbs: passive auxiliary plus its head."""
+    def passives(self) -> list[Span]:
+        """List of passive verbal phrases."""
         return [
-            [feat.text, *[head.text for head in feat.heads]]
+            self._get_span_of_passive_verbal_phrase(feat)
             for feat in self.word_features
-            if feat.token.dep_ == 'aux:pass'
+            if feat.is_passive_auxiliary
         ]
     
+    def _get_span_of_passive_verbal_phrase(self, feat: WordFeatures) -> Span|None:
+        """Get passive verbal phrase as span from token and its heads."""
+        if not feat.is_passive_auxiliary:
+            return None
+        
+        indices = [feat.token.i]
+        indices.extend(head.i for head in feat.heads)
+
+        return feat.token.sent[min(indices):max(indices) + 1]
+
     @cached_property
     def has_subordinate_clause(self) -> bool:
         """
@@ -325,7 +332,7 @@ class SentenceAnalysis:
         ]
 
     def _get_span_of_subordinate_clause(self, feat: WordFeatures) -> Span|None:
-        """Get span from token and its children."""
+        """Get subordinate clause as span from token and its children."""
         if not feat.is_in_subordinate_clause:
             return None
 
