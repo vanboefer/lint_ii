@@ -45,6 +45,9 @@ class WordFeatures:
         Syntactic heads of the token, with special handling for conjunctions. Cached property.
     dep_length : int
         The number of intervening tokens between the token and its syntactic head. Cached property.
+    is_in_subordinate_clause : bool
+        Indicator whether token is part of a subordinate clause based on the dependency label.
+        Cached property.
     is_punctuation : bool
         Indicator whether token is punctuation.
     is_pronoun : bool
@@ -251,6 +254,31 @@ class WordFeatures:
 
         dep_length = len([t for t in part if t.dep_ != 'punct']) - 1
         return dep_length if dep_length >= 0 else 0
+
+    @cached_property
+    def is_in_subordinate_clause(self) -> bool:
+        """
+        Indicator whether token is part of a subordinate clause.
+        
+        Returns True if token:
+        - has a dependency label 'acl:relcl', 'advcl' or 'ccomp'
+        - or has a dependency label 'acl' and:
+            - is itself a finite verb
+            - or has a child that is a finite verb
+        """
+        subordinate_deps = ['acl:relcl', 'advcl', 'ccomp']
+    
+        if self.token.dep_ in subordinate_deps:
+            return True
+        if self.token.dep_ != 'acl':
+            return False
+        if 'WW|pv' in self.token.tag_: # is finite verb
+            return True
+
+        # has child which is a finite verb
+        for child in self.token.children:
+            if 'WW|pv' in child.tag_:
+                return True
 
     @property
     def is_punctuation(self) -> bool:

@@ -74,9 +74,13 @@ class SentenceAnalysis:
     finite_verbs : list[str]
         All finite verbs (verbs showing tense) in the sentence.
     has_passive : bool
-        Indicator whether sentence has one or more passive auxiliaries.
+        Indicator whether sentence has one or more passive auxiliaries. Cached property.
     passives : list[list[str]]
-        List of passive verbs: passive auxiliary plus its head.
+        List of passive verbs: passive auxiliary plus its head. Cached property.
+    has_subordinate_clause : bool
+        Indicator whether sentence has one or more subordinate clauses. Cached property.
+    subordinate_clauses : list[Span]
+        List of subordinate clauses in the sentence. Cached property.
     content_words_per_clause : float | None
         Number of content words per clause. Returns None if there are no finite verbs in the sentence (i.e. no clause). Cached property.
     mean_log_word_frequency : float | None
@@ -297,6 +301,38 @@ class SentenceAnalysis:
             for feat in self.word_features
             if feat.token.dep_ == 'aux:pass'
         ]
+    
+    @cached_property
+    def has_subordinate_clause(self) -> bool:
+        """
+        Indicator whether sentence has one or more subordinate clauses.
+        
+        Loops through tokens in the sentence. Returns True if any token:
+        - has a dependency label 'acl:relcl', 'advcl' or 'ccomp'
+        - or has a dependency label 'acl' and:
+            - is itself a finite verb
+            - or has a child that is a finite verb
+        """
+        return any(feat.is_in_subordinate_clause for feat in self.word_features)
+
+    @cached_property
+    def subordinate_clauses(self) -> list[Span]:
+        """List of subordinate clauses in the sentence."""
+        return [
+            self._get_span_of_subordinate_clause(feat)
+            for feat in self.word_features
+            if feat.is_in_subordinate_clause
+        ]
+
+    def _get_span_of_subordinate_clause(self, feat: WordFeatures) -> Span|None:
+        """Get span from token and its children."""
+        if not feat.is_in_subordinate_clause:
+            return None
+
+        indices = [feat.token.i]
+        if feat.token.children:
+            indices.extend(child.i for child in feat.token.children)
+        return feat.token.sent[min(indices):max(indices) + 1]
 
     @cached_property
     def content_words_per_clause(self) -> float | None:
