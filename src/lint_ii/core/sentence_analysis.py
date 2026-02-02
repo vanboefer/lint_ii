@@ -409,6 +409,7 @@ class SentenceAnalysis:
             'content_words': self.content_words,
             'finite_verbs': self.finite_verbs,
             'passives': self.passives,
+            'subordinate_clauses': self.subordinate_clauses,
             'pronouns_first_person': self.pronouns[1],
             'pronouns_second_person': self.pronouns[2],
             'pronouns_third_person': self.pronouns[3],
