@@ -294,9 +294,8 @@ class SentenceAnalysis:
     def passives(self) -> list[Span]:
         """List of passive verbal phrases."""
         return [
-            self._get_span_of_passive_verbal_phrase(feat)
-            for feat in self.word_features
-            if feat.is_passive_auxiliary
+            span for feat in self.word_features
+            if (span := self._get_span_of_passive_verbal_phrase(feat))
         ]
     
     def _get_span_of_passive_verbal_phrase(self, feat: WordFeatures) -> Span|None:
@@ -307,7 +306,7 @@ class SentenceAnalysis:
         indices = [feat.token.i]
         indices.extend(head.i for head in feat.heads)
 
-        return feat.token.sent[min(indices):max(indices) + 1]
+        return feat.token.doc[min(indices):max(indices) + 1]
 
     @cached_property
     def has_subordinate_clause(self) -> bool:
@@ -326,9 +325,8 @@ class SentenceAnalysis:
     def subordinate_clauses(self) -> list[Span]:
         """List of subordinate clauses in the sentence."""
         return [
-            self._get_span_of_subordinate_clause(feat)
-            for feat in self.word_features
-            if feat.is_in_subordinate_clause
+            span for feat in self.word_features
+            if (span := self._get_span_of_subordinate_clause(feat))
         ]
 
     def _get_span_of_subordinate_clause(self, feat: WordFeatures) -> Span|None:
@@ -337,9 +335,9 @@ class SentenceAnalysis:
             return None
 
         indices = [feat.token.i]
-        if feat.token.children:
-            indices.extend(child.i for child in feat.token.children)
-        return feat.token.sent[min(indices):max(indices) + 1]
+        indices.extend(child.i for child in feat.token.children)
+
+        return feat.token.doc[min(indices):max(indices) + 1]
 
     @cached_property
     def content_words_per_clause(self) -> float | None:
@@ -408,8 +406,8 @@ class SentenceAnalysis:
             'content_words_per_clause': self.content_words_per_clause,
             'content_words': self.content_words,
             'finite_verbs': self.finite_verbs,
-            'passives': self.passives,
-            'subordinate_clauses': self.subordinate_clauses,
+            'passives': [span.text for span in self.passives],
+            'subordinate_clauses': [span.text for span in self.subordinate_clauses],
             'pronouns_first_person': self.pronouns[1],
             'pronouns_second_person': self.pronouns[2],
             'pronouns_third_person': self.pronouns[3],
