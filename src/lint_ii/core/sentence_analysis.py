@@ -81,6 +81,8 @@ class SentenceAnalysis:
         Indicator whether sentence has one or more subordinate clauses. Cached property.
     subordinate_clauses : list[Span]
         List of subordinate clauses in the sentence. Cached property.
+    n_subordinate_clauses : int
+        Number of subordinate clauses. Cached property.
     content_words_per_clause : float | None
         Number of content words per clause. Returns None if there are no finite verbs in the sentence (i.e. no clause). Cached property.
     mean_log_word_frequency : float | None
@@ -329,6 +331,11 @@ class SentenceAnalysis:
             if (span := self._get_span_of_subordinate_clause(feat))
         ]
 
+    @cached_property
+    def n_subordinate_clauses(self) -> int:
+        """Number of subordinate clauses."""
+        return len(self.subordinate_clauses)
+
     def _get_span_of_subordinate_clause(self, feat: WordFeatures) -> Span|None:
         """Get subordinate clause as span from token and its children."""
         if not feat.is_in_subordinate_clause:
@@ -407,6 +414,7 @@ class SentenceAnalysis:
             'content_words': self.content_words,
             'finite_verbs': self.finite_verbs,
             'passives': [span.text for span in self.passives],
+            'n_subordinate_clauses': self.n_subordinate_clauses,
             'subordinate_clauses': [span.text for span in self.subordinate_clauses],
             'pronouns_first_person': self.pronouns[1],
             'pronouns_second_person': self.pronouns[2],
@@ -422,4 +430,4 @@ class SentenceAnalysis:
             'max_sdl': self.max_sdl,
             'proportion_of_concrete_nouns': self.proportion_of_concrete_nouns,
             'content_words_per_clause': self.content_words_per_clause,
-        }
+        } # type: ignore

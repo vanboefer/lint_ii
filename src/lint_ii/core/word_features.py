@@ -53,7 +53,7 @@ class WordFeatures:
         Indicator whether token is punctuation.
     is_pronoun : bool
         Indicator whether token is a pronoun.
-    pronoun_person : int
+    pronoun_person : int|None
         Person of the pronoun (first, second, third).
     is_content_word : bool
         True if token has one of the parts-of-speech: NOUN, PROPN, VERB, ADJ or is a
@@ -210,7 +210,7 @@ class WordFeatures:
 
         zero_count_freq = 1.359228547196266  # log10(1 / total_count * 1e9)
         return self._FREQ_DATA.get(text, zero_count_freq) 
-    
+
     @cached_property
     def heads(self) -> list[Token]:
         """
@@ -271,12 +271,14 @@ class WordFeatures:
         - or has a dependency label 'acl' and:
             - is itself a finite verb
             - or has a child that is a finite verb
+        
+        The function uses the resolved dependency label. If a token is a conjunct the dependency label is recursively taken from its head.
         """
         subordinate_deps = ['acl:relcl', 'advcl', 'ccomp']
     
-        if self.token.dep_ in subordinate_deps:
+        if self._resolved_dependency in subordinate_deps:
             return True
-        if self.token.dep_ != 'acl':
+        if self._resolved_dependency != 'acl':
             return False
         if 'WW|pv' in self.token.tag_: # is finite verb
             return True
@@ -285,6 +287,19 @@ class WordFeatures:
         for child in self.token.children:
             if 'WW|pv' in child.tag_:
                 return True
+        return False
+
+    @cached_property
+    def _resolved_dependency(self) -> str:
+        """
+        Token dependency label.
+        
+        If token is conjunct the dependency label is recursively taken from its head.
+        """
+        current_token = self.token
+        while current_token.dep_ == 'conj':
+            current_token = current_token.head
+        return current_token.dep_
 
     @property
     def is_punctuation(self) -> bool:
@@ -299,7 +314,7 @@ class WordFeatures:
         return 'VNW' in tag and any(i in tag for i in pron_types)
 
     @cached_property
-    def pronoun_person(self) -> int:
+    def pronoun_person(self) -> int|None:
         """Person of the pronoun (first, second, third)."""
         if not self.is_pronoun:
             return None
