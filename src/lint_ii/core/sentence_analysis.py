@@ -21,10 +21,10 @@ class SentenceAnalysisDict(TypedDict):
     word_features: list[WordFeaturesDict]
     lint_score: float | None
     difficulty_level: int | None
-    mean_log_word_frequency: float
+    mean_log_word_frequency: float | None
     max_sdl: int | None
-    proportion_of_concrete_nouns: float
-    content_words_per_clause: float
+    proportion_of_concrete_nouns: float | None
+    content_words_per_clause: float | None
 
 
 class SentenceAnalysis:
@@ -49,29 +49,26 @@ class SentenceAnalysis:
         Linguistic features for each token in the sentence. Cached property.
     sent_length : int
         Number of tokens in the sentence (excluding punctuation).
-    sdls : list[SDLInfo]
-        Syntactic dependency length information for each token.
-        Each entry contains the token text, dependency length, and and a list of token's heads. For one-word sentences, an empty list is returned. Cached property.
     max_sdl : int | None
         Maximum syntactic dependency length in the sentence. 
         If there are no SDLs (i.e. one-word sentence), returns None. Cached property.
-    concrete_nouns : list[str]
+    concrete_nouns : list[WordFeatures]
         All concrete nouns in the sentence.
-    abstract_nouns : list[str]
+    abstract_nouns : list[WordFeatures]
         All abstract nouns in the sentence.
-    undefined_nouns : list[str]
+    undefined_nouns : list[WordFeatures]
         Nouns that have both a concrete and an abstract meaning.
-    unknown_nouns : list[str]
+    unknown_nouns : list[WordFeatures]
         All unknown nouns in the sentence: not found in NOUN_DATA and could not be resolved based on entity type heuristics.
     proportion_of_concrete_nouns : float | None
         Proportion of concrete nouns out of the total nouns in the sentence.
         Nouns of type `unknown` (not in the list) are excluded from the totals count.
         Returns None if totals are 0, i.e. there are no nouns or only `unknown` nouns in the sentence. Cached property.
-    pronouns : dict[int, list[str]]
+    pronouns : dict[int, list[WordFeatures]]
         Pronouns in the sentence categorized by person (first, second, third).
-    content_words : list[str]
+    content_words : list[WordFeatures]
         All content words in the sentence.
-    finite_verbs : list[str]
+    finite_verbs : list[WordFeatures]
         All finite verbs (verbs showing tense) in the sentence.
     has_passive : bool
         Indicator whether sentence has one or more passive auxiliaries. Cached property.
@@ -97,6 +94,9 @@ class SentenceAnalysis:
         Create analysis from text string. Preprocesses text and applies spaCy NLP pipeline.
     get_top_n_least_frequent(n: int = 5) -> list[tuple[str, float]]
         Return the n words with lowest frequency scores.
+    get_sdl_info() -> list[SDLInfo]
+        Syntactic dependency length information for each token.
+        Each entry contains the token text, dependency length, and and a list of token's heads. For one-word sentences, an empty list is returned. Cached property.
     get_detailed_analysis(n: int = 5) -> dict[str, Any]
         Return comprehensive analysis including all feature values.
     as_dict() -> SentenceAnalysisDict
@@ -184,64 +184,49 @@ class SentenceAnalysis:
         return len([wf for wf in self.word_features if not wf.is_punctuation])
 
     @cached_property
-    def sdls(self) -> list[SDLInfo]:
-        """
-        Syntactic dependency length information for each token.
-        Each entry contains the token text, dependency length, and a list of token's heads.
-
-        Special case
-        -------------
-        If the sentence consists of less than 2 tokens (excluding punctuation), an empty list is returned; i.e. there are no SDL's for a one-word sentence.
-        """
-        if len([wf for wf in self.word_features if not wf.is_punctuation]) < 2:
-            return []
-        return [
-            {
-                'token': feat.text,
-                'dep_length': feat.dep_length,
-                'heads': [head.text for head in feat.heads],
-            }
-            for feat in self.word_features
-        ]
-
-    @cached_property
     def max_sdl(self) -> int | None:
         """
         Maximum dependency length in the sentence.
         If there are no SDLs (i.e. one-word sentence), returns None.
         """
-        values = {sdl['dep_length'] for sdl in self.sdls}
-        return max(values, default=None)
+        dep_lengths = [
+            feat.dep_length for feat in self.word_features
+            if not feat.is_punctuation
+        ]
+        if len(dep_lengths) < 2:
+            return None
+
+        return max(dep_lengths, default=None)
     
     @property
-    def concrete_nouns(self) -> list[str]:
+    def concrete_nouns(self) -> list[WordFeatures]:
         """All concrete nouns in the sentence."""
         return [
-            feat.text for feat in self.word_features
+            feat for feat in self.word_features
             if feat.is_concrete
         ]
 
     @property
-    def abstract_nouns(self) -> list[str]:
+    def abstract_nouns(self) -> list[WordFeatures]:
         """All abstract nouns in the sentence."""
         return [
-            feat.text for feat in self.word_features
+            feat for feat in self.word_features
             if feat.is_abstract
         ]
 
     @property
-    def undefined_nouns(self) -> list[str]:
+    def undefined_nouns(self) -> list[WordFeatures]:
         """All undefined nouns in the sentence."""
         return [
-            feat.text for feat in self.word_features
+            feat for feat in self.word_features
             if feat.is_undefined
         ]
 
     @property
-    def unknown_nouns(self) -> list[str]:
+    def unknown_nouns(self) -> list[WordFeatures]:
         """All unknown nouns in the sentence."""
         return [
-            feat.text for feat in self.word_features
+            feat for feat in self.word_features
             if feat.is_unknown
         ]
 
@@ -261,29 +246,29 @@ class SentenceAnalysis:
         return n_concrete_nouns / total_nouns
 
     @property
-    def pronouns(self) -> dict[int, list[str]]:
+    def pronouns(self) -> dict[int, list[WordFeatures]]:
         """Pronouns in the sentence categorized by person (first, second, third)."""
         from collections import defaultdict
 
         dct = defaultdict(list)
         for feat in self.word_features:
             if feat.is_pronoun:
-                dct[feat.pronoun_person].append(feat.text)
+                dct[feat.pronoun_person].append(feat)
         return dct
 
     @property
-    def content_words(self) -> list[str]:
+    def content_words(self) -> list[WordFeatures]:
         """All content words in the sentence."""
         return [
-            feat.text for feat in self.word_features
+            feat for feat in self.word_features
             if feat.is_content_word
         ]
 
     @property
-    def finite_verbs(self) -> list[str]:
+    def finite_verbs(self) -> list[WordFeatures]:
         """All finite verbs in the sentence."""
         return [
-            feat.text for feat in self.word_features
+            feat for feat in self.word_features
             if feat.is_finite_verb
         ]
 
@@ -300,7 +285,7 @@ class SentenceAnalysis:
             if (span := self._get_span_of_passive_verbal_phrase(feat))
         ]
     
-    def _get_span_of_passive_verbal_phrase(self, feat: WordFeatures) -> Span|None:
+    def _get_span_of_passive_verbal_phrase(self, feat: WordFeatures) -> Span | None:
         """Get passive verbal phrase as span from token and its heads."""
         if not feat.is_passive_auxiliary:
             return None
@@ -336,7 +321,7 @@ class SentenceAnalysis:
         """Number of subordinate clauses."""
         return len(self.subordinate_clauses)
 
-    def _get_span_of_subordinate_clause(self, feat: WordFeatures) -> Span|None:
+    def _get_span_of_subordinate_clause(self, feat: WordFeatures) -> Span | None:
         """Get subordinate clause as span from token and its children."""
         if not feat.is_in_subordinate_clause:
             return None
@@ -394,6 +379,27 @@ class SentenceAnalysis:
             return sorted(frequencies.items(), key=itemgetter(1))
         return sorted(frequencies.items(), key=itemgetter(1))[:n]
 
+    def get_sdl_info(self) -> list[SDLInfo]:
+        """
+        Syntactic dependency length information for each token.
+        Each entry contains the token text, dependency length, and a list of token's heads.
+
+        Special case
+        -------------
+        If the sentence consists of less than 2 tokens (excluding punctuation), an empty list is returned; i.e. there are no SDL's for a one-word sentence.
+        """
+        feats = [feat for feat in self.word_features if not feat.is_punctuation]
+        if len(feats) < 2:
+            return []
+        return [
+            {
+                'token': feat.text,
+                'dep_length': feat.dep_length,
+                'heads': [head.text for head in feat.heads],
+            }
+            for feat in feats
+        ]
+
     def get_detailed_analysis(self, n: int = 5) -> dict[str, Any]:
         """Get detailed analysis for the sentence."""
         return {
@@ -403,22 +409,22 @@ class SentenceAnalysis:
             'mean_log_word_frequency': self.mean_log_word_frequency,
             'top_n_least_freq_words': self.get_top_n_least_frequent(n=n),
             'proportion_concrete_nouns': self.proportion_of_concrete_nouns,
-            'concrete_nouns': self.concrete_nouns,
-            'abstract_nouns': self.abstract_nouns,
-            'undefined_nouns': self.undefined_nouns,
-            'unknown_nouns': self.unknown_nouns,
+            'concrete_nouns': [feat.text for feat in self.concrete_nouns],
+            'abstract_nouns': [feat.text for feat in self.abstract_nouns],
+            'undefined_nouns': [feat.text for feat in self.undefined_nouns],
+            'unknown_nouns': [feat.text for feat in self.unknown_nouns],
             'sent_length': self.sent_length,
             'max_sdl': self.max_sdl,
-            'sdls': self.sdls,
+            'sdls': self.get_sdl_info(),
             'content_words_per_clause': self.content_words_per_clause,
-            'content_words': self.content_words,
-            'finite_verbs': self.finite_verbs,
+            'content_words': [feat.text for feat in self.content_words],
+            'finite_verbs': [feat.text for feat in self.finite_verbs],
             'passives': [span.text for span in self.passives],
             'n_subordinate_clauses': self.n_subordinate_clauses,
             'subordinate_clauses': [span.text for span in self.subordinate_clauses],
-            'pronouns_first_person': self.pronouns[1],
-            'pronouns_second_person': self.pronouns[2],
-            'pronouns_third_person': self.pronouns[3],
+            'pronouns_first_person': [feat.text for feat in self.pronouns[1]],
+            'pronouns_second_person': [feat.text for feat in self.pronouns[2]],
+            'pronouns_third_person': [feat.text for feat in self.pronouns[3]],
         }
 
     def as_dict(self) -> SentenceAnalysisDict:
@@ -430,4 +436,4 @@ class SentenceAnalysis:
             'max_sdl': self.max_sdl,
             'proportion_of_concrete_nouns': self.proportion_of_concrete_nouns,
             'content_words_per_clause': self.content_words_per_clause,
-        } # type: ignore
+        }

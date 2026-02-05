@@ -2,7 +2,6 @@ from functools import cached_property
 from typing import Any, TypedDict
 import statistics
 
-from lint_ii import linguistic_data
 from lint_ii.core.preprocessor import preprocess_text
 from lint_ii.core.word_features import WordFeatures
 from lint_ii.core.sentence_analysis import SentenceAnalysis
@@ -14,20 +13,19 @@ from lint_ii.visualization.html import LintIIVisualizer
 
 class DocumentStatsDict(TypedDict):
     sentence_count: int
-    document_lint_score: float
-    document_difficulty_level: int
-    min_lint_score: float
-    max_lint_score: float
-    word_freq_compound_adjustment: bool
+    document_lint_score: float | None
+    document_difficulty_level: int | None
+    min_lint_score: float | None
+    max_lint_score: float | None
 
 
 class ReadabilityAnalysisDict(TypedDict):
     sentences: list[SentenceAnalysisDict]
-    document_lint_score: float
-    document_difficulty_level: int
+    document_lint_score: float | None
+    document_difficulty_level: int | None
     sentence_count: int
-    min_lint_score: float
-    max_lint_score: float
+    min_lint_score: float | None
+    max_lint_score: float | None
 
 
 class ReadabilityAnalysis(LintIIVisualizer):
@@ -50,11 +48,11 @@ class ReadabilityAnalysis(LintIIVisualizer):
         The input sentence analyses.
     word_features : list[WordFeatures]
         Flattened list of all word features across sentences.
-    concrete_nouns : list[str]
+    concrete_nouns : list[WordFeatures]
         All concrete nouns in the document.
-    abstract_nouns : list[str]
+    abstract_nouns : list[WordFeatures]
         All abstract nouns in the document.
-    undefined_nouns : list[str]
+    undefined_nouns : list[WordFeatures]
         All undefined nouns in the document (have both a concrete and an abstract meaning).
     mean_log_word_frequency : float | None
         Document-level mean log frequency of content words (excluding proper nouns).
@@ -147,7 +145,7 @@ class ReadabilityAnalysis(LintIIVisualizer):
         ]
 
     @property
-    def concrete_nouns(self) -> list[str]:
+    def concrete_nouns(self) -> list[WordFeatures]:
         """Bag of concrete nouns for the document."""
         return [
             noun
@@ -156,7 +154,7 @@ class ReadabilityAnalysis(LintIIVisualizer):
         ]
 
     @property
-    def abstract_nouns(self) -> list[str]:
+    def abstract_nouns(self) -> list[WordFeatures]:
         """Bag of abstract nouns for the document."""
         return [
             noun
@@ -165,7 +163,7 @@ class ReadabilityAnalysis(LintIIVisualizer):
         ]
     
     @property
-    def undefined_nouns(self) -> list[str]:
+    def undefined_nouns(self) -> list[WordFeatures]:
         """Bag of undefined nouns for the document."""
         return [
             noun

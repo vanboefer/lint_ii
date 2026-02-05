@@ -52,9 +52,9 @@ class WordFeatures:
     is_punctuation : bool
         Indicator whether token is punctuation.
     is_pronoun : bool
-        Indicator whether token is a pronoun.
-    pronoun_person : int|None
-        Person of the pronoun (first, second, third).
+        Indicator whether token is a pronoun. Cached property.
+    pronoun_person : int | None
+        Person of the pronoun (first, second, third). Cached property.
     is_content_word : bool
         True if token has one of the parts-of-speech: NOUN, PROPN, VERB, ADJ or is a
         manner adverb (from MANNER_ADVERBS list). Special cases: copulas and numerals 
@@ -79,7 +79,7 @@ class WordFeatures:
         True if token has the tag (fine-grained part-of-speech): WW|pv (verb that shows
         tense).
     punctuation : dict[str, str] | None
-        Attached punctuation to a token (used in the LiNT-II visualizer).
+        Attached punctuation to a token (used in the LiNT-II visualizer). Cached property.
 
     Methods
     -------
@@ -314,7 +314,7 @@ class WordFeatures:
         return 'VNW' in tag and any(i in tag for i in pron_types)
 
     @cached_property
-    def pronoun_person(self) -> int|None:
+    def pronoun_person(self) -> int | None:
         """Person of the pronoun (first, second, third)."""
         if not self.is_pronoun:
             return None
@@ -433,7 +433,7 @@ class WordFeatures:
         """Indicator whether word is a finite verb."""
         return "WW|pv" in self.token.tag_ # WW|pv = werkwoord, persoonsvorm
     
-    @property
+    @cached_property
     def punctuation(self) -> dict[str, str] | None:
         """Attached punctuation to a token. Used in the visualizer."""
         from collections import defaultdict
