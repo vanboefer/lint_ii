@@ -48,7 +48,7 @@ class SentenceAnalysis:
     word_features : list[WordFeatures]
         Linguistic features for each token in the sentence. Cached property.
     sent_length : int
-        Number of tokens in the sentence (excluding punctuation).
+        Number of tokens in the sentence (excluding punctuation). Cached property.
     max_sdl : int | None
         Maximum syntactic dependency length in the sentence. 
         If there are no SDLs (i.e. one-word sentence), returns None. Cached property.
