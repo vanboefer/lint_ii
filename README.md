@@ -12,14 +12,20 @@
 
 ## Introduction
 
-**LiNT-II** is a readability assessment tool for Dutch. The library (a) calculates a readability score for a text using the LiNT-II formula, and (b) provides an analysis per sentence, based on the 4 features that are used in the formula.
+**LiNT-II** is a readability assessment tool for Dutch. The library (a) calculates a readability score for a text using the [LiNT-II formula](#lint-ii-score), and (b) provides an analysis per sentence, based on the [4 features that are used in the formula](#features-used-in-the-formula) + a set of [additional features](#additional-features) that are not part of the formula, but could be relevant for readability.
 
-**LiNT-II** is a new implementation of the original **LiNT** tool (see [here](#original-lint)). The main differences between **LiNT** and **LiNT-II** are:
+**LiNT-II** is a new implementation of the original [**LiNT** tool](#original-lint). The main differences between **LiNT** and **LiNT-II** are:
 
 - The **NLP tools** used to extract linguistic features from the text. LiNT has [T-Scan](https://github.com/CentreForDigitalHumanities/tscan) under the hood, while LiNT-II uses [spaCy](https://spacy.io/).
-- The **coefficients** (weights) used in the formula. Since the features are calculated differently, a new linear regression model was fitted on the original reading comprehension data from LiNT. This resulted in new coefficients. The performance of the LiNT-II model is the same as the original LiNT: **Adjusted R<sup>2</sup> = 0.74**, meaning that the model explains 74% of the variance in the comprehension data.
+- The **coefficients** (weights) used in the formula. Since the features are calculated differently, a new linear regression model was fitted on the original reading comprehension data from LiNT. This resulted in new coefficients. The performance of the LiNT-II model is the same as the original LiNT: **adjusted R<sup>2</sup> = 0.74**, meaning that the model explains 74% of the variance in the comprehension data.
 
-For more information, please refer to [What is LiNT-II?](#what-is-lint-ii) and [LiNT-II documentation](https://vanboefer.github.io/lint_ii/).
+For detailed information, please refer to [What is LiNT-II?](#what-is-lint-ii) and [LiNT-II documentation](https://vanboefer.github.io/lint_ii/).
+
+## Changelog
+
+#### New in 0.1.1
+- Added 4 new linguistic features (not used of the formula); see [here](#additional-features).
+- Refactored return types: return `WordFeatures` instead of flattened text everywhere.
 
 ## Quick Start
 
@@ -44,7 +50,7 @@ Nu is het een prachtige plek om te winkelen en te lunchen of te dineren in de ou
 Loading Dutch language model from spaCy... ✓ nl_core_news_lg
 ```
 
-**NOTE**: LiNT-II can process plain text or markdown. Other formats (e.g.. html) or very "unclean" text might produce inaccurate results due to segmentation issues.
+**NOTE**: LiNT-II can process plain text or markdown. Other formats (e.g. html) or very "unclean" text might produce inaccurate results due to sentence segmentation issues.
 
 #### Get LiNT-II scores
 
@@ -61,9 +67,36 @@ You can see the score and difficulty level for the whole document and/or per sen
 [18.511612982419507, 54.27056340066443, 63.24402181810589]
 ```
 
+#### Access properties on sentence-level and text-level
+
+TO DO: add additional examples
+
+All the linguistic features can be accessed on a text-level and a sentence-level. This includes the 4 features used in the formula (e.g. word frequency), as well as additional features related to readability (e.g. passive constructions). For example-- 
+
+Getting the mean word frequency for the whole text:
+
+```python
+>>> analysis.mean_log_word_frequency
+4.208347333820788
+```
+
+Getting the list of content words in each sentence:
+```python
+>>> for sent in analysis.sentences:
+      print(sent.content_words)
+['oudegracht', 'sfeervolle', 'hart', 'stad']
+['middeleeuwen', 'drukte', 'belang', 'afvoer', 'goederen']
+['prachtige', 'plek', 'winkelen', 'lunchen', 'dineren', 'oude', 'stadskastelen']
+```
+
+For a list of available properties, refer to the documentation in [`readability_analysis.py`](https://github.com/vanboefer/lint_ii/blob/main/src/lint_ii/core/readability_analysis.py) and [`sentence_analysis.py`](https://github.com/vanboefer/lint_ii/blob/main/src/lint_ii/core/sentence_analysis.py).
+
+
 #### Get detailed analysis
 
-For a detailed analysis, use the `get_detailed_analysis()` method:
+For a human-readable detailed analysis, use the `get_detailed_analysis()` method:
+
+TO DO: update the output with the new features
 
 ```python
 >>> detailed_analysis = analysis.get_detailed_analysis()
@@ -106,28 +139,6 @@ dict_keys(['document_stats', 'sentence_stats'])
  'finite_verbs': ['is']}
 ```
 
-#### Access properties on sentence-level and text-level
-
-All the linguistic features used in the analysis can be accessed on a text-level and a sentence-level. For example-- 
-
-Getting the mean word frequency for the whole text:
-
-```python
->>> analysis.mean_log_word_frequency
-4.208347333820788
-```
-
-Getting the list of content words in each sentence:
-```python
->>> for sent in analysis.sentences:
-      print(sent.content_words)
-['oudegracht', 'sfeervolle', 'hart', 'stad']
-['middeleeuwen', 'drukte', 'belang', 'afvoer', 'goederen']
-['prachtige', 'plek', 'winkelen', 'lunchen', 'dineren', 'oude', 'stadskastelen']
-```
-
-For a list of available properties, refer to the documentation in [`readability_analysis.py`](https://github.com/vanboefer/lint_ii/blob/main/src/lint_ii/core/readability_analysis.py) and [`sentence_analysis.py`](https://github.com/vanboefer/lint_ii/blob/main/src/lint_ii/core/sentence_analysis.py).
-
 #### Visualization in Jupyter Notebook (Binder)
 
 To visualize your readability analysis, you can use [this notebook](https://mybinder.org/v2/gh/vanboefer/lint_ii/HEAD?urlpath=%2Fdoc%2Ftree%2Flint_ii_demo.ipynb).
@@ -138,7 +149,9 @@ To visualize your readability analysis, you can use [this notebook](https://mybi
 
 **LiNT-II** is a Python implementation of **LiNT** (*Leesbaar­heids­instrument voor Nederlandse Teksten*), a readability assessment tool that analyzes Dutch texts and estimates their difficulty.
 
-LiNT-II outputs a readability score based on 4 features:
+### Features used in the formula
+
+LiNT-II readability score is based on 4 features:
 
 Feature | Description
 --- | ---
@@ -189,6 +202,17 @@ For more information about how this estimation was done for the original LiNT, p
 
 For more information about how the estimation was adapted for LiNT-II, please refer to the [LiNT-II documentation](https://vanboefer.github.io/lint_ii/).
 
+### Additional features
+
+LiNT-II can output additional linguistic features, which are not part of the formula:
+
+Feature | Description
+--- | ---
+**sentence length** | [...]. <br>➡ [...].
+**pronouns** | [...]. <br>➡ [...].
+**passives** | [...]. <br>➡ [...].
+**subordinate clauses** | [...]. <br>➡ [...].
+
 ## References and Credits
 
 ### LiNT-II
@@ -196,6 +220,8 @@ For more information about how the estimation was adapted for LiNT-II, please re
 LiNT-II was developed by [Jenia Kim](https://www.linkedin.com/in/jeniakim/) (Hogeschool Utrecht, VU Amsterdam), in collaboration with [Henk Pander Maat](https://www.uu.nl/medewerkers/HLWPanderMaat) (Utrecht University).
 
 If you use this library, please cite as follows:
+
+TO DO: update version
 
 ```
 @software{lint_ii,
