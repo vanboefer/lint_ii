@@ -101,7 +101,7 @@
             <li><a href="#demo">Demo</a></li>
             <li><a href="#lint-and-lint-ii">LiNT and LiNT-II</a></li>
             <li><a href="#linguistic-features">Linguistic Features</a></li>
-            <li><a href="#formula-scores-and-diffculty-levels">Formula, Scores and Diffculty Levels</a></li>
+            <li><a href="#formula-scores-and-difficulty-levels">Formula, Scores and Difficulty Levels</a></li>
             <li><a href="#references-and-credits">References and Credits</a></li>
         </ol>
     </section>
@@ -109,7 +109,7 @@
         <h2 id="introduction">Introduction</h2>
         <ul>
             <li><strong>LiNT-II</strong> analyzes Dutch text readability using four linguistic features: word frequency, syntactic dependency length, information density (number content words per clause), and proportion of concrete vs abstract nouns. <a href="#linguistic-features"><em>Read more</em></a></li>
-            <li><strong>LiNT-II</strong> outputs a readability score between 0-100; the higher the score is, the more difficult the text is. The scores can be mapped to four difficulty levels: a text of Level 1 is estimated to be difficult for 14% of adult Dutch readers, while a text of Level 4 is estimated to be difficult for 78% of adult Dutch readers. <a href="#formula-scores-and-diffculty-levels"><em>Read more</em></a></li>
+            <li><strong>LiNT-II</strong> outputs a readability score between 0-100; the higher the score is, the more difficult the text is. The scores can be mapped to four difficulty levels: a text of Level 1 is estimated to be difficult for 14% of adult Dutch readers, while a text of Level 4 is estimated to be difficult for 78% of adult Dutch readers. <a href="#formula-scores-and-difficulty-levels"><em>Read more</em></a></li>
             <li><strong>LiNT-II</strong> scores and levels are based on an empirical comprehension study, where understanding of different texts was assessed using a <em>cloze test</em> (fill-in missing words). The study involved 120 texts; 2700 Dutch high-school students participated. <a href="#lint-and-lint-ii"><em>Read more</em></a></li>
             <li>For code and usage, please refer to the <a href="https://github.com/vanboefer/lint_ii">GitHub repo</a>.</li>
         </ul>
@@ -151,8 +151,8 @@
         <li><a href="https://www.aup-online.com/content/journals/10.5117/TVT2023.3.002.MAAT">Pander Maat et al. 2023</a> (Dutch)</li>
     </ul>
     <h3>LiNT-II</h3>
-    <p>In LiNT-II, the linguistic analysis of the text is done with <a href="https://spacy.io/">spaCy</a>, instead of the original <a href="https://github.com/CentreForDigitalHumanities/tscan">T-Scan</a>. This includes, for example, splitting the text into sentences and tokens, tagging the part-of-speech of each token (noun, verb, etc.), and parsing the syntactic structure of the sentence. We use the spaCy model <a href="https://spacy.io/models/nl#nl_core_news_lg"><code>nl_core_news_lg</code></a>.</p>
-    <p>Doing the linguistic analysis with a different software affects the values of the <a href="#linguistic-features">linguistic features</a>. Therefore, we fitted a <strong>new model</strong> on the comprehension data that was collected for the original LiNT. The new model leads to a new LiNT-II formula for calculating the readability score. For more information, read <a href="#formula-scores-and-diffculty-levels">here</a>.</p>
+    <p>In LiNT-II, text is processed with <a href="https://spacy.io/">spaCy</a>, instead of the original <a href="https://github.com/CentreForDigitalHumanities/tscan">T-Scan</a>. This includes, for example, splitting the text into sentences and tokens, tagging the part-of-speech of each token (noun, verb, etc.), and parsing the syntactic structure of the sentence. We use the spaCy model <a href="https://spacy.io/models/nl#nl_core_news_lg"><code>nl_core_news_lg</code></a>.</p>
+    <p>Processing the text with a different software affects the values of the <a href="#linguistic-features">linguistic features</a>. Therefore, we fitted a <strong>new model</strong> on the comprehension data that was collected for the original LiNT. The new model leads to a new LiNT-II formula for calculating the readability score. For more information, read <a href="#formula-scores-and-difficulty-levels">here</a>.</p>
     <h2 id="linguistic-features">Linguistic Features</h2>
     <h3>Overview</h3>
     <p>The readability score of LiNT-II is calculated based on 4 features:</p>
@@ -194,11 +194,11 @@
     </ul>
     <h3>Word Frequency</h3>
     <h4>Why word frequencies?</h4>
-    <p>Words that are not common in spoken language tend to be less familiar to people and therefore more difficult to process and understand. We can estimate how familiar a certain word is by measuring its frequency, i.e. counting its occurences in a big text corpus (dataset).</p>
+    <p>Words that are not common in spoken language tend to be less familiar to people and therefore more difficult to process and understand. We can estimate how familiar a certain word is by measuring its frequency, i.e. counting its occurrences in a big text corpus.</p>
     <h4>Choice of corpus</h4>
     <p>LiNT-II calculates word frequencies from <a href="https://github.com/vanboefer/lint_ii/blob/main/src/lint_ii/linguistic_data/data/subtlex_wordfreq.parquet">SUBTLEX-NL</a> (<a href="https://link.springer.com/article/10.3758/brm.42.3.643">Keuleers et al. 2010</a>): a corpus of Dutch subtitles, which contains about 40 million words. This corpus was chosen for the original LiNT after elaborate analysis and consideration; for details, please refer to the <a href="https://raw.githubusercontent.com/CentreForDigitalHumanities/tscan/master/docs/tscanhandleiding.pdf">T-Scan manual</a> and <a href="https://lint.hum.uu.nl/assets/pander-maat-en-dekker-2016.pdf">Pander Maat &amp; Dekker 2016</a>.</p>
     <blockquote>
-    <p>During the development of LiNT-II, we also experimented with using frequencies from <a href="https://github.com/rspeer/wordfreq">wordfreq</a> instead of SUBTLEX-NL. The <a href="https://github.com/rspeer/wordfreq">wordfreq</a> corpus is a lot bigger and contains multiple genres: SUBTLEX-NL, OpenSubtitles, Wikipedia, NewsCrawl, GlobalVoices, Web text (OSCAR), Twitter. However, <a href="https://github.com/rspeer/wordfreq">wordfreq</a> frequencies gave lower results when <a href="#formula-scores-and-diffculty-levels">fitting the model</a> on comprehension data. This suggests that SUBTLEX-NL might be a better approximation of spoken language than a bigger corpus that contains a lot of written language like news and Wikipedia.</p>
+    <p>During the development of LiNT-II, we also experimented with using frequencies from <a href="https://github.com/rspeer/wordfreq">wordfreq</a> instead of SUBTLEX-NL. The <a href="https://github.com/rspeer/wordfreq">wordfreq</a> corpus is a lot bigger and contains multiple genres:  subtitles (SUBTLEX-NL, OpenSubtitles), Wikipedia, news (NewsCrawl, GlobalVoices), web text (OSCAR), social media (Twitter). However, <a href="https://github.com/rspeer/wordfreq">wordfreq</a> frequencies gave lower results when <a href="#formula-scores-and-difficulty-levels">fitting the model</a> on comprehension data. This suggests that SUBTLEX-NL might be a better approximation of spoken language than a bigger corpus that contains a lot of written language like news and Wikipedia.</p>
     </blockquote>
     <p>It is important to note that any corpus captures language use only partially. Since the SUBTLEX-NL corpus is based on Dutch subtitles for English-speaking shows, some words that are common in a Dutch-speaking context might be less frequent there (e.g., <em>fietser</em> &quot;cyclist&quot;). In addition, the shows are from the years 2000-2010; new words from the last 15 years (<em>Instagram</em>, <em>covid</em>) are not in the corpus. Additional corrections were applied to address some of these issues, as described <a href="#corrections-and-exceptions">below</a>.</p>
     <h4>What do the values mean?</h4>
@@ -212,7 +212,7 @@
     <h4>Corrections and exceptions</h4>
     <p>The corrections and exceptions applied in LiNT-II are the same ones as in the original LiNT.</p>
     <ul>
-        <li>We calculate word frequencies only for <a href="#definitions">content words</a>, since function words are generally frequent (for example, <em>dat</em>: 7.34, <em>de</em>: 7.38, <em>en</em>: 7.14) and do not contribute to the diffuculty of the text. From the content words, we exclude proper nouns (names of people, places, etc.) since their frequency does not influence the difficulty of the text.</li>
+        <li>We calculate word frequencies only for <a href="#definitions">content words</a>, since function words are generally frequent (for example, <em>dat</em>: 7.34, <em>de</em>: 7.38, <em>en</em>: 7.14) and do not contribute to the difficulty of the text. From the content words, we exclude proper nouns (names of people, places, etc.) since their frequency cannot be reliably linked to the difficulty of the text.</li>
         <li>For transparent compounds (e.g., <em>duwboot</em> &quot;towboat&quot;), we use the frequency of the base word (<em>boot</em> &quot;boat&quot;), rather than the frequency of the compound as a whole. Previous research shows that this provides a better estimate of word difficulty; for more details, see <a href="https://lint.hum.uu.nl/assets/pander-maat-en-dekker-2016.pdf">Pander Maat &amp; Dekker 2016</a>. The compounds and their base words are identified based on a manually-annotated <a href="https://github.com/vanboefer/lint_ii/blob/main/src/lint_ii/linguistic_data/data/nouns_sem_types_20251118.parquet">list</a>. The list contains 123,307 compounds: 63,316 singular forms and 59,991 plural forms; for the plural forms, the base word is given in singular (for example, the base word of both <em>integriteitstoets</em> &quot;integrity test&quot; and <em>integriteitstoetsen</em> &quot;integrity tests&quot; is <em>toets</em> &quot;test&quot;).</li>
         <li>As mentioned above, some words that are missing or infrequent in the SUBTLEX-NL corpus are actually pretty common in the spoken language. This includes new words that entered the Dutch language after 2010 (e.g., <em>appen</em> &quot;to send a message on WhatsApp&quot;), and words that are common in a Dutch-speaking context but might be not common in English-speaking TV shows (e.g., <em>knutselen</em> &quot;to craft&quot;, <em>fietser</em> &quot;cyclist&quot;). To address the most obvious discrepancies of this sort, the makers of the original LiNT manually created a list of words that should be skipped when calculating frequencies. So instead of incorrectly getting a low frequency, these words don't get any frequency value at all, and so do not mistakenly affect the difficulty score. For more details on how this was done, see the <a href="https://raw.githubusercontent.com/CentreForDigitalHumanities/tscan/master/docs/tscanhandleiding.pdf">T-Scan manual</a>. The list can be found <a href="https://github.com/vanboefer/lint_ii/blob/main/src/lint_ii/linguistic_data/data/subtlex_wordfreq_skiplist.parquet">here</a>.</li>
     </ul>
@@ -341,7 +341,7 @@
 \]
 </section>
 <section>
-    <h2 id="formula-scores-and-diffculty-levels">Formula, Scores and Diffculty Levels</h2>
+    <h2 id="formula-scores-and-difficulty-levels">Formula, Scores and Difficulty Levels</h2>
     <h3>Where does LiNT-II Formula Come from?</h3>
     <h4>Original LiNT: data and model</h4>
     <p>For the development of the original LiNT, an empirical comprehension study was done. In this study, 2700 Dutch high-school students read 120 texts; their understanding of the texts was assessed using a <em>cloze test</em> (fill-in missing words). This comprehension dataset was then used by the researchers to fit a <a href="https://en.wikipedia.org/wiki/Linear_regression">linear regression model</a>; the model expresses which features of the text best predict the students' performance in the cloze test.</p>
@@ -527,7 +527,7 @@
   title = {{LiNT-II: readability assessment for Dutch}},
   year = {2025},
   url = {https://github.com/vanboefer/lint_ii},
-  version = {0.1.0},
+  version = {0.1.1},
   note = {Python package}
 }
 </code></pre>
