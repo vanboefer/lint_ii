@@ -267,25 +267,23 @@ class WordFeatures:
         Indicator whether token is part of a subordinate clause.
         
         Returns True if token:
-        - has a dependency label 'acl:relcl', 'advcl' or 'ccomp'
-        - or has a dependency label 'acl' and:
-            - is itself a finite verb
-            - or has a child that is a finite verb
+        - has a dependency label 'acl:relcl', 'advcl', 'ccomp', 'csubj' or 'acl'
+        - and:
+            - is itself a verb
+            - or has a child that is a verb
         
         The function uses the resolved dependency label. If a token is a conjunct the dependency label is recursively taken from its head.
         """
-        subordinate_deps = ['acl:relcl', 'advcl', 'ccomp']
-    
-        if self._resolved_dependency in subordinate_deps:
-            return True
-        if self._resolved_dependency != 'acl':
+        subordinate_deps = ['acl:relcl', 'advcl', 'ccomp', 'csubj', 'acl']
+
+        if self._resolved_dependency not in subordinate_deps:
             return False
-        if 'WW|pv' in self.token.tag_: # is finite verb
+        if 'WW' in self.token.tag_: # is verb
             return True
 
-        # has child which is a finite verb
+        # has child which is a verb
         for child in self.token.children:
-            if 'WW|pv' in child.tag_:
+            if 'WW' in child.tag_:
                 return True
         return False
 
