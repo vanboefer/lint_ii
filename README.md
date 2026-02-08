@@ -6,15 +6,29 @@
 
 ## Table of contents
 1. [Introduction](#introduction)
-2. [Quick Start](#quick-start)
-3. [What is LiNT-II?](#what-is-lint-ii)
-4. [References and Credits](#references-and-credits)
+2. [Changelog](#changelog)
+3. [Installation](#installation)
+4. [Usage](#usage)
+    - [Create `ReadabilityAnalysis` from text](#create-readabilityanalysis-from-text)
+    - [Get LiNT-II score and difficulty level](#get-lint-ii-score-and-difficulty-level)
+    - [Get linguistic features](#get-linguistic-features)
+    - [Get dictionary with detailed analysis](#get-dictionary-with-detailed-analysis)
+    - [Visualization in Jupyter Notebook (Binder)](#visualization-in-jupyter-notebook-binder)
+5. [What is LiNT-II?](#what-is-lint-ii)
+    - [Features used in the formula](#features-used-in-the-formula)
+    - [LiNT-II score](#lint-ii-score)
+    - [Difficulty levels](#difficulty-levels)
+    - [Additional features](#additional-features)
+6. [References and Credits](#references-and-credits)
 
 ## Introduction
 
-**LiNT-II** is a readability assessment tool for Dutch. The library (a) calculates a readability score for a text using the [LiNT-II formula](#lint-ii-score), and (b) provides an analysis per sentence, based on the [4 features that are used in the formula](#features-used-in-the-formula) + a set of [additional features](#additional-features) that are not part of the formula, but could be relevant for readability.
+**LiNT-II** is a readability assessment tool for Dutch. The library:
 
-**LiNT-II** is a new implementation of the original [**LiNT** tool](#original-lint). The main differences between **LiNT** and **LiNT-II** are:
+- calculates a **readability score** for a text using the [LiNT-II formula](#lint-ii-score), and 
+- provides an **analysis** per sentence, based on the [4 features that are used in the formula](#features-used-in-the-formula) + a set of [additional features](#additional-features) that are not part of the formula, but could be relevant for readability.
+
+**LiNT-II** is a new implementation of the original [LiNT tool](#original-lint). The main differences between **LiNT** and **LiNT-II** are:
 
 - The **NLP tools** used to extract linguistic features from the text. LiNT has [T-Scan](https://github.com/CentreForDigitalHumanities/tscan) under the hood, while LiNT-II uses [spaCy](https://spacy.io/).
 - The **coefficients** (weights) used in the formula. Since the features are calculated differently, a new linear regression model was fitted on the original reading comprehension data from LiNT. This resulted in new coefficients. The performance of the LiNT-II model is the same as the original LiNT: **adjusted R<sup>2</sup> = 0.74**, meaning that the model explains 74% of the variance in the comprehension data.
@@ -27,17 +41,16 @@ For detailed information, please refer to [What is LiNT-II?](#what-is-lint-ii) a
 - Added 4 new linguistic features (not used of the formula); see [here](#additional-features).
 - Refactored return types: return `WordFeatures` instead of flattened text everywhere.
 
-## Quick Start
-
-### Installation
+## Installation
 
 ```bash
 pip install lint_ii
 python -m spacy download nl_core_news_lg
 ```
-### Usage in Python
 
-#### Create `ReadabilityAnalysis` object from text
+## Usage
+
+### Create `ReadabilityAnalysis` from text
 
 ```python
 >>> from lint_ii import ReadabilityAnalysis
@@ -50,9 +63,10 @@ Nu is het een prachtige plek om te winkelen en te lunchen of te dineren in de ou
 Loading Dutch language model from spaCy... ✓ nl_core_news_lg
 ```
 
-**NOTE**: LiNT-II can process plain text or markdown. Other formats (e.g. html) or very "unclean" text might produce inaccurate results due to sentence segmentation issues.
+#### Note:
+LiNT-II can process plain text or markdown. Other formats (e.g. html) or very "unclean" text might produce inaccurate results due to sentence segmentation issues.
 
-#### Get LiNT-II scores
+### Get LiNT-II score and difficulty level
 
 You can see the score and difficulty level for the whole document and/or per sentence:
 
@@ -67,11 +81,9 @@ You can see the score and difficulty level for the whole document and/or per sen
 [18.511612982419507, 54.27056340066443, 63.24402181810589]
 ```
 
-#### Access properties on sentence-level and text-level
+### Get linguistic features
 
-TO DO: add additional examples
-
-All the linguistic features can be accessed on a text-level and a sentence-level. This includes the 4 features used in the formula (e.g. word frequency), as well as additional features related to readability (e.g. passive constructions). For example-- 
+All the linguistic features can be accessed on a text-level, a sentence-level, and a word-level (if applicable). This includes the 4 features used in the formula (e.g. word frequency), as well as additional features related to readability (e.g. passive constructions). For example:
 
 Getting the mean word frequency for the whole text:
 
@@ -83,34 +95,49 @@ Getting the mean word frequency for the whole text:
 Getting the list of content words in each sentence:
 ```python
 >>> for sent in analysis.sentences:
-      print(sent.content_words)
+      print([feat.text for feat in sent.content_words])
 ['oudegracht', 'sfeervolle', 'hart', 'stad']
 ['middeleeuwen', 'drukte', 'belang', 'afvoer', 'goederen']
 ['prachtige', 'plek', 'winkelen', 'lunchen', 'dineren', 'oude', 'stadskastelen']
 ```
 
-For a list of available properties, refer to the documentation in [`readability_analysis.py`](https://github.com/vanboefer/lint_ii/blob/main/src/lint_ii/core/readability_analysis.py) and [`sentence_analysis.py`](https://github.com/vanboefer/lint_ii/blob/main/src/lint_ii/core/sentence_analysis.py).
+Getting the word frequencies for each content word in the text:
+```python
+>>> frequencies = {
+    feat.text:freq
+    for feat in analysis.word_features
+    if (freq := feat.word_frequency) is not None
+}
+print(frequencies)
+{'hart': 5.293120582960477, 'stad': 5.435577664689725, 'middeleeuwen': 3.423686536423184, 'drukte': 3.96775458077346, 'belang': 4.509063243912051, 'afvoer': 3.3845344124610364, 'goederen': 3.7985612410265284, 'prachtige': 4.7805033384066125, 'plek': 5.249034299064351, 'winkelen': 4.177454440810221, 'dineren': 3.893254653252401, 'oude': 5.436741798693928, 'stadskastelen': 1.359228547196266}
+```
+
+For a list of available properties, refer to the documentation in [`readability_analysis.py`](https://github.com/vanboefer/lint_ii/blob/main/src/lint_ii/core/readability_analysis.py), [`sentence_analysis.py`](https://github.com/vanboefer/lint_ii/blob/main/src/lint_ii/core/sentence_analysis.py), and [`word_features.py`](https://github.com/vanboefer/lint_ii/blob/main/src/lint_ii/core/word_features.py).
 
 
-#### Get detailed analysis
+### Get dictionary with detailed analysis
 
-For a human-readable detailed analysis, use the `get_detailed_analysis()` method:
-
-TO DO: update the output with the new features
+For a human-readable dictionary with a detailed analysis, use the `get_detailed_analysis()` method:
 
 ```python
 >>> detailed_analysis = analysis.get_detailed_analysis()
+```
 
+```python
 >>> detailed_analysis.keys()
 dict_keys(['document_stats', 'sentence_stats'])
+```
 
+```python
 >>> detailed_analysis['document_stats']
 {'sentence_count': 3,
  'document_lint_score': 48.20593518603563,
  'document_difficulty_level': 3,
  'min_lint_score': 18.511612982419507,
  'max_lint_score': 63.24402181810589}
+ ```
 
+ ```python
 >>> detailed_analysis['sentence_stats'][0]
 {'text': 'De Oudegracht is het sfeervolle hart van de stad.',
  'score': 18.511612982419507,
@@ -123,6 +150,7 @@ dict_keys(['document_stats', 'sentence_stats'])
  'abstract_nouns': [],
  'undefined_nouns': ['hart'],
  'unknown_nouns': ['oudegracht'],
+ 'sent_length': 9,
  'max_sdl': 3,
  'sdls': [{'token': 'de', 'dep_length': 0, 'heads': ['Oudegracht']},
   {'token': 'oudegracht', 'dep_length': 3, 'heads': ['hart']},
@@ -132,14 +160,19 @@ dict_keys(['document_stats', 'sentence_stats'])
   {'token': 'hart', 'dep_length': 0, 'heads': ['hart']},
   {'token': 'van', 'dep_length': 1, 'heads': ['stad']},
   {'token': 'de', 'dep_length': 0, 'heads': ['stad']},
-  {'token': 'stad', 'dep_length': 2, 'heads': ['hart']},
-  {'token': '.', 'dep_length': 0, 'heads': ['hart']}],
+  {'token': 'stad', 'dep_length': 2, 'heads': ['hart']}],
  'content_words_per_clause': 4.0,
  'content_words': ['oudegracht', 'sfeervolle', 'hart', 'stad'],
- 'finite_verbs': ['is']}
+ 'finite_verbs': ['is'],
+ 'passives': [],
+ 'n_subordinate_clauses': 0,
+ 'subordinate_clauses': [],
+ 'pronouns_first_person': [],
+ 'pronouns_second_person': [],
+ 'pronouns_third_person': []}
 ```
 
-#### Visualization in Jupyter Notebook (Binder)
+### Visualization in Jupyter Notebook (Binder)
 
 To visualize your readability analysis, you can use [this notebook](https://mybinder.org/v2/gh/vanboefer/lint_ii/HEAD?urlpath=%2Fdoc%2Ftree%2Flint_ii_demo.ipynb).
 
@@ -181,37 +214,33 @@ LiNT-II score =
   )
 ```
 
-The formula's coefficients were estimated using a linear regression model fitted on empirical reading comprehension data from highschool students.
+The formula's coefficients were estimated using a linear regression model fitted on empirical reading comprehension data from high school students.
 
-For more information about the empirical study (done for the original LiNT), please refer to the sources listed in [Original LiNT](#original-lint).
-
-For more information about the LiNT-II model, please refer to the [LiNT-II documentation](https://vanboefer.github.io/lint_ii/).
+For more information, please refer to the [LiNT-II documentation](https://vanboefer.github.io/lint_ii/).
 
 ### Difficulty levels
 
-LiNT-II scores are mapped to 4 difficulty levels. For each level, it is estimated how many adult Dutch readers have difficulty understanding texts on this level.
+LiNT-II scores are mapped to 4 difficulty levels. For each level, it is estimated which percentage of adult Dutch readers have difficulty understanding texts on this level.
 
-Score | Difficulty level | Proportion of adults who have diffuculty understanding this level
+Score | Difficulty level | Proportion of adults who have difficulty understanding this level
 --- | --- | ---
 [0-34) | 1 | 14%
 [34-46) | 2 | 29%
 [46-58) | 3 | 53%
 [58-100] | 4 | 78%
 
-For more information about how this estimation was done for the original LiNT, please refer to the sources listed in [Original LiNT](#original-lint).
-
-For more information about how the estimation was adapted for LiNT-II, please refer to the [LiNT-II documentation](https://vanboefer.github.io/lint_ii/).
+For more information, please refer to the [LiNT-II documentation](https://vanboefer.github.io/lint_ii/).
 
 ### Additional features
 
-LiNT-II can output additional linguistic features, which are not part of the formula:
+LiNT-II outputs additional linguistic features, which are not part of the formula, but can be relevant for readability:
 
 Feature | Description
 --- | ---
-**sentence length** | [...]. <br>➡ [...].
-**pronouns** | [...]. <br>➡ [...].
-**passives** | [...]. <br>➡ [...].
-**subordinate clauses** | [...]. <br>➡ [...].
+**sentence length** | The number of words in a sentence, excluding punctuation.
+**pronouns** | All the pronouns in the text, categorized into 1st / 2nd / 3rd person.
+**passives** | Passive voice constructions. <br>Example: *Het boek **is gepubliceerd** nadat de auteur was overleden.* "The book **was published** after the author's death"
+**subordinate clauses** | A subordinate clause cannot stand alone as a complete sentence and relies on a main clause for its meaning. It adds additional information to the main clause. <br>Example: *Mijn broer, **die in Leuven woont**, is morgen jarig.* "My brother, **who lives in Leuven**, has his birthday tomorrow."
 
 ## References and Credits
 
@@ -221,15 +250,13 @@ LiNT-II was developed by [Jenia Kim](https://www.linkedin.com/in/jeniakim/) (Hog
 
 If you use this library, please cite as follows:
 
-TO DO: update version
-
 ```
 @software{lint_ii,
   author = {Kim, Jenia and Pander Maat, Henk},
   title = {{LiNT-II: readability assessment for Dutch}},
   year = {2025},
   url = {https://github.com/vanboefer/lint_ii},
-  version = {0.1.0},
+  version = {0.1.1},
   note = {Python package}
 }
 ```
