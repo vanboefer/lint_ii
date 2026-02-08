@@ -161,10 +161,10 @@ class LintScorer:
         """
         result = (
             + self.COEFFICIENTS['constant']
-            + self.COEFFICIENTS['freq_log'] * self.freq_log
-            + self.COEFFICIENTS['max_sdl'] * self.max_sdl
-            + self.COEFFICIENTS['content_words_per_clause'] * self.content_words_per_clause
-            + self.COEFFICIENTS['proportion_concrete'] * self.proportion_concrete
+            + self.COEFFICIENTS['freq_log'] * self.freq_log # type: ignore
+            + self.COEFFICIENTS['max_sdl'] * self.max_sdl # type: ignore
+            + self.COEFFICIENTS['content_words_per_clause'] * self.content_words_per_clause # type: ignore
+            + self.COEFFICIENTS['proportion_concrete'] * self.proportion_concrete # type: ignore
         )
         score = min(100.0, max(0.0, 100 - result))
         return score
@@ -183,11 +183,11 @@ class LintScorer:
             - Level 3 [46-58): Difficult text, 53% of adults struggle to understand
             - Level 4 [58-100]: Very difficult text, 78% of adults struggle
         """
-        if self.score < 34:
+        if self.score < 34: # type: ignore
             level = 1
-        elif self.score < 46:
+        elif self.score < 46: # type: ignore
             level = 2
-        elif self.score < 58:
+        elif self.score < 58: # type: ignore
             level = 3
         else:
             level = 4
