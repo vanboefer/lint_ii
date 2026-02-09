@@ -45,6 +45,8 @@ class SentenceAnalysis:
     -----------------------
     doc : Doc | Span
         The input spaCy sentence object.
+    text : str
+        Sentence as string.
     word_features : list[WordFeatures]
         Linguistic features for each token in the sentence. Cached property.
     sent_length : int
@@ -172,6 +174,10 @@ class SentenceAnalysis:
         clean_text = preprocess_text(text)
         doc = NLP_MODEL(clean_text)
         return cls(doc)
+
+    @property
+    def text(self) -> str:
+        return self.doc.text
 
     @cached_property
     def word_features(self) -> list[WordFeatures]:
