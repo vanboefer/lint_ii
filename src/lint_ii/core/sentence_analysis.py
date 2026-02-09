@@ -1,4 +1,3 @@
-
 from operator import itemgetter
 from functools import cached_property
 from typing import Any, TypedDict
@@ -94,7 +93,7 @@ class SentenceAnalysis:
     -------
     from_text(text: str) -> SentenceAnalysis
         Create analysis from text string. Preprocesses text and applies spaCy NLP pipeline.
-    get_top_n_least_frequent(n: int = 5) -> list[tuple[str, float]]
+    get_top_n_least_frequent(n: int = 5) -> list[tuple[WordFeatures, float]]
         Return the n words with lowest frequency scores.
     get_sdl_info() -> list[SDLInfo]
         Syntactic dependency length information for each token.
@@ -374,10 +373,10 @@ class SentenceAnalysis:
             proportion_concrete = self.proportion_of_concrete_nouns,
         )
 
-    def get_top_n_least_frequent(self, n: int = 5) -> list[tuple[str, float]]:
+    def get_top_n_least_frequent(self, n: int = 5) -> list[tuple[WordFeatures, float]]:
         """Get the top n least frequent words in the sentence."""
         frequencies = {
-            feat.text:freq
+            feat:freq
             for feat in self.word_features
             if (freq := feat.word_frequency) is not None
         }
@@ -413,7 +412,10 @@ class SentenceAnalysis:
             'score': self.lint.score,
             'level': self.lint.level,
             'mean_log_word_frequency': self.mean_log_word_frequency,
-            'top_n_least_freq_words': self.get_top_n_least_frequent(n=n),
+            'top_n_least_freq_words': [
+                (feat.text, freq)
+                for feat, freq in self.get_top_n_least_frequent(n=n)
+            ],
             'proportion_concrete_nouns': self.proportion_of_concrete_nouns,
             'concrete_nouns': [feat.text for feat in self.concrete_nouns],
             'abstract_nouns': [feat.text for feat in self.abstract_nouns],

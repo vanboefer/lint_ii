@@ -1,3 +1,4 @@
+from operator import itemgetter
 from functools import cached_property
 from typing import Any, TypedDict
 import statistics
@@ -82,6 +83,8 @@ class ReadabilityAnalysis(LintIIVisualizer):
     -------
     from_text(text: str) -> ReadabilityAnalysis
         Create analysis from text string. Preprocesses text and applies spaCy NLP pipeline.
+    get_top_n_least_frequent -> list[tuple[WordFeatures, float]]
+        Get the top n least frequent words in the document.
     calculate_document_stats() -> DocumentStatsDict
         Generate summary statistics including sentence count, mean/min/max scores.
     get_detailed_analysis() -> dict[str, Any]
@@ -259,6 +262,17 @@ class ReadabilityAnalysis(LintIIVisualizer):
         Returns None if there are no sentence-level scores.
         """
         return max(self.lint_scores_per_sentence, default=None)
+
+    def get_top_n_least_frequent(self, n: int = 5) -> list[tuple[WordFeatures, float]]:
+        """Get the top n least frequent words in the document."""
+        frequencies = {
+            feat:freq
+            for feat in self.word_features
+            if (freq := feat.word_frequency) is not None
+        }
+        if n == -1:
+            return sorted(frequencies.items(), key=itemgetter(1))
+        return sorted(frequencies.items(), key=itemgetter(1))[:n]
 
     def calculate_document_stats(self) -> DocumentStatsDict:
         """
