@@ -16,7 +16,7 @@ exclude = [
 
 [project]
 name = "lint_ii"
-version = "0.1.0"
+version = "0.1.1"
 description = "LiNT-II is a readability assessment tool for Dutch."
 authors = [
     {name = "Jenia Kim"}
