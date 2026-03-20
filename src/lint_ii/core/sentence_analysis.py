@@ -83,6 +83,8 @@ class SentenceAnalysis:
         Number of subordinate clauses. Cached property.
     content_words_per_clause : float | None
         Number of content words per clause. Returns None if there are no finite verbs in the sentence (i.e. no clause). Cached property.
+    clause_length : float | None
+        Number of words per clause. Returns None if there are no finite verbs in the sentence (i.e. no clause). Cached property.
     mean_log_word_frequency : float | None
         Mean log frequency of content words (excluding proper nouns).
         Returns None if there are no frequencies in the sentence, i.e. no content words or all the content words are in the SKIPLIST. Cached property.
@@ -346,6 +348,16 @@ class SentenceAnalysis:
             return None
         return len(self.content_words) / len(self.finite_verbs)
     
+    @cached_property
+    def clause_length(self) -> float | None:
+        """
+        Number of words per clause.
+        Returns None if there are no finite verbs in the sentence (i.e. no clause).
+        """
+        if not self.finite_verbs:
+            return None
+        return self.sent_length / len(self.finite_verbs)
+
     @cached_property
     def mean_log_word_frequency(self) -> float | None:
         """
