@@ -55,6 +55,8 @@ class WordFeatures:
         Indicator whether token is a pronoun. Cached property.
     pronoun_person : int | None
         Person of the pronoun (first, second, third). Cached property.
+    is_human : bool
+        Indicator whether token refers to a human. Cached property.
     is_content_word : bool
         True if token has one of the parts-of-speech: NOUN, PROPN, VERB, ADJ or is a
         manner adverb (from MANNER_ADVERBS list). Special cases: copulas and numerals 
@@ -320,6 +322,30 @@ class WordFeatures:
         for chr in self.token.tag_:
             if chr.isdigit():
                 return int(chr)
+
+    @cached_property
+    def is_human(self) -> bool:
+        """
+        Indicator whether token refers to a human.
+        Returns True if:
+        - token is pronoun (excluding 'het')
+        - entity type is 'PERSON'
+        - lemma of the token has semantic type 'human' in NOUN_DATA list
+        """
+        if self.is_pronoun and self.text != 'het':
+            return True
+
+        if not self.is_noun:
+            return False
+
+        if self.token.ent_type_ == 'PERSON':
+            return True
+
+        sem_type = self._NOUN_DATA.get(self.lemma, {}).get('sem_type', '')
+        if sem_type == 'human':
+            return True
+        
+        return False
 
     @property
     def is_content_word(self) -> bool:

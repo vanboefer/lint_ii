@@ -67,6 +67,8 @@ class SentenceAnalysis:
         Returns None if totals are 0, i.e. there are no nouns or only `unknown` nouns in the sentence. Cached property.
     pronouns : dict[int, list[WordFeatures]]
         Pronouns in the sentence categorized by person (first, second, third).
+    humans : list[WordFeatures]
+        All words referering to humans in the sentence.
     content_words : list[WordFeatures]
         All content words in the sentence.
     finite_verbs : list[WordFeatures]
@@ -264,6 +266,14 @@ class SentenceAnalysis:
         return dct
 
     @property
+    def humans(self) -> list[WordFeatures]:
+        """All words referering to humans in the sentence."""
+        return [
+            feat for feat in self.word_features
+            if feat.is_human
+        ]
+
+    @property
     def content_words(self) -> list[WordFeatures]:
         """All content words in the sentence."""
         return [
@@ -445,6 +455,7 @@ class SentenceAnalysis:
             'pronouns_first_person': [feat.text for feat in self.pronouns[1]],
             'pronouns_second_person': [feat.text for feat in self.pronouns[2]],
             'pronouns_third_person': [feat.text for feat in self.pronouns[3]],
+            'humans': [feat.text for feat in self.humans],
         }
 
     def as_dict(self) -> SentenceAnalysisDict:
