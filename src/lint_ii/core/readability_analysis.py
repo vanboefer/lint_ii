@@ -49,6 +49,10 @@ class ReadabilityAnalysis(LintIIVisualizer):
         The input sentence analyses.
     word_features : list[WordFeatures]
         Flattened list of all word features across sentences.
+    entities_and_situations : list[WordFeatures]
+        Bag of entities and situations for the document.
+    contextually_new : list[WordFeatures]
+        Bag of contextually new words in the document.
     concrete_nouns : list[WordFeatures]
         All concrete nouns in the document.
     abstract_nouns : list[WordFeatures]
@@ -117,6 +121,8 @@ class ReadabilityAnalysis(LintIIVisualizer):
 
     def __init__(self, sentences: list[SentenceAnalysis]) -> None:
         self.sentences = sentences
+        for sent in self.sentences:
+            sent.readability_analysis = self
 
     def __repr__(self) -> str:
         return f"{self.__class__.__name__}({[repr(s.doc) for s in self.sentences]})"
@@ -149,6 +155,16 @@ class ReadabilityAnalysis(LintIIVisualizer):
             for sentence in self.sentences
             for feat in sentence.word_features
         ]
+
+    @property
+    def entities_and_situations(self) -> list[WordFeatures]:
+        """Bag of entities and situations for the document."""
+        return [feat for feat in self.word_features if feat.is_entity_or_situation]
+
+    @property
+    def contextually_new(self) -> list[WordFeatures]:
+        """Bag of contextually new words in the document."""
+        return [feat for feat in self.word_features if feat.is_contextually_new]
 
     @property
     def concrete_nouns(self) -> list[WordFeatures]:
@@ -312,6 +328,7 @@ class ReadabilityAnalysis(LintIIVisualizer):
                 sent.get_detailed_analysis(n=n)
                 for sent in self.sentences
             ],
+            'contextually_new_words': [feat.text for feat in self.contextually_new],
         }
 
     def as_dict(self) -> ReadabilityAnalysisDict:

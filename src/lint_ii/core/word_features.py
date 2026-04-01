@@ -1,11 +1,13 @@
+from __future__ import annotations
 from functools import cached_property
-from typing import TypedDict, NotRequired
+from typing import TypedDict, NotRequired, TYPE_CHECKING
 
 from spacy.tokens import Token
 
 from lint_ii import linguistic_data
 from lint_ii.linguistic_data import SuperSemTypes
-
+if TYPE_CHECKING:
+    from lint_ii.core.sentence_analysis import SentenceAnalysis
 
 class WordFeaturesDict(TypedDict):
     text: str
@@ -63,6 +65,10 @@ class WordFeatures:
         are excluded.
     is_content_word_excl_propn : bool
         True if token is content word but not a PROPN.
+    is_entity_or_situation : bool
+        Indicator whether word refers to entity or situation. True if token has one of the parts-of-speech: NOUN, PROPN, VERB or is a pronoun. Cached property.
+    is_contextually_new : bool | None
+        Indicator whether entity or situation is contextually new (i.e. did not appear in the preceding 50 tokens). Cached property.
     is_noun : bool
         True if token has one of the parts-of-speech: NOUN, PROPN.
     super_sem_type : SuperSemTypes | None
@@ -138,6 +144,8 @@ class WordFeatures:
     ReadabilityAnalysis : Document-level readability analysis
     SuperSemTypes : Enum for semantic noun categorization
     """
+
+    sentence_analysis: SentenceAnalysis | None = None
 
     def __init__(
         self,
@@ -372,6 +380,56 @@ class WordFeatures:
     def is_content_word_excl_propn(self) -> bool:
         """Indicator whether word is a content word, excluding proper nouns."""
         return False if self.token.pos_ == 'PROPN' else self.is_content_word
+
+    @cached_property
+    def is_entity_or_situation(self) -> bool:
+        """
+        Indicator whether word refers to entity or situation.
+        True if token has one of the parts-of-speech: NOUN, PROPN, VERB or is a pronoun.
+
+        Special cases
+        -------------
+        - Copulas are excluded (sometimes tagged as VERB)
+        """
+        if self.token.dep_ == 'cop':
+            return False
+        if self.token.pos_ in ["NOUN", "PROPN", "VERB"]:
+            return True
+        if self.is_pronoun:
+            return True
+        return False
+
+    @cached_property
+    def is_contextually_new(self) -> bool | None:
+        """
+        Indicator whether entity or situation is contextually new (i.e. did not appear in the preceding 50 tokens).
+
+        Special cases
+        -------------
+        - For pronouns we check if pronouns of the same person (1, 2, 3) appeared in the preceding 50 tokens 
+        """
+        if self.sentence_analysis is None:
+            return None
+        if self.sentence_analysis.readability_analysis is None:
+            return None
+        if self.token.i < 50:
+            return None
+        if not self.is_entity_or_situation:
+            return None
+        
+        feats = self.sentence_analysis.readability_analysis.entities_and_situations
+        context_start, context_end = self.token.i - 50, self.token.i
+        context = [
+            feat for feat in feats
+            if context_start <= feat.token.i < context_end
+        ]
+
+        if self.is_pronoun:
+            return not any(
+                feat.pronoun_person == self.pronoun_person
+                for feat in context
+            )
+        return not any(feat.lemma == self.lemma for feat in context)
 
     @property
     def is_noun(self) -> bool:

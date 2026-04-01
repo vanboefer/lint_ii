@@ -1,6 +1,7 @@
+from __future__ import annotations
 from operator import itemgetter
 from functools import cached_property
-from typing import Any, TypedDict
+from typing import Any, TypedDict, TYPE_CHECKING
 import statistics
 
 from spacy.tokens import Doc, Span
@@ -8,7 +9,8 @@ from spacy.tokens import Doc, Span
 from lint_ii.core.preprocessor import preprocess_text
 from lint_ii.core.lint_scorer import LintScorer
 from lint_ii.core.word_features import WordFeatures, WordFeaturesDict
-
+if TYPE_CHECKING:
+    from lint_ii.core.readability_analysis import ReadabilityAnalysis
 
 class SDLInfo(TypedDict):
     token: str
@@ -154,6 +156,8 @@ class SentenceAnalysis:
     LintScorer : LiNT scoring algorithms
     """
 
+    readability_analysis: ReadabilityAnalysis | None = None
+
     def __init__(
         self,
         doc: Doc|Span,
@@ -185,7 +189,10 @@ class SentenceAnalysis:
     @cached_property
     def word_features(self) -> list[WordFeatures]:
         """Linguistic features for each token in the sentence."""
-        return [WordFeatures(token) for token in self.doc]
+        wfs = [WordFeatures(token) for token in self.doc]
+        for wf in wfs:
+            wf.sentence_analysis = self
+        return wfs
 
     @cached_property
     def sent_length(self) -> int:
@@ -444,6 +451,7 @@ class SentenceAnalysis:
             'undefined_nouns': [feat.text for feat in self.undefined_nouns],
             'unknown_nouns': [feat.text for feat in self.unknown_nouns],
             'sent_length': self.sent_length,
+            'clause_length': self.clause_length,
             'max_sdl': self.max_sdl,
             'sdls': self.get_sdl_info(),
             'content_words_per_clause': self.content_words_per_clause,
