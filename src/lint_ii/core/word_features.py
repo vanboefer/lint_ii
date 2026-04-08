@@ -71,6 +71,10 @@ class WordFeatures:
         Indicator whether entity or situation is contextually new (i.e. did not appear in the preceding 50 tokens). Cached property.
     is_adj_mod : bool
         Indicator whether token is adjectival modifier.
+    is_coordinated_constituent : bool
+        Indicator whether token is a coordinated constituent.
+        True if token has dependency label 'conj' and one of the following parts of speech: 'NOUN', 'PROPN', 'PRON', 'ADJ', 'NUM', 'ADV'.
+        This excludes coordinated clauses.
     is_noun : bool
         True if token has one of the parts-of-speech: NOUN, PROPN.
     super_sem_type : SuperSemTypes | None
@@ -448,6 +452,26 @@ class WordFeatures:
             'acl',
         ]
         return self.token.dep_ in adj_mod_deps
+
+    @property
+    def is_coordinated_constituent(self) -> bool:
+        """
+        Indicator whether token is a coordinated constituent.
+        True if token has dependency label 'conj' and one of the following parts of speech: 'NOUN', 'PROPN', 'PRON', 'ADJ', 'NUM', 'ADV'.
+        This excludes coordinated clauses.
+        """
+        if self.token.dep_ != 'conj':
+            return False
+        
+        included_pos = [
+            'NOUN',
+            'PROPN',
+            'PRON',
+            'ADJ',
+            'NUM',
+            'ADV',
+        ]
+        return self.token.pos_ in included_pos
 
     @property
     def is_noun(self) -> bool:

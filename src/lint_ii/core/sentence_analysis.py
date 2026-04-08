@@ -89,6 +89,10 @@ class SentenceAnalysis:
         List of adjectival modifiers in the sentence. Cached property.
     adjectival_modifiers_per_clause : float | None
         Number of adjectival modifiers per clause. Returns None if there are no finite verbs in the sentence (i.e. no clause). Cached property.
+    coordinated_constituents : list[WordFeatures]
+        List of coordinated constituents in the sentence.
+    coordinated_constituents_per_clause : float | None
+        Number of coordinated constituents per clause. Returns None if there are no finite verbs in the sentence (i.e. no clause). Cached property.
     content_words_per_clause : float | None
         Number of content words per clause. Returns None if there are no finite verbs in the sentence (i.e. no clause). Cached property.
     clause_length : float | None
@@ -349,6 +353,21 @@ class SentenceAnalysis:
         """Number of subordinate clauses."""
         return len(self.subordinate_clauses)
     
+    @property
+    def coordinated_constituents(self) -> list[WordFeatures]:
+        """List of coordinated constituents in the sentence."""
+        return [feat for feat in self.word_features if feat.is_coordinated_constituent]
+
+    @cached_property
+    def coordinated_constituents_per_clause(self) -> float | None:
+        """
+        Number of coordinated constituents per clause.
+        Returns None if there are no finite verbs in the sentence (i.e. no clause).
+        """
+        if not self.finite_verbs:
+            return None
+        return len(self.coordinated_constituents) / len(self.finite_verbs)
+
     @cached_property
     def adjectival_modifiers(self) -> list[Span]:
         """List of adjectival modifiers in the sentence."""
@@ -480,6 +499,8 @@ class SentenceAnalysis:
             'subordinate_clauses': [span.text for span in self.subordinate_clauses],
             'adjectival_modifiers_per_clause': self.adjectival_modifiers_per_clause,
             'adjectival_modifiers': [span.text for span in self.adjectival_modifiers],
+            'coordinated_constituents_per_clause': self.coordinated_constituents_per_clause,
+            'coordinated_constituents': [feat.text for feat in self.coordinated_constituents],
             'pronouns_first_person': [feat.text for feat in self.pronouns[1]],
             'pronouns_second_person': [feat.text for feat in self.pronouns[2]],
             'pronouns_third_person': [feat.text for feat in self.pronouns[3]],
