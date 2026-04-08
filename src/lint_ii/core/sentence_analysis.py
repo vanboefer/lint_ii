@@ -78,8 +78,8 @@ class SentenceAnalysis:
         LintScorer object that contains the score (lint.score) and the difficulty level (lint.level) for the sentence. Cached property.
     sent_length : int
         Number of tokens in the sentence (excluding punctuation). Cached property.
-    clause_length : float | None
-        Number of words per clause. Returns None if there are no finite verbs in the sentence (i.e. no clause). Cached property.
+    mean_clause_length : float | None
+        Mean number of words per clause (sentence length / number of finite verbs). Returns None if there are no finite verbs in the sentence (i.e. no clause). Cached property.
     has_passive : bool
         Indicator whether sentence has one or more passive auxiliaries. Cached property.
     passives : list[Span]
@@ -329,9 +329,9 @@ class SentenceAnalysis:
         return len([wf for wf in self.word_features if not wf.is_punctuation])
 
     @cached_property
-    def clause_length(self) -> float | None:
+    def mean_clause_length(self) -> float | None:
         """
-        Number of words per clause.
+        Mean number of words per clause (sentence length / number of finite verbs).
         Returns None if there are no finite verbs in the sentence (i.e. no clause).
         """
         if not self.finite_verbs:
@@ -505,7 +505,7 @@ class SentenceAnalysis:
             'content_words': [feat.text for feat in self.content_words],
             'finite_verbs': [feat.text for feat in self.finite_verbs],
             'sent_length': self.sent_length,
-            'clause_length': self.clause_length,
+            'mean_clause_length': self.mean_clause_length,
             'passives': [span.text for span in self.passives],
             'n_subordinate_clauses': self.n_subordinate_clauses,
             'subordinate_clauses': [span.text for span in self.subordinate_clauses],
