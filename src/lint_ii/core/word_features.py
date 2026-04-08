@@ -69,6 +69,8 @@ class WordFeatures:
         Indicator whether word refers to entity or situation. True if token has one of the parts-of-speech: NOUN, PROPN, VERB or is a pronoun. Cached property.
     is_contextually_new : bool | None
         Indicator whether entity or situation is contextually new (i.e. did not appear in the preceding 50 tokens). Cached property.
+    is_adj_mod : bool
+        Indicator whether token is adjectival modifier.
     is_noun : bool
         True if token has one of the parts-of-speech: NOUN, PROPN.
     super_sem_type : SuperSemTypes | None
@@ -430,6 +432,22 @@ class WordFeatures:
                 for feat in context
             )
         return not any(feat.lemma == self.lemma for feat in context)
+
+    @property
+    def is_adj_mod(self) -> bool:
+        """
+        Indicator whether token is adjectival modifier.
+        True if token has one of the following dependency labels:
+        amod, nummod, nmod, nmod:poss, acl.
+        """
+        adj_mod_deps = [
+            'amod',
+            'nummod',
+            'nmod',
+            'nmod:poss',
+            'acl',
+        ]
+        return self.token.dep_ in adj_mod_deps
 
     @property
     def is_noun(self) -> bool:

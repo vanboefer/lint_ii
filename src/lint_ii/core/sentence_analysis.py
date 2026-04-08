@@ -85,6 +85,10 @@ class SentenceAnalysis:
         List of subordinate clauses in the sentence. Cached property.
     n_subordinate_clauses : int
         Number of subordinate clauses. Cached property.
+    adjectival_modifiers : list[Span]
+        List of adjectival modifiers in the sentence. Cached property.
+    adjectival_modifiers_per_clause : float | None
+        Number of adjectival modifiers per clause. Returns None if there are no finite verbs in the sentence (i.e. no clause). Cached property.
     content_words_per_clause : float | None
         Number of content words per clause. Returns None if there are no finite verbs in the sentence (i.e. no clause). Cached property.
     clause_length : float | None
@@ -336,23 +340,37 @@ class SentenceAnalysis:
     def subordinate_clauses(self) -> list[Span]:
         """List of subordinate clauses in the sentence."""
         return [
-            span for feat in self.word_features
-            if (span := self._get_span_of_subordinate_clause(feat))
+            self._get_span_of_token_and_children(feat) for feat in self.word_features
+            if feat.is_in_subordinate_clause
         ]
 
     @cached_property
     def n_subordinate_clauses(self) -> int:
         """Number of subordinate clauses."""
         return len(self.subordinate_clauses)
-
-    def _get_span_of_subordinate_clause(self, feat: WordFeatures) -> Span | None:
-        """Get subordinate clause as span from token and its children."""
-        if not feat.is_in_subordinate_clause:
+    
+    @cached_property
+    def adjectival_modifiers(self) -> list[Span]:
+        """List of adjectival modifiers in the sentence."""
+        return [
+            self._get_span_of_token_and_children(feat) for feat in self.word_features
+            if feat.is_adj_mod
+        ]
+    
+    @cached_property
+    def adjectival_modifiers_per_clause(self) -> float | None:
+        """
+        Number of adjectival modifiers per clause.
+        Returns None if there are no finite verbs in the sentence (i.e. no clause).
+        """
+        if not self.finite_verbs:
             return None
+        return len(self.adjectival_modifiers) / len(self.finite_verbs)
 
+    def _get_span_of_token_and_children(self, feat: WordFeatures) -> Span:
+        """Get the span of the token and its children."""
         indices = [feat.token.i]
         indices.extend(child.i for child in feat.token.children)
-
         return feat.token.doc[min(indices):max(indices) + 1]
 
     @cached_property
@@ -460,6 +478,8 @@ class SentenceAnalysis:
             'passives': [span.text for span in self.passives],
             'n_subordinate_clauses': self.n_subordinate_clauses,
             'subordinate_clauses': [span.text for span in self.subordinate_clauses],
+            'adjectival_modifiers_per_clause': self.adjectival_modifiers_per_clause,
+            'adjectival_modifiers': [span.text for span in self.adjectival_modifiers],
             'pronouns_first_person': [feat.text for feat in self.pronouns[1]],
             'pronouns_second_person': [feat.text for feat in self.pronouns[2]],
             'pronouns_third_person': [feat.text for feat in self.pronouns[3]],
