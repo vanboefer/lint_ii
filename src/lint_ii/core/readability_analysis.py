@@ -49,10 +49,6 @@ class ReadabilityAnalysis(LintIIVisualizer):
         The input sentence analyses.
     word_features : list[WordFeatures]
         Flattened list of all word features across sentences.
-    entities_and_situations : list[WordFeatures]
-        Bag of entities and situations for the document.
-    contextually_new : list[WordFeatures]
-        Bag of contextually new words in the document.
     concrete_nouns : list[WordFeatures]
         All concrete nouns in the document.
     abstract_nouns : list[WordFeatures]
@@ -82,6 +78,10 @@ class ReadabilityAnalysis(LintIIVisualizer):
     max_lint_score : float | None
         Highest sentence-level score in the document.
         Returns None if there are no sentence-level scores. Cached property.
+    entities_and_situations : list[WordFeatures]
+        Bag of entities and situations for the document.
+    contextually_new : list[WordFeatures]
+        Bag of contextually new words in the document.
 
     Methods
     -------
@@ -152,16 +152,6 @@ class ReadabilityAnalysis(LintIIVisualizer):
             for sentence in self.sentences
             for feat in sentence.word_features
         ]
-
-    @property
-    def entities_and_situations(self) -> list[WordFeatures]:
-        """Bag of entities and situations for the document."""
-        return [feat for feat in self.word_features if feat.is_entity_or_situation]
-
-    @property
-    def contextually_new(self) -> list[WordFeatures]:
-        """Bag of contextually new words in the document."""
-        return [feat for feat in self.word_features if feat.is_contextually_new]
 
     @property
     def concrete_nouns(self) -> list[WordFeatures]:
@@ -278,6 +268,16 @@ class ReadabilityAnalysis(LintIIVisualizer):
         Returns None if there are no sentence-level scores.
         """
         return max(self.lint_scores_per_sentence, default=None)
+
+    @property
+    def entities_and_situations(self) -> list[WordFeatures]:
+        """Bag of entities and situations for the document."""
+        return [feat for feat in self.word_features if feat.is_entity_or_situation]
+
+    @property
+    def contextually_new(self) -> list[WordFeatures]:
+        """Bag of contextually new words in the document."""
+        return [feat for feat in self.word_features if feat.is_contextually_new]
 
     def get_top_n_least_frequent(self, n: int = 5) -> list[tuple[WordFeatures, float]]:
         """Get the top n least frequent words in the document."""

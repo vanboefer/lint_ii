@@ -50,11 +50,9 @@ class SentenceAnalysis:
         Sentence as string.
     word_features : list[WordFeatures]
         Linguistic features for each token in the sentence. Cached property.
-    sent_length : int
-        Number of tokens in the sentence (excluding punctuation). Cached property.
-    max_sdl : int | None
-        Maximum syntactic dependency length in the sentence. 
-        If there are no SDLs (i.e. one-word sentence), returns None. Cached property.
+    mean_log_word_frequency : float | None
+        Mean log frequency of content words (excluding proper nouns).
+        Returns None if there are no frequencies in the sentence, i.e. no content words or all the content words are in the SKIPLIST. Cached property.
     concrete_nouns : list[WordFeatures]
         All concrete nouns in the sentence.
     abstract_nouns : list[WordFeatures]
@@ -67,14 +65,21 @@ class SentenceAnalysis:
         Proportion of concrete nouns out of the total nouns in the sentence.
         Nouns of type `unknown` (not in the list) are excluded from the totals count.
         Returns None if totals are 0, i.e. there are no nouns or only `unknown` nouns in the sentence. Cached property.
-    pronouns : dict[int, list[WordFeatures]]
-        Pronouns in the sentence categorized by person (first, second, third).
-    humans : list[WordFeatures]
-        All words referering to humans in the sentence.
-    content_words : list[WordFeatures]
-        All content words in the sentence.
+    max_sdl : int | None
+        Maximum syntactic dependency length in the sentence. 
+        If there are no SDLs (i.e. one-word sentence), returns None. Cached property.
     finite_verbs : list[WordFeatures]
         All finite verbs (verbs showing tense) in the sentence.
+    content_words : list[WordFeatures]
+        All content words in the sentence.
+    content_words_per_clause : float | None
+        Number of content words per clause. Returns None if there are no finite verbs in the sentence (i.e. no clause). Cached property.
+    lint : LintScorer
+        LintScorer object that contains the score (lint.score) and the difficulty level (lint.level) for the sentence. Cached property.
+    sent_length : int
+        Number of tokens in the sentence (excluding punctuation). Cached property.
+    clause_length : float | None
+        Number of words per clause. Returns None if there are no finite verbs in the sentence (i.e. no clause). Cached property.
     has_passive : bool
         Indicator whether sentence has one or more passive auxiliaries. Cached property.
     passives : list[Span]
@@ -93,15 +98,10 @@ class SentenceAnalysis:
         List of coordinated constituents in the sentence.
     coordinated_constituents_per_clause : float | None
         Number of coordinated constituents per clause. Returns None if there are no finite verbs in the sentence (i.e. no clause). Cached property.
-    content_words_per_clause : float | None
-        Number of content words per clause. Returns None if there are no finite verbs in the sentence (i.e. no clause). Cached property.
-    clause_length : float | None
-        Number of words per clause. Returns None if there are no finite verbs in the sentence (i.e. no clause). Cached property.
-    mean_log_word_frequency : float | None
-        Mean log frequency of content words (excluding proper nouns).
-        Returns None if there are no frequencies in the sentence, i.e. no content words or all the content words are in the SKIPLIST. Cached property.
-    lint : LintScorer
-        LintScorer object that contains the score (lint.score) and the difficulty level (lint.level) for the sentence. Cached property.
+    pronouns : dict[int, list[WordFeatures]]
+        Pronouns in the sentence categorized by person (first, second, third).
+    humans : list[WordFeatures]
+        All words referering to humans in the sentence.
 
     Methods
     -------
@@ -194,6 +194,8 @@ class SentenceAnalysis:
     def text(self) -> str:
         return self.doc.text
 
+    # ── word features ────────────────────────────────────────────────────
+
     @cached_property
     def word_features(self) -> list[WordFeatures]:
         """Linguistic features for each token in the sentence."""
@@ -202,26 +204,23 @@ class SentenceAnalysis:
             wf.sentence_analysis = self
         return wfs
 
-    @cached_property
-    def sent_length(self) -> int:
-        """Number of tokens in the sentence (excluding punctuation)."""
-        return len([wf for wf in self.word_features if not wf.is_punctuation])
+    # ── core readability features ────────────────────────────────────────
 
     @cached_property
-    def max_sdl(self) -> int | None:
+    def mean_log_word_frequency(self) -> float | None:
         """
-        Maximum dependency length in the sentence.
-        If there are no SDLs (i.e. one-word sentence), returns None.
+        Mean log frequency of content words (excluding proper nouns) in the sentence.
+        Returns None if there are no frequencies in the sentence, i.e. no content words or all the content words are in the SKIPLIST.
         """
-        dep_lengths = [
-            feat.dep_length for feat in self.word_features
-            if not feat.is_punctuation
+        frequencies = [
+            freq
+            for feat in self.word_features
+            if (freq := feat.word_frequency) is not None
         ]
-        if len(dep_lengths) < 2:
+        if not frequencies:
             return None
+        return statistics.mean(frequencies)
 
-        return max(dep_lengths, default=None)
-    
     @property
     def concrete_nouns(self) -> list[WordFeatures]:
         """All concrete nouns in the sentence."""
@@ -269,23 +268,27 @@ class SentenceAnalysis:
             return None
         return n_concrete_nouns / total_nouns
 
-    @property
-    def pronouns(self) -> dict[int, list[WordFeatures]]:
-        """Pronouns in the sentence categorized by person (first, second, third)."""
-        from collections import defaultdict
+    @cached_property
+    def max_sdl(self) -> int | None:
+        """
+        Maximum dependency length in the sentence.
+        If there are no SDLs (i.e. one-word sentence), returns None.
+        """
+        dep_lengths = [
+            feat.dep_length for feat in self.word_features
+            if not feat.is_punctuation
+        ]
+        if len(dep_lengths) < 2:
+            return None
 
-        dct = defaultdict(list)
-        for feat in self.word_features:
-            if feat.is_pronoun:
-                dct[feat.pronoun_person].append(feat)
-        return dct
+        return max(dep_lengths, default=None)
 
     @property
-    def humans(self) -> list[WordFeatures]:
-        """All words referering to humans in the sentence."""
+    def finite_verbs(self) -> list[WordFeatures]:
+        """All finite verbs in the sentence."""
         return [
             feat for feat in self.word_features
-            if feat.is_human
+            if feat.is_finite_verb
         ]
 
     @property
@@ -296,13 +299,44 @@ class SentenceAnalysis:
             if feat.is_content_word
         ]
 
-    @property
-    def finite_verbs(self) -> list[WordFeatures]:
-        """All finite verbs in the sentence."""
-        return [
-            feat for feat in self.word_features
-            if feat.is_finite_verb
-        ]
+    @cached_property
+    def content_words_per_clause(self) -> float | None:
+        """
+        Number of content words per clause.
+        Returns None if there are no finite verbs in the sentence (i.e. no clause).
+        """
+        if not self.finite_verbs:
+            return None
+        return len(self.content_words) / len(self.finite_verbs)
+
+    @cached_property
+    def lint(self) -> LintScorer:
+        """
+        LintScorer object that contains the score and the difficulty level for the sentence.
+        """
+        return LintScorer(
+            freq_log = self.mean_log_word_frequency,
+            max_sdl = self.max_sdl,
+            content_words_per_clause = self.content_words_per_clause,
+            proportion_concrete = self.proportion_of_concrete_nouns,
+        )
+
+    # ── sentence structure ───────────────────────────────────────────────
+
+    @cached_property
+    def sent_length(self) -> int:
+        """Number of tokens in the sentence (excluding punctuation)."""
+        return len([wf for wf in self.word_features if not wf.is_punctuation])
+
+    @cached_property
+    def clause_length(self) -> float | None:
+        """
+        Number of words per clause.
+        Returns None if there are no finite verbs in the sentence (i.e. no clause).
+        """
+        if not self.finite_verbs:
+            return None
+        return self.sent_length / len(self.finite_verbs)
 
     @cached_property
     def has_passive(self) -> bool:
@@ -352,21 +386,8 @@ class SentenceAnalysis:
     def n_subordinate_clauses(self) -> int:
         """Number of subordinate clauses."""
         return len(self.subordinate_clauses)
-    
-    @property
-    def coordinated_constituents(self) -> list[WordFeatures]:
-        """List of coordinated constituents in the sentence."""
-        return [feat for feat in self.word_features if feat.is_coordinated_constituent]
 
-    @cached_property
-    def coordinated_constituents_per_clause(self) -> float | None:
-        """
-        Number of coordinated constituents per clause.
-        Returns None if there are no finite verbs in the sentence (i.e. no clause).
-        """
-        if not self.finite_verbs:
-            return None
-        return len(self.coordinated_constituents) / len(self.finite_verbs)
+    # ── modifiers & coordination ─────────────────────────────────────────
 
     @cached_property
     def adjectival_modifiers(self) -> list[Span]:
@@ -386,58 +407,49 @@ class SentenceAnalysis:
             return None
         return len(self.adjectival_modifiers) / len(self.finite_verbs)
 
+    @property
+    def coordinated_constituents(self) -> list[WordFeatures]:
+        """List of coordinated constituents in the sentence."""
+        return [feat for feat in self.word_features if feat.is_coordinated_constituent]
+
+    @cached_property
+    def coordinated_constituents_per_clause(self) -> float | None:
+        """
+        Number of coordinated constituents per clause.
+        Returns None if there are no finite verbs in the sentence (i.e. no clause).
+        """
+        if not self.finite_verbs:
+            return None
+        return len(self.coordinated_constituents) / len(self.finite_verbs)
+
     def _get_span_of_token_and_children(self, feat: WordFeatures) -> Span:
         """Get the span of the token and its children."""
         indices = [feat.token.i]
         indices.extend(child.i for child in feat.token.children)
         return feat.token.doc[min(indices):max(indices) + 1]
 
-    @cached_property
-    def content_words_per_clause(self) -> float | None:
-        """
-        Number of content words per clause.
-        Returns None if there are no finite verbs in the sentence (i.e. no clause).
-        """
-        if not self.finite_verbs:
-            return None
-        return len(self.content_words) / len(self.finite_verbs)
-    
-    @cached_property
-    def clause_length(self) -> float | None:
-        """
-        Number of words per clause.
-        Returns None if there are no finite verbs in the sentence (i.e. no clause).
-        """
-        if not self.finite_verbs:
-            return None
-        return self.sent_length / len(self.finite_verbs)
+    # ── pronouns & humans ────────────────────────────────────────────────
 
-    @cached_property
-    def mean_log_word_frequency(self) -> float | None:
-        """
-        Mean log frequency of content words (excluding proper nouns) in the sentence.
-        Returns None if there are no frequencies in the sentence, i.e. no content words or all the content words are in the SKIPLIST.
-        """
-        frequencies = [
-            freq
-            for feat in self.word_features
-            if (freq := feat.word_frequency) is not None
+    @property
+    def pronouns(self) -> dict[int, list[WordFeatures]]:
+        """Pronouns in the sentence categorized by person (first, second, third)."""
+        from collections import defaultdict
+
+        dct = defaultdict(list)
+        for feat in self.word_features:
+            if feat.is_pronoun:
+                dct[feat.pronoun_person].append(feat)
+        return dct
+
+    @property
+    def humans(self) -> list[WordFeatures]:
+        """All words referering to humans in the sentence."""
+        return [
+            feat for feat in self.word_features
+            if feat.is_human
         ]
-        if not frequencies:
-            return None
-        return statistics.mean(frequencies)
 
-    @cached_property
-    def lint(self) -> LintScorer:
-        """
-        LintScorer object that contains the score and the difficulty level for the sentence.
-        """
-        return LintScorer(
-            freq_log = self.mean_log_word_frequency,
-            max_sdl = self.max_sdl,
-            content_words_per_clause = self.content_words_per_clause,
-            proportion_concrete = self.proportion_of_concrete_nouns,
-        )
+    # ── serialization ────────────────────────────────────────────────────
 
     def get_top_n_least_frequent(self, n: int = 5) -> list[tuple[WordFeatures, float]]:
         """Get the top n least frequent words in the sentence."""
