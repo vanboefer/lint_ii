@@ -68,9 +68,6 @@ class ReadabilityAnalysis(LintIIVisualizer):
     mean_content_words_per_clause : float | None
         Mean content words per clause across sentences.
         Returns None if there are no content words / clause on the sentence-level. Cached property.
-    mean_clause_length : float | None
-        Mean value of sentence-level words per clause.
-        Returns None if there are no clause lengths on the sentence-level. Cached property.
     proportion_of_concrete_nouns : float | None
         Proportion of concrete nouns out of the total nouns in the document.
         Nouns of type `unknown` (not in the list) are excluded from the totals count.
@@ -233,21 +230,6 @@ class ReadabilityAnalysis(LintIIVisualizer):
         if not content_words_per_clause:
             return None
         return statistics.mean(content_words_per_clause)
-
-    @cached_property
-    def mean_clause_length(self) -> float | None:
-        """
-        Mean value of sentence-level words per clause.
-        Returns None if there are no clause lengths on the sentence-level.
-        """
-        clause_lengths = [
-            s.clause_length
-            for s in self.sentences
-            if s.clause_length is not None
-        ]
-        if not clause_lengths:
-            return None
-        return statistics.mean(clause_lengths)
 
     @cached_property
     def proportion_of_concrete_nouns(self) -> float | None:
