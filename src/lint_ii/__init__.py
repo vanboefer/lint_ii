@@ -2,7 +2,7 @@
 lint_ii
 -------
 
-LiNT-II is a readability assessment tool for Dutch. The library (a) calculates a readability score for a text using the LiNT-II formula, and (b) provides an analysis per sentence, based on the 4 features that are used in the formula.
+LiNT-II is a readability assessment tool for Dutch. The library (a) calculates a readability score for a text using the LiNT-II formula, and (b) provides an analysis per sentence, based on the 4 features that are used in the formula + a set of additional features that are not part of the formula, but could be also relevant for readability.
 
 The four linguistic features of LiNT-II are:
 - word frequency
@@ -39,7 +39,7 @@ Loading Dutch language model from spaCy... ✓ nl_core_news_lg
 ```python
 >>> detailed_analysis = ra.get_detailed_analysis()
 >>> detailed_analysis.keys()
-dict_keys(['document_stats', 'sentence_stats'])
+dict_keys(['document_stats', 'sentence_stats', 'contextually_new_words'])
 >>> detailed_analysis['document_stats']
 {'sentence_count': 3,
  'document_lint_score': 48.20593518603563,
@@ -67,11 +67,23 @@ dict_keys(['document_stats', 'sentence_stats'])
   {'token': 'hart', 'dep_length': 0, 'heads': ['hart']},
   {'token': 'van', 'dep_length': 1, 'heads': ['stad']},
   {'token': 'de', 'dep_length': 0, 'heads': ['stad']},
-  {'token': 'stad', 'dep_length': 2, 'heads': ['hart']},
-  {'token': '.', 'dep_length': 0, 'heads': ['hart']}],
+  {'token': 'stad', 'dep_length': 2, 'heads': ['hart']}],
  'content_words_per_clause': 4.0,
  'content_words': ['oudegracht', 'sfeervolle', 'hart', 'stad'],
- 'finite_verbs': ['is']}
+ 'finite_verbs': ['is'],
+ 'sent_length': 9,
+ 'mean_clause_length': 9.0,
+ 'passives': [],
+ 'n_subordinate_clauses': 0,
+ 'subordinate_clauses': [],
+ 'adjectival_modifiers_per_clause': 2.0,
+ 'adjectival_modifiers': ['sfeervolle', 'van de stad'],
+ 'coordinated_constituents_per_clause': 0.0,
+ 'coordinated_constituents': [],
+ 'pronouns_first_person': [],
+ 'pronouns_second_person': [],
+ 'pronouns_third_person': [],
+ 'humans': []}
 ```
 """
 

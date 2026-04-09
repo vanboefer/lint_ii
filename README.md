@@ -26,7 +26,7 @@
 **LiNT-II** is a readability assessment tool for Dutch. The library:
 
 - calculates a **readability score** for a text using the [LiNT-II formula](#lint-ii-score), and 
-- provides an **analysis** per sentence, based on the [4 features that are used in the formula](#features-used-in-the-formula) + a set of [additional features](#additional-features) that are not part of the formula, but could be relevant for readability.
+- provides an **analysis** per sentence, based on the [4 features that are used in the formula](#features-used-in-the-formula) + a set of [additional features](#additional-features) that are not part of the formula, but could be also relevant for readability.
 
 **LiNT-II** is a new implementation of the original [LiNT tool](#original-lint). The main differences between **LiNT** and **LiNT-II** are:
 
@@ -40,6 +40,9 @@ For detailed information, please refer to [What is LiNT-II?](#what-is-lint-ii) a
 #### New in 0.1.1
 - Added 4 new linguistic features (not used of the formula); see [here](#additional-features).
 - Refactored return types: return `WordFeatures` instead of flattened text everywhere.
+
+#### New in 0.1.2
+- Added 5 new linguistic features (not used of the formula); see [here](#additional-features).
 
 ## Installation
 
@@ -117,7 +120,7 @@ For a list of available properties, refer to the documentation in [`readability_
 
 ### Get dictionary with detailed analysis
 
-For a human-readable dictionary with a detailed analysis, use the `get_detailed_analysis()` method:
+For a human-readable dictionary with a detailed analysis, use the `get_detailed_analysis()` method. Note that running this method calculates all 13 features (core + additional), which might be a bit slow. If you need only some of the features, accessing them directly is faster.
 
 ```python
 >>> detailed_analysis = analysis.get_detailed_analysis()
@@ -125,7 +128,7 @@ For a human-readable dictionary with a detailed analysis, use the `get_detailed_
 
 ```python
 >>> detailed_analysis.keys()
-dict_keys(['document_stats', 'sentence_stats'])
+dict_keys(['document_stats', 'sentence_stats', 'contextually_new_words'])
 ```
 
 ```python
@@ -150,7 +153,6 @@ dict_keys(['document_stats', 'sentence_stats'])
  'abstract_nouns': [],
  'undefined_nouns': ['hart'],
  'unknown_nouns': ['oudegracht'],
- 'sent_length': 9,
  'max_sdl': 3,
  'sdls': [{'token': 'de', 'dep_length': 0, 'heads': ['Oudegracht']},
   {'token': 'oudegracht', 'dep_length': 3, 'heads': ['hart']},
@@ -164,12 +166,19 @@ dict_keys(['document_stats', 'sentence_stats'])
  'content_words_per_clause': 4.0,
  'content_words': ['oudegracht', 'sfeervolle', 'hart', 'stad'],
  'finite_verbs': ['is'],
+ 'sent_length': 9,
+ 'mean_clause_length': 9.0,
  'passives': [],
  'n_subordinate_clauses': 0,
  'subordinate_clauses': [],
+ 'adjectival_modifiers_per_clause': 2.0,
+ 'adjectival_modifiers': ['sfeervolle', 'van de stad'],
+ 'coordinated_constituents_per_clause': 0.0,
+ 'coordinated_constituents': [],
  'pronouns_first_person': [],
  'pronouns_second_person': [],
- 'pronouns_third_person': []}
+ 'pronouns_third_person': [],
+ 'humans': []}
 ```
 
 ### Visualization in Jupyter Notebook (Binder)
@@ -233,14 +242,21 @@ For more information, please refer to the [LiNT-II documentation](https://vanboe
 
 ### Additional features
 
-LiNT-II outputs additional linguistic features, which are not part of the formula, but can be relevant for readability:
+LiNT-II outputs additional linguistic features, which are not part of the formula, but can be relevant for readability.
 
-Feature | Description
---- | ---
-**sentence length** | The number of words in a sentence, excluding punctuation.
-**pronouns** | All the pronouns in the text, categorized into 1st / 2nd / 3rd person.
-**passives** | Passive voice constructions. <br>Example: *Het boek **is gepubliceerd** nadat de auteur was overleden.* "The book **was published** after the author's death"
-**subordinate clauses** | A subordinate clause cannot stand alone as a complete sentence and relies on a main clause for its meaning. It adds additional information to the main clause. <br>Example: *Mijn broer, **die in Leuven woont**, is morgen jarig.* "My brother, **who lives in Leuven**, has his birthday tomorrow."
+Feature | Description | Release
+--- | --- | ---
+**sentence length** | The number of words in a sentence, excluding punctuation. | v0.1.1
+**pronouns** | All the pronouns in the text, categorized into 1st / 2nd / 3rd person. | v0.1.1
+**passives** | Passive voice constructions. <br>Example: *Het boek **is gepubliceerd** nadat de auteur was overleden.* "The book **was published** after the author's death" | v0.1.1
+**subordinate clauses** | A subordinate clause cannot stand alone as a complete sentence and relies on a main clause for its meaning. It adds additional information to the main clause. <br>Example: *Mijn broer, **die in Leuven woont**, is morgen jarig.* "My brother, **who lives in Leuven**, has his birthday tomorrow." | v0.1.1
+**mean clause length** | The number of words in a sentence, divided by the number of clauses in the sentence. | v0.1.2
+**adjectival modifiers per clause** | The number of adjectival modifiers in a sentence, divided by the number of clauses in the sentence. Adjectival modifiers are words or phrases that describe nouns, providing additional information about them. <br>Example: *De man [**met hoed**] [**die daar loopt**] is mijn vriend.* "The man [**with the hat**] [**walking there**] is my friend." (Two adjectival modifiers; one clause).| v0.1.2
+**coordinated constituents per clause** | Coordination is a syntactic structure that links two or more elements using words like "and", "or", "but". We count the number of coordinated constituents in a sentence (excluding coordinated verbs or clauses), divided by the number of clauses in the sentence. <br>Example: *Daar horen **Schotland**, [**Wales**] en [**Noord-Ierland**] ook bij.* "**Scotland**, **Wales**, and **Northern Ireland** are also part of it." (Two coordinated constituents; one clause. Note that the first conjunct - the head of the coordination, *Schotland* - is not counted.) | v0.1.2
+**humans** | All the words that refer to people (including pronouns). | v0.1.2
+**contextually new words** | Entities and situations that are new in the text, i.e. that were not mentioned in the preceding 50 words. | v0.1.2
+
+The feature **contextually new words** is available on the `ReadabilityAnalysis` level. The other 8 additional features are available on a `SentenceAnalysis` level.
 
 ## References and Credits
 
