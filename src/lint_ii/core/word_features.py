@@ -408,9 +408,7 @@ class WordFeatures:
         
         Returns True if token:
         - has a dependency label 'acl:relcl', 'advcl', 'ccomp', 'csubj' or 'acl'
-        - and:
-            - is itself a verb
-            - or has a child that is a verb
+        - and token or one of its descendants is a verb
         
         The function uses the resolved dependency label. If a token is a conjunct the dependency label is recursively taken from its head.
         """
@@ -418,12 +416,10 @@ class WordFeatures:
 
         if self._resolved_dependency not in subordinate_deps:
             return False
-        if 'WW' in self.token.tag_: # is verb
-            return True
 
-        # has child which is a verb
-        for child in self.token.children:
-            if 'WW' in child.tag_:
+        # token or one of its descendants is a verb 
+        for token in self.token.subtree:
+            if 'WW' in token.tag_:
                 return True
         return False
 

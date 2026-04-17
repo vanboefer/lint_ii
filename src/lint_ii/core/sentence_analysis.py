@@ -4,7 +4,7 @@ from functools import cached_property
 from typing import Any, TypedDict, TYPE_CHECKING
 import statistics
 
-from spacy.tokens import Doc, Span
+from spacy.tokens import Doc, Span, Token
 
 from lint_ii.core.preprocessor import preprocess_text
 from lint_ii.core.lint_scorer import LintScorer
@@ -86,11 +86,11 @@ class SentenceAnalysis:
         List of passive verbal phrases. Cached property.
     has_subordinate_clause : bool
         Indicator whether sentence has one or more subordinate clauses. Cached property.
-    subordinate_clauses : list[Span]
+    subordinate_clauses : list[list[Token]]
         List of subordinate clauses in the sentence. Cached property.
     n_subordinate_clauses : int
         Number of subordinate clauses. Cached property.
-    adjectival_modifiers : list[Span]
+    adjectival_modifiers : list[list[Token]]
         List of adjectival modifiers in the sentence. Cached property.
     adjectival_modifiers_per_clause : float | None
         Number of adjectival modifiers per clause. Returns None if there are no finite verbs in the sentence (i.e. no clause). Cached property.
@@ -375,10 +375,10 @@ class SentenceAnalysis:
         return any(feat.is_in_subordinate_clause for feat in self.word_features)
 
     @cached_property
-    def subordinate_clauses(self) -> list[Span]:
+    def subordinate_clauses(self) -> list[list[Token]]:
         """List of subordinate clauses in the sentence."""
         return [
-            self._get_span_of_token_and_children(feat) for feat in self.word_features
+            list(feat.token.subtree) for feat in self.word_features
             if feat.is_in_subordinate_clause
         ]
 
@@ -390,10 +390,10 @@ class SentenceAnalysis:
     # ── modifiers & coordination ─────────────────────────────────────────
 
     @cached_property
-    def adjectival_modifiers(self) -> list[Span]:
+    def adjectival_modifiers(self) -> list[list[Token]]:
         """List of adjectival modifiers in the sentence."""
         return [
-            self._get_span_of_token_and_children(feat) for feat in self.word_features
+            list(feat.token.subtree) for feat in self.word_features
             if feat.is_adj_mod
         ]
     
@@ -421,12 +421,6 @@ class SentenceAnalysis:
         if not self.finite_verbs:
             return None
         return len(self.coordinated_constituents) / len(self.finite_verbs)
-
-    def _get_span_of_token_and_children(self, feat: WordFeatures) -> Span:
-        """Get the span of the token and its children."""
-        indices = [feat.token.i]
-        indices.extend(child.i for child in feat.token.children)
-        return feat.token.doc[min(indices):max(indices) + 1]
 
     # ── pronouns & humans ────────────────────────────────────────────────
 
@@ -508,9 +502,15 @@ class SentenceAnalysis:
             'mean_clause_length': self.mean_clause_length,
             'passives': [span.text for span in self.passives],
             'n_subordinate_clauses': self.n_subordinate_clauses,
-            'subordinate_clauses': [span.text for span in self.subordinate_clauses],
+            'subordinate_clauses': [
+                ' '.join([token.text for token in tokens])
+                for tokens in self.subordinate_clauses
+            ], 
             'adjectival_modifiers_per_clause': self.adjectival_modifiers_per_clause,
-            'adjectival_modifiers': [span.text for span in self.adjectival_modifiers],
+            'adjectival_modifiers': [
+                ' '.join([token.text for token in tokens])
+                for tokens in self.adjectival_modifiers
+            ],
             'coordinated_constituents_per_clause': self.coordinated_constituents_per_clause,
             'coordinated_constituents': [feat.text for feat in self.coordinated_constituents],
             'pronouns_first_person': [feat.text for feat in self.pronouns[1]],
