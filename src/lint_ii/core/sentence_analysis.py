@@ -78,8 +78,8 @@ class SentenceAnalysis:
         LintScorer object that contains the score (lint.score) and the difficulty level (lint.level) for the sentence. Cached property.
     sent_length : int
         Number of tokens in the sentence (excluding punctuation). Cached property.
-    mean_clause_length : float | None
-        Mean number of words per clause (sentence length / number of finite verbs). Returns None if there are no finite verbs in the sentence (i.e. no clause). Cached property.
+    mean_clause_length : float
+        Mean number of words per clause (sentence length / number of finite verbs). Returns sentence length if no finite verbs were identified in the sentence. Cached property.
     has_passive : bool
         Indicator whether sentence has one or more passive auxiliaries. Cached property.
     passives : list[Span]
@@ -329,13 +329,13 @@ class SentenceAnalysis:
         return len([wf for wf in self.word_features if not wf.is_punctuation])
 
     @cached_property
-    def mean_clause_length(self) -> float | None:
+    def mean_clause_length(self) -> float:
         """
         Mean number of words per clause (sentence length / number of finite verbs).
-        Returns None if there are no finite verbs in the sentence (i.e. no clause).
+        Returns sentence length if no finite verbs were identified in the sentence.
         """
         if not self.finite_verbs:
-            return None
+            return self.sent_length
         return self.sent_length / len(self.finite_verbs)
 
     @cached_property
