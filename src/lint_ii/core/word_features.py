@@ -460,10 +460,32 @@ class WordFeatures:
         Indicator whether token refers to a human.
         Returns True if:
         - token is pronoun (excluding 'het')
+        - token is an indefinite pronoun referring to humans (based on list)
         - entity type is 'PERSON'
         - lemma of the token has semantic type 'human' in NOUN_DATA list
         """
         if self.is_pronoun and self.text != 'het':
+            return True
+        
+        indefinite_pronouns = [
+            'iemand',
+            'niemand',
+            'elk',
+            'ieder',
+            'iedereen',
+            'eenieder',
+            'menigeen',
+            'elkeen',
+            'sommigen',
+            'enigen',
+            'anderen',
+            'velen',
+            'allen',
+            'weinigen',
+            'enkelen',
+            'beiden',
+        ]
+        if self.token.tag_.startswith('VNW|onbep') and self.text in indefinite_pronouns:
             return True
 
         if not self.is_noun:
@@ -472,7 +494,8 @@ class WordFeatures:
         if self.token.ent_type_ == 'PERSON':
             return True
 
-        sem_type = self._NOUN_DATA.get(self.lemma, {}).get('sem_type', '')
+        sem_type = self._NOUN_DATA.get(self.lemma,
+        {}).get('sem_type', '')
         if sem_type == 'human':
             return True
         
