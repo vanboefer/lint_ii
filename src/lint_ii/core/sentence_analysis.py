@@ -92,12 +92,12 @@ class SentenceAnalysis:
         Number of subordinate clauses. Cached property.
     adjectival_modifiers : list[list[Token]]
         List of adjectival modifiers in the sentence. Cached property.
-    adjectival_modifiers_per_clause : float | None
-        Number of adjectival modifiers per clause. Any conjunctions nested inside the modifier are added to the count. Returns None if there are no finite verbs in the sentence (i.e. no clause). Cached property.
+    adjectival_modifiers_per_clause : float
+        Number of adjectival modifiers per clause. Any conjunctions nested inside the modifier are added to the count. Cached property.
     coordinated_constituents : list[WordFeatures]
         List of coordinated constituents in the sentence.
-    coordinated_constituents_per_clause : float | None
-        Number of coordinated constituents per clause. Returns None if there are no finite verbs in the sentence (i.e. no clause). Cached property.
+    coordinated_constituents_per_clause : float
+        Number of coordinated constituents per clause. Cached property.
     pronouns : dict[int, list[WordFeatures]]
         Pronouns in the sentence categorized by person (first, second, third).
     humans : list[WordFeatures]
@@ -398,14 +398,12 @@ class SentenceAnalysis:
         ]
     
     @cached_property
-    def adjectival_modifiers_per_clause(self) -> float | None:
+    def adjectival_modifiers_per_clause(self) -> float:
         """
         Number of adjectival modifiers per clause.
         Any conjunctions nested inside the modifier are added to the count. 
-        Returns None if there are no finite verbs in the sentence (i.e. no clause).
         """
-        if not self.finite_verbs:
-            return None
+        n_finite_verbs = len(self.finite_verbs) if self.finite_verbs else 1
         n_adjmods = len(self.adjectival_modifiers)
         n_nested_adjmods = len([
             token
@@ -413,7 +411,7 @@ class SentenceAnalysis:
             for token in subtree
             if token.dep_ == 'conj'
         ])
-        return (n_adjmods + n_nested_adjmods) / len(self.finite_verbs)
+        return (n_adjmods + n_nested_adjmods) / n_finite_verbs
 
     @property
     def coordinated_constituents(self) -> list[WordFeatures]:
@@ -421,14 +419,12 @@ class SentenceAnalysis:
         return [feat for feat in self.word_features if feat.is_coordinated_constituent]
 
     @cached_property
-    def coordinated_constituents_per_clause(self) -> float | None:
+    def coordinated_constituents_per_clause(self) -> float:
         """
         Number of coordinated constituents per clause.
-        Returns None if there are no finite verbs in the sentence (i.e. no clause).
         """
-        if not self.finite_verbs:
-            return None
-        return len(self.coordinated_constituents) / len(self.finite_verbs)
+        n_finite_verbs = len(self.finite_verbs) if self.finite_verbs else 1
+        return len(self.coordinated_constituents) / n_finite_verbs
 
     # ── pronouns & humans ────────────────────────────────────────────────
 
