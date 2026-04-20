@@ -5,8 +5,19 @@ import pyarrow.parquet as pq
 
 LINGUISTIC_DATA_PATH = Path(__file__).parent.resolve() / 'data'
 
-path_nouns_sem_types = next(LINGUISTIC_DATA_PATH.glob('nouns_sem_types_*.parquet'))
-path_manner_adverbs = next(LINGUISTIC_DATA_PATH.glob('manner_adverbs_*.parquet'))
+def get_latest_version(path: Path, pat: str) -> Path:
+    glob = path.glob(pat)
+    sorted_paths = sorted(list(glob), key=lambda i: i.stem, reverse=True)
+    return sorted_paths[0]
+
+path_nouns_sem_types = get_latest_version(
+    LINGUISTIC_DATA_PATH,
+    'nouns_sem_types_*.parquet'
+)
+path_manner_adverbs = get_latest_version(
+    LINGUISTIC_DATA_PATH,
+    'manner_adverbs_*.parquet'
+)
 
 path_measurement_units = LINGUISTIC_DATA_PATH / 'measurement_units.parquet'
 path_word_freq = LINGUISTIC_DATA_PATH / 'subtlex_wordfreq.parquet'
