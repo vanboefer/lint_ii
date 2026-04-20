@@ -516,6 +516,15 @@
     <p>*<em>opgekomen</em> is a content word, but it is in the <a
             href="https://github.com/vanboefer/lint_ii/blob/main/src/lint_ii/linguistic_data/data/subtlex_wordfreq_skiplist.parquet">&quot;skip-list&quot;</a>
     </p>
+    <h3>Reproducibility</h3>
+    <p>
+        To reproduce the linear regression model of LiNT-II:
+        <ul>
+            <li>The reading comprehension data is available upon request via DANS: <a href="https://ssh.datastations.nl/dataset.xhtml?persistentId=doi:10.17026/dans-z4y-gbmq">Leesbaarheidsindex voor het Nederlands</a>.</li>
+            <li>The code to generate the features is in the <a href="https://github.com/vanboefer/lint_ii">GitHub repo</a>.</li>
+            <li><strong>Note</strong>: To reproduce the formula, you need to use the <a href="https://github.com/vanboefer/lint_ii/blob/main/src/lint_ii/linguistic_data/data/nouns_sem_types_20251118.parquet">2025-11-18 version of the noun list</a>. Later versions of the list will create slight changes in the formula's coefficients.</li>
+        </ul>
+    </p>
 </section>
 <section>
     <h2 id="references-and-credits">References and Credits</h2>

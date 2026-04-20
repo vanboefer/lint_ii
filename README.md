@@ -43,6 +43,7 @@ For detailed information, please refer to [What is LiNT-II?](#what-is-lint-ii) a
 
 #### New in 0.1.2
 - Added 5 new linguistic features (not used of the formula); see [here](#additional-features).
+- Updated the `NOUN_DATA` list: the semantic type of words related to *kabinet/regering* (cabinet/government) was changed to `human`.
 
 ## Installation
 
