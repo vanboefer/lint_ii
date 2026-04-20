@@ -93,7 +93,7 @@ class SentenceAnalysis:
     adjectival_modifiers : list[list[Token]]
         List of adjectival modifiers in the sentence. Cached property.
     adjectival_modifiers_per_clause : float | None
-        Number of adjectival modifiers per clause. Returns None if there are no finite verbs in the sentence (i.e. no clause). Cached property.
+        Number of adjectival modifiers per clause. Any conjunctions nested inside the modifier are added to the count. Returns None if there are no finite verbs in the sentence (i.e. no clause). Cached property.
     coordinated_constituents : list[WordFeatures]
         List of coordinated constituents in the sentence.
     coordinated_constituents_per_clause : float | None
@@ -401,11 +401,19 @@ class SentenceAnalysis:
     def adjectival_modifiers_per_clause(self) -> float | None:
         """
         Number of adjectival modifiers per clause.
+        Any conjunctions nested inside the modifier are added to the count. 
         Returns None if there are no finite verbs in the sentence (i.e. no clause).
         """
         if not self.finite_verbs:
             return None
-        return len(self.adjectival_modifiers) / len(self.finite_verbs)
+        n_adjmods = len(self.adjectival_modifiers)
+        n_nested_adjmods = len([
+            token
+            for subtree in self.adjectival_modifiers
+            for token in subtree
+            if token.dep_ == 'conj'
+        ])
+        return (n_adjmods + n_nested_adjmods) / len(self.finite_verbs)
 
     @property
     def coordinated_constituents(self) -> list[WordFeatures]:
