@@ -559,9 +559,12 @@ class WordFeatures:
     def is_adj_mod(self) -> bool:
         """
         Indicator whether token is adjectival modifier.
-        True if token has one of the following dependency labels:
+        True if token is not an adverb and has one of the following dependency labels:
         amod, nummod, nmod, nmod:poss, acl.
         """
+        if self.token.pos_ == 'ADV':
+            return False
+
         adj_mod_deps = [
             'amod',
             'nummod',
