@@ -139,9 +139,6 @@ ehthumbs.db
 Thumbs.db
 
 # project specific files
-documents/
 notebooks/
-output/
-pos_tags/
 regression_analysis/
 environment_full.yml
