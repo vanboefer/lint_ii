@@ -213,7 +213,7 @@
     <p>The corrections and exceptions applied in LiNT-II are the same ones as in the original LiNT.</p>
     <ul>
         <li>We calculate word frequencies only for <a href="#definitions">content words</a>, since function words are generally frequent (for example, <em>dat</em>: 7.34, <em>de</em>: 7.38, <em>en</em>: 7.14) and do not contribute to the difficulty of the text. From the content words, we exclude proper nouns (names of people, places, etc.) since their frequency cannot be reliably linked to the difficulty of the text.</li>
-        <li>For transparent compounds (e.g., <em>duwboot</em> &quot;towboat&quot;), we use the frequency of the base word (<em>boot</em> &quot;boat&quot;), rather than the frequency of the compound as a whole. Previous research shows that this provides a better estimate of word difficulty; for more details, see <a href="https://lint.hum.uu.nl/assets/pander-maat-en-dekker-2016.pdf">Pander Maat &amp; Dekker 2016</a>. The compounds and their base words are identified based on a manually-annotated <a href="https://github.com/vanboefer/lint_ii/blob/main/src/lint_ii/linguistic_data/data/nouns_sem_types_20251118.parquet">list</a>. The list contains 123,307 compounds: 63,316 singular forms and 59,991 plural forms; for the plural forms, the base word is given in singular (for example, the base word of both <em>integriteitstoets</em> &quot;integrity test&quot; and <em>integriteitstoetsen</em> &quot;integrity tests&quot; is <em>toets</em> &quot;test&quot;).</li>
+        <li>For transparent compounds (e.g., <em>duwboot</em> &quot;towboat&quot;), we use the frequency of the base word (<em>boot</em> &quot;boat&quot;), rather than the frequency of the compound as a whole. Previous research shows that this provides a better estimate of word difficulty; for more details, see <a href="https://lint.hum.uu.nl/assets/pander-maat-en-dekker-2016.pdf">Pander Maat &amp; Dekker 2016</a>. The compounds and their base words are identified based on a manually-annotated <a href="https://github.com/vanboefer/lint_ii/blob/main/src/lint_ii/linguistic_data/data/nouns_sem_types_20260420.parquet">list</a>. The list contains 123,307 compounds: 63,316 singular forms and 59,991 plural forms; for the plural forms, the base word is given in singular (for example, the base word of both <em>integriteitstoets</em> &quot;integrity test&quot; and <em>integriteitstoetsen</em> &quot;integrity tests&quot; is <em>toets</em> &quot;test&quot;).</li>
         <li>As mentioned above, some words that are missing or infrequent in the SUBTLEX-NL corpus are actually pretty common in the spoken language. This includes new words that entered the Dutch language after 2010 (e.g., <em>appen</em> &quot;to send a message on WhatsApp&quot;), and words that are common in a Dutch-speaking context but might be not common in English-speaking TV shows (e.g., <em>knutselen</em> &quot;to craft&quot;, <em>fietser</em> &quot;cyclist&quot;). To address the most obvious discrepancies of this sort, the makers of the original LiNT manually created a list of words that should be skipped when calculating frequencies. So instead of incorrectly getting a low frequency, these words don't get any frequency value at all, and so do not mistakenly affect the difficulty score. For more details on how this was done, see the <a href="https://raw.githubusercontent.com/CentreForDigitalHumanities/tscan/master/docs/tscanhandleiding.pdf">T-Scan manual</a>. The list can be found <a href="https://github.com/vanboefer/lint_ii/blob/main/src/lint_ii/linguistic_data/data/subtlex_wordfreq_skiplist.parquet">here</a>.</li>
     </ul>
     <h3>Syntactic Dependency Length (SDL)</h3>
@@ -243,7 +243,7 @@
     <h4>Why concrete and abstract nouns?</h4>
     <p>Concrete nouns refer to specific, tangible items that can be perceived through the senses, like &quot;apple&quot; or &quot;car&quot;. Abstract nouns, on the other hand, represent general ideas or concepts that cannot be physically touched, such as &quot;freedom&quot; or &quot;happiness&quot;. Research suggests that a more concrete text is easier to understand; for example, adding examples helps understanding because examples make ideas more specific and concrete.</p>
     <h4>LiNT-II noun list</h4>
-    <p>The <a href="https://github.com/vanboefer/lint_ii/blob/main/src/lint_ii/linguistic_data/data/nouns_sem_types_20251118.parquet">noun list</a> was created for the original LiNT and further revised and updated for LiNT-II. The original annotation work was done by Henk Pander Maat, Nick Dekker and N. van Houten; the revisions and additions for LiNT-II were done by Henk Pander Maat.</p>
+    <p>The <a href="https://github.com/vanboefer/lint_ii/blob/main/src/lint_ii/linguistic_data/data/nouns_sem_types_20260420.parquet">noun list</a> was created for the original LiNT and further revised and updated for LiNT-II. The original annotation work was done by Henk Pander Maat, Nick Dekker and N. van Houten; the revisions and additions for LiNT-II were done by Henk Pander Maat.</p>
     <p>The list contains 164,671 nouns, annotated for their semantic type (e.g., &quot;human&quot;, &quot;place&quot;) and semantic class (&quot;abstract&quot;, &quot;concrete&quot;, &quot;undefined&quot;); the full annotation scheme is described <a href="#semantic-types-annotation">below</a>. The annotations are based on an existing lexicon -- <a href="https://taalmaterialen.ivdnt.org/download/tstc-referentiebestand-nederlands/">Referentiebestand Nederlands (Martin &amp; Maks 2005)</a> -- which was expanded and revised. For more information about how the original list was created, see the <a href="https://raw.githubusercontent.com/CentreForDigitalHumanities/tscan/master/docs/tscanhandleiding.pdf">T-Scan manual</a>.</p>
     <p>Descriptive statistics of the LiNT-II noun list:</p>
     <ul>
@@ -252,9 +252,9 @@
         <li>123,307 nouns in the list are compounds (e.g., <em>duwboot</em> &quot;towboat&quot;). For compounds, the base word (<em>boot</em> &quot;boat&quot;) and the modifier (<em>duw</em> &quot;tow&quot;) are annotated. This information is used in the word frequency feature, as described <a href="#corrections-and-exceptions">above</a>. For plural form compounds (N=59,911), the base word is given in singular (for example, the base word of both <em>integriteitstoets</em> &quot;integrity test&quot; and <em>integriteitstoetsen</em> &quot;integrity tests&quot; is <em>toets</em> &quot;test&quot;).</li>
         <li>The distribution of semantic classes in the list is as follows:
             <ul>
-                <li>concrete: 84,144</li>
-                <li>abstract: 78,018</li>
-                <li>undefined: 2,509</li>
+                <li>concrete: 84,226</li>
+                <li>abstract: 77,938</li>
+                <li>undefined: 2,507</li>
             </ul>
         </li>
     </ul>
@@ -368,7 +368,7 @@
         <tbody>
             <tr>
                 <td>constant</td>
-                <td>-4.21</td>
+                <td>-4.30</td>
                 <td></td>
                 <td></td>
                 <td></td>
@@ -376,8 +376,8 @@
             </tr>
             <tr>
                 <td>word frequency</td>
-                <td>17.28</td>
-                <td>0.403</td>
+                <td>17.31</td>
+                <td>0.404</td>
                 <td>0.72</td>
                 <td>0.56</td>
                 <td>1.43</td>
@@ -393,15 +393,15 @@
             <tr>
                 <td>content words per clause</td>
                 <td>-2.54</td>
-                <td>-0.218</td>
+                <td>-0.219</td>
                 <td>-0.70</td>
                 <td>-0.28</td>
                 <td>2.30</td>
             </tr>
             <tr>
                 <td>proportion concrete nouns</td>
-                <td>16.00</td>
-                <td>0.246</td>
+                <td>15.95</td>
+                <td>0.244</td>
                 <td>0.56</td>
                 <td>0.40</td>
                 <td>1.27</td>
@@ -419,11 +419,11 @@
 \[
 \begin{align}
 \text{LiNT-II score} = 100 - (
-    & -\text{4.21} \\
-    & + \text{17.28} \cdot \text{word frequency} \\
+    & -\text{4.30} \\
+    & + \text{17.31} \cdot \text{word frequency} \\
     & - \text{1.62} \cdot \text{syntactic dependency length} \\
     & - \text{2.54} \cdot \text{content words per clause} \\
-    & + \text{16.00} \cdot \text{proportion concrete nouns}
+    & + \text{15.95} \cdot \text{proportion concrete nouns}
 )
 \end{align}
 \]
@@ -469,7 +469,7 @@
         <li><code>word frequency</code> is None when (a) there are no content words in the sentence, or (b) all content words are in the <a href="https://github.com/vanboefer/lint_ii/blob/main/src/lint_ii/linguistic_data/data/subtlex_wordfreq_skiplist.parquet">&quot;skip-list&quot;</a>, as explained <a href="#corrections-and-exceptions">here</a>.</li>
         <li><code>syntactic dependency length</code> is None when the sentence consists of one word only, excluding punctuation.</li>
         <li><code>content words per clause</code> is None if there are no finite verbs in the sentence.</li>
-        <li><code>proportion concrete nouns</code> is None if there are no nouns or only 'unknown' nouns ('unknown' = not in the <a href="https://github.com/vanboefer/lint_ii/blob/main/src/lint_ii/linguistic_data/data/nouns_sem_types_20251118.parquet">&quot;noun list&quot;</a>) in the sentence.</li>
+        <li><code>proportion concrete nouns</code> is None if there are no nouns or only 'unknown' nouns ('unknown' = not in the <a href="https://github.com/vanboefer/lint_ii/blob/main/src/lint_ii/linguistic_data/data/nouns_sem_types_20260420.parquet">&quot;noun list&quot;</a>) in the sentence.</li>
     </ul>
     <p>Examples:</p>
     <table class="col-2-r col-3-r col-4-r col-5-r">
@@ -518,12 +518,8 @@
     </p>
     <h3>Reproducibility</h3>
     <p>
-        To reproduce the linear regression model of LiNT-II:
-        <ul>
-            <li>The reading comprehension data is available upon request via DANS: <a href="https://ssh.datastations.nl/dataset.xhtml?persistentId=doi:10.17026/dans-z4y-gbmq">Leesbaarheidsindex voor het Nederlands</a>.</li>
-            <li>The code to generate the features is in the <a href="https://github.com/vanboefer/lint_ii">GitHub repo</a>.</li>
-            <li><strong>Note</strong>: To reproduce the formula, you need to use the <a href="https://github.com/vanboefer/lint_ii/blob/main/src/lint_ii/linguistic_data/data/nouns_sem_types_20251118.parquet">2025-11-18 version of the noun list</a>. Later versions of the list will create slight changes in the formula's coefficients.</li>
-        </ul>
+        To reproduce the linear regression model of LiNT-II, please refer to the data and the versioning details <a
+            href="https://github.com/vanboefer/lint_ii/tree/main/regression_data_and_results">here</a>.
     </p>
 </section>
 <section>
@@ -536,13 +532,13 @@
   title = {{LiNT-II: readability assessment for Dutch}},
   year = {2025},
   url = {https://github.com/vanboefer/lint_ii},
-  version = {0.1.1},
+  version = {0.1.3},
   note = {Python package}
 }
 </code></pre>
     <ul>
         <li>Special thanks to <a href="https://www.uu.nl/staff/APJvandenBosch">Antal van den Bosch</a> (Utrecht University) for setting up and facilitating the collaboration.</li>
-        <li>Special thanks to <a href="https://github.com/lcvriend">Lawrence Vriend</a> for his work on the <strong>LiNT-II Visualizer</strong> and other help with the code.</li>
+        <li>Special thanks to <a href="https://github.com/lcvriend">Lawrence Vriend</a> for his work on the <strong>LiNT-II Visualizer</strong> and other invaluable help with the code.</li>
         <li>The code for LiNT-II was inspired by a spaCy implementation of LiNT by the City of Amsterdam: <a href="https://github.com/Amsterdam/alletaal-lint">alletaal-lint</a>.</li>
     </ul>
     <h3>Original LiNT</h3>

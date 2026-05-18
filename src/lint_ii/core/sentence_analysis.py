@@ -147,7 +147,7 @@ class SentenceAnalysis:
     geremde gemoed prijsgeven aan een onnozel stuk lijntjespapier."
     >>> analysis = SentenceAnalysis.from_text(text)
     >>> analysis.lint.score
-    75.4232676597771
+    75.48046469213625
     >>> analysis.lint.level
     4
     >>> analysis.max_sdl
@@ -155,7 +155,9 @@ class SentenceAnalysis:
     >>> analysis.content_words_per_clause
     10.0
     >>> analysis.get_top_n_least_frequent(3)
-    [('onoverkomenlijk', 1.359228547196266), ('lijntjespapier', 1.359228547196266),('geremde', 1.9612885385242282)]
+    [(WordFeatures('onoverkomenlijk'), 1.359228547196266),
+     (WordFeatures('lijntjespapier'), 1.359228547196266),
+     (WordFeatures('geremde'), 1.9612885385242282)]
 
     See Also
     --------

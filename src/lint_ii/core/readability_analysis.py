@@ -102,7 +102,7 @@ class ReadabilityAnalysis(LintIIVisualizer):
     >>> text = "Jip zit bij de kapper. Knip, knap, zegt de schaar."
     >>> analysis = ReadabilityAnalysis.from_text(text)
     >>> analysis.lint.score
-    21.9
+    21.925221167552593
     >>> analysis.lint.level
     1
     >>> stats = analysis.calculate_document_stats()

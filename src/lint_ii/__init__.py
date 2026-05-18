@@ -4,11 +4,13 @@ lint_ii
 
 LiNT-II is a readability assessment tool for Dutch. The library (a) calculates a readability score for a text using the LiNT-II formula, and (b) provides an analysis per sentence, based on the 4 features that are used in the formula + a set of additional features that are not part of the formula, but could be also relevant for readability.
 
-The four linguistic features of LiNT-II are:
+The 4 linguistic features that are included in the LiNT-II formula are:
 - word frequency
 - proportion of concrete nouns
 - syntactic dependency length
 - number of content words per clause
+
+In addition, LiNT-II outputs 9 additional features , which are not part of the formula, but can be relevant for readability.
 
 For more information about the features and the scientific research behind LiNT-II, please refer to https://github.com/vanboefer/lint_ii.
 
@@ -27,11 +29,11 @@ Loading Dutch language model from spaCy... ✓ nl_core_news_lg
 
 ```python
 >>> ra.lint.score
-48.20593518603563
+48.21821023715232
 >>> ra.lint.level
 3
 >>> ra.lint_scores_per_sentence
-[18.511612982419507, 54.27056340066443, 63.24402181810589]
+[18.488663741182307, 54.29401862227567, 63.24784032931867]
 ```
 
 ## Get detailed analysis
@@ -42,13 +44,13 @@ Loading Dutch language model from spaCy... ✓ nl_core_news_lg
 dict_keys(['document_stats', 'sentence_stats', 'contextually_new_words'])
 >>> detailed_analysis['document_stats']
 {'sentence_count': 3,
- 'document_lint_score': 48.20593518603563,
+ 'document_lint_score': 48.21821023715232,
  'document_difficulty_level': 3,
- 'min_lint_score': 18.511612982419507,
- 'max_lint_score': 63.24402181810589}
+ 'min_lint_score': 18.488663741182307,
+ 'max_lint_score': 63.24784032931867}
 >>> detailed_analysis['sentence_stats'][0]
 {'text': 'De Oudegracht is het sfeervolle hart van de stad.',
- 'score': 18.511612982419507,
+ 'score': 18.488663741182307,
  'level': 1,
  'mean_log_word_frequency': 5.364349123825101,
  'top_n_least_freq_words': [('hart', 5.293120582960477),
@@ -96,3 +98,4 @@ class LiNT_II_Exception(Exception):
     def __init__(self, message):
         self.message = message
         super().__init__(self.message)
+        

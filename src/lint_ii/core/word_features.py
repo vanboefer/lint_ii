@@ -132,7 +132,7 @@ class WordFeatures:
     >>> from lint_ii import WordFeatures
     >>> word = WordFeatures.from_text("slaapt")
     >>> word.word_frequency
-    4.756
+    4.75612499633879
     >>> word.is_finite_verb
     True
     >>> word.is_content_word

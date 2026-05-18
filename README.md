@@ -6,19 +6,19 @@
 
 ## Table of contents
 1. [Introduction](#introduction)
-2. [Changelog](#changelog)
-3. [Installation](#installation)
-4. [Usage](#usage)
+2. [Installation](#installation)
+3. [Usage](#usage)
     - [Create `ReadabilityAnalysis` from text](#create-readabilityanalysis-from-text)
     - [Get LiNT-II score and difficulty level](#get-lint-ii-score-and-difficulty-level)
     - [Get linguistic features](#get-linguistic-features)
     - [Get dictionary with detailed analysis](#get-dictionary-with-detailed-analysis)
     - [Visualization in Jupyter Notebook (Binder)](#visualization-in-jupyter-notebook-binder)
-5. [What is LiNT-II?](#what-is-lint-ii)
+4. [What is LiNT-II?](#what-is-lint-ii)
     - [Features used in the formula](#features-used-in-the-formula)
     - [LiNT-II score](#lint-ii-score)
     - [Difficulty levels](#difficulty-levels)
     - [Additional features](#additional-features)
+5. [Changelog (releases)](#changelog)
 6. [References and Credits](#references-and-credits)
 
 ## Introduction
@@ -31,26 +31,26 @@
 **LiNT-II** is a new implementation of the original [LiNT tool](#original-lint). The main differences between **LiNT** and **LiNT-II** are:
 
 - The **NLP tools** used to extract linguistic features from the text. LiNT has [T-Scan](https://github.com/CentreForDigitalHumanities/tscan) under the hood, while LiNT-II uses [spaCy](https://spacy.io/).
-- The **coefficients** (weights) used in the formula. Since the features are calculated differently, a new linear regression model was fitted on the original reading comprehension data from LiNT. This resulted in new coefficients. The performance of the LiNT-II model is the same as the original LiNT: **adjusted R<sup>2</sup> = 0.74**, meaning that the model explains 74% of the variance in the comprehension data.
+- The **coefficients** (weights) used in the formula. Since the features are calculated differently, [a new linear regression model was fitted on the original reading comprehension data from LiNT](https://github.com/vanboefer/lint_ii/tree/main/regression_data_and_results). This resulted in new coefficients. The performance of the LiNT-II model is the same as the original LiNT: **adjusted R<sup>2</sup> = 0.74**, meaning that the model explains 74% of the variance in the comprehension data.
 
 For detailed information, please refer to [What is LiNT-II?](#what-is-lint-ii) and [LiNT-II documentation](https://vanboefer.github.io/lint_ii/).
 
-## Changelog
-
-#### New in 0.1.1
-- Added 4 new linguistic features (not used of the formula); see [here](#additional-features).
-- Refactored return types: return `WordFeatures` instead of flattened text everywhere.
-
-#### New in 0.1.2
-- Added 5 new linguistic features (not used of the formula); see [here](#additional-features).
-- Updated the `NOUN_DATA` list: the semantic type of words related to *kabinet/regering* (cabinet/government) was changed to `human`.
-
 ## Installation
+
+### Quick install
+
+1. Create an environment with **Python 3.11**<sup>[1]</sup>
+2. Run:
 
 ```bash
 pip install lint_ii
 python -m spacy download nl_core_news_lg
 ```
+<sup>[1]</sup> **Python 3.11** will trigger installation of **spaCy 3.7**, which is the recommended version for LiNT-II. For more details about this, see [here](https://github.com/vanboefer/lint_ii/tree/main/regression_data_and_results).
+
+### Support for other Python versions
+
+LiNT-II also supports Python 3.12 and 3.13, which install spaCy 3.8. Note that this is not the recommended configuration; for more details, see [here](https://github.com/vanboefer/lint_ii/tree/main/regression_data_and_results).
 
 ## Usage
 
@@ -76,13 +76,13 @@ You can see the score and difficulty level for the whole document and/or per sen
 
 ```python
 >>> analysis.lint.score
-48.20593518603563
+48.21821023715232
 
 >>> analysis.lint.level
 3
 
 >>> analysis.lint_scores_per_sentence
-[18.511612982419507, 54.27056340066443, 63.24402181810589]
+[18.488663741182307, 54.29401862227567, 63.24784032931867]
 ```
 
 ### Get linguistic features
@@ -135,16 +135,16 @@ dict_keys(['document_stats', 'sentence_stats', 'contextually_new_words'])
 ```python
 >>> detailed_analysis['document_stats']
 {'sentence_count': 3,
- 'document_lint_score': 48.20593518603563,
+ 'document_lint_score': 48.21821023715232,
  'document_difficulty_level': 3,
- 'min_lint_score': 18.511612982419507,
- 'max_lint_score': 63.24402181810589}
+ 'min_lint_score': 18.488663741182307,
+ 'max_lint_score': 63.24784032931867}
  ```
 
  ```python
 >>> detailed_analysis['sentence_stats'][0]
 {'text': 'De Oudegracht is het sfeervolle hart van de stad.',
- 'score': 18.511612982419507,
+ 'score': 18.488663741182307,
  'level': 1,
  'mean_log_word_frequency': 5.364349123825101,
  'top_n_least_freq_words': [('hart', 5.293120582960477),
@@ -216,17 +216,15 @@ The readability score is calculated based on the following formula:
 LiNT-II score = 
 
   100 - (
-      - 4.21
-      + (17.28 * word frequency)
+      - 4.30
+      + (17.31 * word frequency)
       - (1.62  * syntactic dependency length)
       - (2.54  * content words per clause)
-      + (16.00 * proportion concrete nouns)
+      + (15.95 * proportion concrete nouns)
   )
 ```
 
-The formula's coefficients were estimated using a linear regression model fitted on empirical reading comprehension data from high school students.
-
-For more information, please refer to the [LiNT-II documentation](https://vanboefer.github.io/lint_ii/).
+The formula's coefficients were estimated using a linear regression model fitted on empirical reading comprehension data from high school students. For more information about the regression analysis, see [here](https://github.com/vanboefer/lint_ii/tree/main/regression_data_and_results).
 
 ### Difficulty levels
 
@@ -259,6 +257,19 @@ Feature | Description | Release
 
 The feature **contextually new words** is available on the `ReadabilityAnalysis` level. The other 8 additional features are available on a `SentenceAnalysis` level.
 
+## Changelog
+
+#### New in 0.1.3
+- LiNT-II now supports Python 3.12 and Python 3.13; these versions install spaCy 3.8. We recommend using Python 3.11 and spaCy 3.7, if possible; see [here](https://github.com/vanboefer/lint_ii/tree/main/regression_data_and_results).
+
+#### New in 0.1.2
+- Added 5 new linguistic features (not used of the formula); see [here](#additional-features).
+- Updated the `NOUN_DATA` list: the semantic type of words related to *kabinet/regering* (cabinet/government) was changed to `human`.
+
+#### New in 0.1.1
+- Added 4 new linguistic features (not used of the formula); see [here](#additional-features).
+- Refactored return types: return `WordFeatures` instead of flattened text everywhere.
+
 ## References and Credits
 
 ### LiNT-II
@@ -273,13 +284,13 @@ If you use this library, please cite as follows:
   title = {{LiNT-II: readability assessment for Dutch}},
   year = {2025},
   url = {https://github.com/vanboefer/lint_ii},
-  version = {0.1.1},
+  version = {0.1.3},
   note = {Python package}
 }
 ```
 
 - Special thanks to [Antal van den Bosch](https://www.uu.nl/staff/APJvandenBosch) (Utrecht University) for setting up and facilitating the collaboration.
-- Special thanks to [Lawrence Vriend](https://github.com/lcvriend) for his work on the **LiNT-II Visualizer** and other help with the code.
+- Special thanks to [Lawrence Vriend](https://github.com/lcvriend) for his work on the **LiNT-II Visualizer** and other invaluable help with the code.
 - The code for LiNT-II was inspired by a spaCy implementation of LiNT by the City of Amsterdam: [alletaal-lint](https://github.com/Amsterdam/alletaal-lint).
 
 ### Original LiNT
