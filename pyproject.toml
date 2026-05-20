@@ -16,7 +16,7 @@ exclude = [
 
 [project]
 name = "lint_ii"
-version = "0.1.2"
+version = "0.1.3"
 description = "LiNT-II is a readability assessment tool for Dutch."
 authors = [
     {name = "Jenia Kim"}
@@ -24,17 +24,19 @@ authors = [
 license = {text = "EUPL"}
 keywords = ["readability", "dutch", "nlp"]
 readme = "README.md"
-requires-python = ">=3.11,<3.12"
+requires-python = ">=3.11,<3.14"
 dependencies = [
-    "spacy>=3.7,<3.8",
-    "numpy>=1.25.0,<2.0",
-    "pyarrow>=21.0,<22.0",
-    "mistune>=3.1,<3.2",
+    "spacy>=3.8.2,<3.9; python_version>='3.12'",
+    "spacy>=3.7,<3.8; python_version<'3.12'",
+    "numpy>=1.25.0,<2.0; python_version<'3.12'",
+    "pyarrow>=21.0,<25.0",
+    "mistune>=3.1,<3.3",
+    "pip",
 ]
 
 [project.optional-dependencies]
 notebook = ["ipykernel", "jupyter"]
 
 [project.urls]
-homepage = "https://vanboefer.github.io/lint_ii/"
-repository = "https://vanboefer.github.io/lint_ii/"
+homepage = "https://vanboefer.github.io/lint_ii"
+repository = "https://github.com/vanboefer/lint_ii"
