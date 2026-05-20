@@ -9,7 +9,7 @@ class LintScorer:
     linguistic features to produce a readability score and a difficulty level. 
     
     The formula's coefficients were estimated using a linear regression model fitted on
-    empirical reading comprehension data from Dutch highschool students.
+    empirical reading comprehension data from Dutch highschool students. The appropriate coefficients are automatically loaded based on the versions of the model and the noun list.
 
     The formula returns None if one of the four feature values is None.
 
@@ -82,7 +82,7 @@ class LintScorer:
     ...     proportion_concrete = 0.6
     ... )
     >>> lint_ii.score
-    21.020445599999988
+    21.010140322363895
     >>> lint_ii.level
     1
 
@@ -91,14 +91,6 @@ class LintScorer:
     ReadabilityAnalysis : Document-level readability analysis
     SentenceAnalysis : Sentence-level readability analysis
     """
-
-    COEFFICIENTS = {
-        'constant': -4.20782,
-        'freq_log': 17.283729,
-        'max_sdl': -1.624415,
-        'content_words_per_clause': -2.536780,
-        'proportion_concrete': 16.001231,
-    }
 
     def __init__(
         self,
@@ -126,6 +118,11 @@ class LintScorer:
         self.max_sdl = max_sdl
         self.content_words_per_clause = content_words_per_clause
         self.proportion_concrete = proportion_concrete
+
+    @property
+    def COEFFICIENTS(self) -> dict[str, float]:
+        from lint_ii.linguistic_data.nlp_model import COEFFICIENTS
+        return COEFFICIENTS
 
     @cached_property
     def score(self) -> float | None:
@@ -160,10 +157,10 @@ class LintScorer:
             less readable text. Scores are clamped to the [0, 100] range.
         """
         result = (
-            + self.COEFFICIENTS['constant']
-            + self.COEFFICIENTS['freq_log'] * self.freq_log # type: ignore
-            + self.COEFFICIENTS['max_sdl'] * self.max_sdl # type: ignore
-            + self.COEFFICIENTS['content_words_per_clause'] * self.content_words_per_clause # type: ignore
+            + self.COEFFICIENTS['const']
+            + self.COEFFICIENTS['mean_log_word_freq'] * self.freq_log # type: ignore
+            + self.COEFFICIENTS['mean_max_sdl'] * self.max_sdl # type: ignore
+            + self.COEFFICIENTS['mean_content_words'] * self.content_words_per_clause # type: ignore
             + self.COEFFICIENTS['proportion_concrete'] * self.proportion_concrete # type: ignore
         )
         score = min(100.0, max(0.0, 100 - result))
