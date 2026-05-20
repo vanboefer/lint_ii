@@ -1,0 +1,2158 @@
+[
+    {
+        "model_version": "3.7.0",
+        "noun_list": "nouns_sem_types_20260420",
+        "readability_analysis": {
+            "document_stats": {
+                "sentence_count": 3,
+                "document_lint_score": 48.21821023715232,
+                "document_difficulty_level": 3,
+                "min_lint_score": 18.488663741182307,
+                "max_lint_score": 63.24784032931867
+            },
+            "sentence_stats": [
+                {
+                    "text": "De Oudegracht is het sfeervolle hart van de stad.",
+                    "score": 18.488663741182307,
+                    "level": 1,
+                    "mean_log_word_frequency": 5.364349123825101,
+                    "top_n_least_freq_words": [
+                        [
+                            "hart",
+                            5.293120582960477
+                        ],
+                        [
+                            "stad",
+                            5.435577664689725
+                        ]
+                    ],
+                    "proportion_concrete_nouns": 0.5,
+                    "concrete_nouns": [
+                        "stad"
+                    ],
+                    "abstract_nouns": [],
+                    "undefined_nouns": [
+                        "hart"
+                    ],
+                    "unknown_nouns": [
+                        "oudegracht"
+                    ],
+                    "max_sdl": 3,
+                    "sdls": [
+                        {
+                            "token": "de",
+                            "dep_length": 0,
+                            "heads": [
+                                "Oudegracht"
+                            ]
+                        },
+                        {
+                            "token": "oudegracht",
+                            "dep_length": 3,
+                            "heads": [
+                                "hart"
+                            ]
+                        },
+                        {
+                            "token": "is",
+                            "dep_length": 2,
+                            "heads": [
+                                "hart"
+                            ]
+                        },
+                        {
+                            "token": "het",
+                            "dep_length": 1,
+                            "heads": [
+                                "hart"
+                            ]
+                        },
+                        {
+                            "token": "sfeervolle",
+                            "dep_length": 0,
+                            "heads": [
+                                "hart"
+                            ]
+                        },
+                        {
+                            "token": "hart",
+                            "dep_length": 0,
+                            "heads": [
+                                "hart"
+                            ]
+                        },
+                        {
+                            "token": "van",
+                            "dep_length": 1,
+                            "heads": [
+                                "stad"
+                            ]
+                        },
+                        {
+                            "token": "de",
+                            "dep_length": 0,
+                            "heads": [
+                                "stad"
+                            ]
+                        },
+                        {
+                            "token": "stad",
+                            "dep_length": 2,
+                            "heads": [
+                                "hart"
+                            ]
+                        }
+                    ],
+                    "content_words_per_clause": 4.0,
+                    "content_words": [
+                        "oudegracht",
+                        "sfeervolle",
+                        "hart",
+                        "stad"
+                    ],
+                    "finite_verbs": [
+                        "is"
+                    ],
+                    "sent_length": 9,
+                    "mean_clause_length": 9.0,
+                    "passives": [],
+                    "n_subordinate_clauses": 0,
+                    "subordinate_clauses": [],
+                    "adjectival_modifiers_per_clause": 2.0,
+                    "adjectival_modifiers": [
+                        "sfeervolle",
+                        "van de stad"
+                    ],
+                    "coordinated_constituents_per_clause": 0.0,
+                    "coordinated_constituents": [],
+                    "pronouns_first_person": [],
+                    "pronouns_second_person": [],
+                    "pronouns_third_person": [],
+                    "humans": []
+                },
+                {
+                    "text": "In de middeleeuwen was het hier een drukte van belang met de aan- en afvoer van goederen.",
+                    "score": 54.29401862227567,
+                    "level": 3,
+                    "mean_log_word_frequency": 3.816720002919252,
+                    "top_n_least_freq_words": [
+                        [
+                            "afvoer",
+                            3.3845344124610364
+                        ],
+                        [
+                            "middeleeuwen",
+                            3.423686536423184
+                        ],
+                        [
+                            "goederen",
+                            3.7985612410265284
+                        ],
+                        [
+                            "drukte",
+                            3.96775458077346
+                        ],
+                        [
+                            "belang",
+                            4.509063243912051
+                        ]
+                    ],
+                    "proportion_concrete_nouns": 0.4,
+                    "concrete_nouns": [
+                        "middeleeuwen",
+                        "afvoer"
+                    ],
+                    "abstract_nouns": [
+                        "drukte",
+                        "belang"
+                    ],
+                    "undefined_nouns": [
+                        "goederen"
+                    ],
+                    "unknown_nouns": [],
+                    "max_sdl": 6,
+                    "sdls": [
+                        {
+                            "token": "in",
+                            "dep_length": 1,
+                            "heads": [
+                                "middeleeuwen"
+                            ]
+                        },
+                        {
+                            "token": "de",
+                            "dep_length": 0,
+                            "heads": [
+                                "middeleeuwen"
+                            ]
+                        },
+                        {
+                            "token": "middeleeuwen",
+                            "dep_length": 4,
+                            "heads": [
+                                "drukte"
+                            ]
+                        },
+                        {
+                            "token": "was",
+                            "dep_length": 3,
+                            "heads": [
+                                "drukte"
+                            ]
+                        },
+                        {
+                            "token": "het",
+                            "dep_length": 2,
+                            "heads": [
+                                "drukte"
+                            ]
+                        },
+                        {
+                            "token": "hier",
+                            "dep_length": 1,
+                            "heads": [
+                                "drukte"
+                            ]
+                        },
+                        {
+                            "token": "een",
+                            "dep_length": 0,
+                            "heads": [
+                                "drukte"
+                            ]
+                        },
+                        {
+                            "token": "drukte",
+                            "dep_length": 0,
+                            "heads": [
+                                "drukte"
+                            ]
+                        },
+                        {
+                            "token": "van",
+                            "dep_length": 0,
+                            "heads": [
+                                "belang"
+                            ]
+                        },
+                        {
+                            "token": "belang",
+                            "dep_length": 1,
+                            "heads": [
+                                "drukte"
+                            ]
+                        },
+                        {
+                            "token": "met",
+                            "dep_length": 1,
+                            "heads": [
+                                "aan-"
+                            ]
+                        },
+                        {
+                            "token": "de",
+                            "dep_length": 0,
+                            "heads": [
+                                "aan-"
+                            ]
+                        },
+                        {
+                            "token": "aan-",
+                            "dep_length": 4,
+                            "heads": [
+                                "drukte"
+                            ]
+                        },
+                        {
+                            "token": "en",
+                            "dep_length": 0,
+                            "heads": [
+                                "afvoer"
+                            ]
+                        },
+                        {
+                            "token": "afvoer",
+                            "dep_length": 6,
+                            "heads": [
+                                "drukte"
+                            ]
+                        },
+                        {
+                            "token": "van",
+                            "dep_length": 0,
+                            "heads": [
+                                "goederen"
+                            ]
+                        },
+                        {
+                            "token": "goederen",
+                            "dep_length": 3,
+                            "heads": [
+                                "aan-"
+                            ]
+                        }
+                    ],
+                    "content_words_per_clause": 5.0,
+                    "content_words": [
+                        "middeleeuwen",
+                        "drukte",
+                        "belang",
+                        "afvoer",
+                        "goederen"
+                    ],
+                    "finite_verbs": [
+                        "was"
+                    ],
+                    "sent_length": 17,
+                    "mean_clause_length": 17.0,
+                    "passives": [],
+                    "n_subordinate_clauses": 0,
+                    "subordinate_clauses": [],
+                    "adjectival_modifiers_per_clause": 4.0,
+                    "adjectival_modifiers": [
+                        "van belang",
+                        "met de aan- en afvoer van goederen",
+                        "van goederen"
+                    ],
+                    "coordinated_constituents_per_clause": 1.0,
+                    "coordinated_constituents": [
+                        "afvoer"
+                    ],
+                    "pronouns_first_person": [],
+                    "pronouns_second_person": [],
+                    "pronouns_third_person": [
+                        "het"
+                    ],
+                    "humans": []
+                },
+                {
+                    "text": "Nu is het een prachtige plek om te winkelen en te lunchen of te dineren in de oude stadskastelen.",
+                    "score": 63.24784032931867,
+                    "level": 4,
+                    "mean_log_word_frequency": 4.149369512903963,
+                    "top_n_least_freq_words": [
+                        [
+                            "stadskastelen",
+                            1.359228547196266
+                        ],
+                        [
+                            "dineren",
+                            3.893254653252401
+                        ],
+                        [
+                            "winkelen",
+                            4.177454440810221
+                        ],
+                        [
+                            "prachtige",
+                            4.7805033384066125
+                        ],
+                        [
+                            "plek",
+                            5.249034299064351
+                        ]
+                    ],
+                    "proportion_concrete_nouns": 0.0,
+                    "concrete_nouns": [],
+                    "abstract_nouns": [],
+                    "undefined_nouns": [
+                        "plek"
+                    ],
+                    "unknown_nouns": [
+                        "stadskastelen"
+                    ],
+                    "max_sdl": 8,
+                    "sdls": [
+                        {
+                            "token": "nu",
+                            "dep_length": 4,
+                            "heads": [
+                                "plek"
+                            ]
+                        },
+                        {
+                            "token": "is",
+                            "dep_length": 3,
+                            "heads": [
+                                "plek"
+                            ]
+                        },
+                        {
+                            "token": "het",
+                            "dep_length": 2,
+                            "heads": [
+                                "plek"
+                            ]
+                        },
+                        {
+                            "token": "een",
+                            "dep_length": 1,
+                            "heads": [
+                                "plek"
+                            ]
+                        },
+                        {
+                            "token": "prachtige",
+                            "dep_length": 0,
+                            "heads": [
+                                "plek"
+                            ]
+                        },
+                        {
+                            "token": "plek",
+                            "dep_length": 0,
+                            "heads": [
+                                "plek"
+                            ]
+                        },
+                        {
+                            "token": "om",
+                            "dep_length": 1,
+                            "heads": [
+                                "winkelen"
+                            ]
+                        },
+                        {
+                            "token": "te",
+                            "dep_length": 0,
+                            "heads": [
+                                "winkelen"
+                            ]
+                        },
+                        {
+                            "token": "winkelen",
+                            "dep_length": 2,
+                            "heads": [
+                                "plek"
+                            ]
+                        },
+                        {
+                            "token": "en",
+                            "dep_length": 1,
+                            "heads": [
+                                "lunchen"
+                            ]
+                        },
+                        {
+                            "token": "te",
+                            "dep_length": 0,
+                            "heads": [
+                                "lunchen"
+                            ]
+                        },
+                        {
+                            "token": "lunchen",
+                            "dep_length": 5,
+                            "heads": [
+                                "plek"
+                            ]
+                        },
+                        {
+                            "token": "of",
+                            "dep_length": 1,
+                            "heads": [
+                                "dineren"
+                            ]
+                        },
+                        {
+                            "token": "te",
+                            "dep_length": 0,
+                            "heads": [
+                                "dineren"
+                            ]
+                        },
+                        {
+                            "token": "dineren",
+                            "dep_length": 8,
+                            "heads": [
+                                "plek"
+                            ]
+                        },
+                        {
+                            "token": "in",
+                            "dep_length": 2,
+                            "heads": [
+                                "stadskastelen"
+                            ]
+                        },
+                        {
+                            "token": "de",
+                            "dep_length": 1,
+                            "heads": [
+                                "stadskastelen"
+                            ]
+                        },
+                        {
+                            "token": "oude",
+                            "dep_length": 0,
+                            "heads": [
+                                "stadskastelen"
+                            ]
+                        },
+                        {
+                            "token": "stadskastelen",
+                            "dep_length": 3,
+                            "heads": [
+                                "dineren"
+                            ]
+                        }
+                    ],
+                    "content_words_per_clause": 7.0,
+                    "content_words": [
+                        "prachtige",
+                        "plek",
+                        "winkelen",
+                        "lunchen",
+                        "dineren",
+                        "oude",
+                        "stadskastelen"
+                    ],
+                    "finite_verbs": [
+                        "is"
+                    ],
+                    "sent_length": 19,
+                    "mean_clause_length": 19.0,
+                    "passives": [],
+                    "n_subordinate_clauses": 3,
+                    "subordinate_clauses": [
+                        "om te winkelen en te lunchen of te dineren in de oude stadskastelen",
+                        "en te lunchen of te dineren in de oude stadskastelen",
+                        "of te dineren in de oude stadskastelen"
+                    ],
+                    "adjectival_modifiers_per_clause": 5.0,
+                    "adjectival_modifiers": [
+                        "prachtige",
+                        "om te winkelen en te lunchen of te dineren in de oude stadskastelen",
+                        "oude"
+                    ],
+                    "coordinated_constituents_per_clause": 0.0,
+                    "coordinated_constituents": [],
+                    "pronouns_first_person": [],
+                    "pronouns_second_person": [],
+                    "pronouns_third_person": [
+                        "het"
+                    ],
+                    "humans": []
+                }
+            ],
+            "contextually_new_words": []
+        }
+    },
+    {
+        "model_version": "3.8.0",
+        "noun_list": "nouns_sem_types_20260420",
+        "readability_analysis": {
+            "document_stats": {
+                "sentence_count": 3,
+                "document_lint_score": 48.83003424009749,
+                "document_difficulty_level": 3,
+                "min_lint_score": 18.11105373147157,
+                "max_lint_score": 63.317820893230014
+            },
+            "sentence_stats": [
+                {
+                    "text": "De Oudegracht is het sfeervolle hart van de stad.",
+                    "score": 18.11105373147157,
+                    "level": 1,
+                    "mean_log_word_frequency": 5.364349123825101,
+                    "top_n_least_freq_words": [
+                        [
+                            "hart",
+                            5.293120582960477
+                        ],
+                        [
+                            "stad",
+                            5.435577664689725
+                        ]
+                    ],
+                    "proportion_concrete_nouns": 0.5,
+                    "concrete_nouns": [
+                        "stad"
+                    ],
+                    "abstract_nouns": [],
+                    "undefined_nouns": [
+                        "hart"
+                    ],
+                    "unknown_nouns": [
+                        "oudegracht"
+                    ],
+                    "max_sdl": 3,
+                    "sdls": [
+                        {
+                            "token": "de",
+                            "dep_length": 0,
+                            "heads": [
+                                "Oudegracht"
+                            ]
+                        },
+                        {
+                            "token": "oudegracht",
+                            "dep_length": 3,
+                            "heads": [
+                                "hart"
+                            ]
+                        },
+                        {
+                            "token": "is",
+                            "dep_length": 2,
+                            "heads": [
+                                "hart"
+                            ]
+                        },
+                        {
+                            "token": "het",
+                            "dep_length": 1,
+                            "heads": [
+                                "hart"
+                            ]
+                        },
+                        {
+                            "token": "sfeervolle",
+                            "dep_length": 0,
+                            "heads": [
+                                "hart"
+                            ]
+                        },
+                        {
+                            "token": "hart",
+                            "dep_length": 0,
+                            "heads": [
+                                "hart"
+                            ]
+                        },
+                        {
+                            "token": "van",
+                            "dep_length": 1,
+                            "heads": [
+                                "stad"
+                            ]
+                        },
+                        {
+                            "token": "de",
+                            "dep_length": 0,
+                            "heads": [
+                                "stad"
+                            ]
+                        },
+                        {
+                            "token": "stad",
+                            "dep_length": 2,
+                            "heads": [
+                                "hart"
+                            ]
+                        }
+                    ],
+                    "content_words_per_clause": 4.0,
+                    "content_words": [
+                        "oudegracht",
+                        "sfeervolle",
+                        "hart",
+                        "stad"
+                    ],
+                    "finite_verbs": [
+                        "is"
+                    ],
+                    "sent_length": 9,
+                    "mean_clause_length": 9.0,
+                    "passives": [],
+                    "n_subordinate_clauses": 0,
+                    "subordinate_clauses": [],
+                    "adjectival_modifiers_per_clause": 2.0,
+                    "adjectival_modifiers": [
+                        "sfeervolle",
+                        "van de stad"
+                    ],
+                    "coordinated_constituents_per_clause": 0.0,
+                    "coordinated_constituents": [],
+                    "pronouns_first_person": [],
+                    "pronouns_second_person": [],
+                    "pronouns_third_person": [],
+                    "humans": []
+                },
+                {
+                    "text": "In de middeleeuwen was het hier een drukte van belang met de aan- en afvoer van goederen.",
+                    "score": 55.365492309999944,
+                    "level": 3,
+                    "mean_log_word_frequency": 3.816720002919252,
+                    "top_n_least_freq_words": [
+                        [
+                            "afvoer",
+                            3.3845344124610364
+                        ],
+                        [
+                            "middeleeuwen",
+                            3.423686536423184
+                        ],
+                        [
+                            "goederen",
+                            3.7985612410265284
+                        ],
+                        [
+                            "drukte",
+                            3.96775458077346
+                        ],
+                        [
+                            "belang",
+                            4.509063243912051
+                        ]
+                    ],
+                    "proportion_concrete_nouns": 0.4,
+                    "concrete_nouns": [
+                        "middeleeuwen",
+                        "afvoer"
+                    ],
+                    "abstract_nouns": [
+                        "drukte",
+                        "belang"
+                    ],
+                    "undefined_nouns": [
+                        "goederen"
+                    ],
+                    "unknown_nouns": [],
+                    "max_sdl": 6,
+                    "sdls": [
+                        {
+                            "token": "in",
+                            "dep_length": 1,
+                            "heads": [
+                                "middeleeuwen"
+                            ]
+                        },
+                        {
+                            "token": "de",
+                            "dep_length": 0,
+                            "heads": [
+                                "middeleeuwen"
+                            ]
+                        },
+                        {
+                            "token": "middeleeuwen",
+                            "dep_length": 4,
+                            "heads": [
+                                "drukte"
+                            ]
+                        },
+                        {
+                            "token": "was",
+                            "dep_length": 3,
+                            "heads": [
+                                "drukte"
+                            ]
+                        },
+                        {
+                            "token": "het",
+                            "dep_length": 2,
+                            "heads": [
+                                "drukte"
+                            ]
+                        },
+                        {
+                            "token": "hier",
+                            "dep_length": 1,
+                            "heads": [
+                                "drukte"
+                            ]
+                        },
+                        {
+                            "token": "een",
+                            "dep_length": 0,
+                            "heads": [
+                                "drukte"
+                            ]
+                        },
+                        {
+                            "token": "drukte",
+                            "dep_length": 0,
+                            "heads": [
+                                "drukte"
+                            ]
+                        },
+                        {
+                            "token": "van",
+                            "dep_length": 0,
+                            "heads": [
+                                "belang"
+                            ]
+                        },
+                        {
+                            "token": "belang",
+                            "dep_length": 1,
+                            "heads": [
+                                "drukte"
+                            ]
+                        },
+                        {
+                            "token": "met",
+                            "dep_length": 1,
+                            "heads": [
+                                "aan-"
+                            ]
+                        },
+                        {
+                            "token": "de",
+                            "dep_length": 0,
+                            "heads": [
+                                "aan-"
+                            ]
+                        },
+                        {
+                            "token": "aan-",
+                            "dep_length": 4,
+                            "heads": [
+                                "drukte"
+                            ]
+                        },
+                        {
+                            "token": "en",
+                            "dep_length": 0,
+                            "heads": [
+                                "afvoer"
+                            ]
+                        },
+                        {
+                            "token": "afvoer",
+                            "dep_length": 6,
+                            "heads": [
+                                "drukte"
+                            ]
+                        },
+                        {
+                            "token": "van",
+                            "dep_length": 0,
+                            "heads": [
+                                "goederen"
+                            ]
+                        },
+                        {
+                            "token": "goederen",
+                            "dep_length": 3,
+                            "heads": [
+                                "aan-"
+                            ]
+                        }
+                    ],
+                    "content_words_per_clause": 5.0,
+                    "content_words": [
+                        "middeleeuwen",
+                        "drukte",
+                        "belang",
+                        "afvoer",
+                        "goederen"
+                    ],
+                    "finite_verbs": [
+                        "was"
+                    ],
+                    "sent_length": 17,
+                    "mean_clause_length": 17.0,
+                    "passives": [],
+                    "n_subordinate_clauses": 0,
+                    "subordinate_clauses": [],
+                    "adjectival_modifiers_per_clause": 4.0,
+                    "adjectival_modifiers": [
+                        "van belang",
+                        "met de aan- en afvoer van goederen",
+                        "van goederen"
+                    ],
+                    "coordinated_constituents_per_clause": 1.0,
+                    "coordinated_constituents": [
+                        "afvoer"
+                    ],
+                    "pronouns_first_person": [],
+                    "pronouns_second_person": [],
+                    "pronouns_third_person": [
+                        "het"
+                    ],
+                    "humans": []
+                },
+                {
+                    "text": "Nu is het een prachtige plek om te winkelen en te lunchen of te dineren in de oude stadskastelen.",
+                    "score": 63.317820893230014,
+                    "level": 4,
+                    "mean_log_word_frequency": 4.149369512903963,
+                    "top_n_least_freq_words": [
+                        [
+                            "stadskastelen",
+                            1.359228547196266
+                        ],
+                        [
+                            "dineren",
+                            3.893254653252401
+                        ],
+                        [
+                            "winkelen",
+                            4.177454440810221
+                        ],
+                        [
+                            "prachtige",
+                            4.7805033384066125
+                        ],
+                        [
+                            "plek",
+                            5.249034299064351
+                        ]
+                    ],
+                    "proportion_concrete_nouns": 0.0,
+                    "concrete_nouns": [],
+                    "abstract_nouns": [],
+                    "undefined_nouns": [
+                        "plek"
+                    ],
+                    "unknown_nouns": [
+                        "stadskastelen"
+                    ],
+                    "max_sdl": 8,
+                    "sdls": [
+                        {
+                            "token": "nu",
+                            "dep_length": 4,
+                            "heads": [
+                                "plek"
+                            ]
+                        },
+                        {
+                            "token": "is",
+                            "dep_length": 3,
+                            "heads": [
+                                "plek"
+                            ]
+                        },
+                        {
+                            "token": "het",
+                            "dep_length": 2,
+                            "heads": [
+                                "plek"
+                            ]
+                        },
+                        {
+                            "token": "een",
+                            "dep_length": 1,
+                            "heads": [
+                                "plek"
+                            ]
+                        },
+                        {
+                            "token": "prachtige",
+                            "dep_length": 0,
+                            "heads": [
+                                "plek"
+                            ]
+                        },
+                        {
+                            "token": "plek",
+                            "dep_length": 0,
+                            "heads": [
+                                "plek"
+                            ]
+                        },
+                        {
+                            "token": "om",
+                            "dep_length": 1,
+                            "heads": [
+                                "winkelen"
+                            ]
+                        },
+                        {
+                            "token": "te",
+                            "dep_length": 0,
+                            "heads": [
+                                "winkelen"
+                            ]
+                        },
+                        {
+                            "token": "winkelen",
+                            "dep_length": 2,
+                            "heads": [
+                                "plek"
+                            ]
+                        },
+                        {
+                            "token": "en",
+                            "dep_length": 1,
+                            "heads": [
+                                "lunchen"
+                            ]
+                        },
+                        {
+                            "token": "te",
+                            "dep_length": 0,
+                            "heads": [
+                                "lunchen"
+                            ]
+                        },
+                        {
+                            "token": "lunchen",
+                            "dep_length": 5,
+                            "heads": [
+                                "plek"
+                            ]
+                        },
+                        {
+                            "token": "of",
+                            "dep_length": 1,
+                            "heads": [
+                                "dineren"
+                            ]
+                        },
+                        {
+                            "token": "te",
+                            "dep_length": 0,
+                            "heads": [
+                                "dineren"
+                            ]
+                        },
+                        {
+                            "token": "dineren",
+                            "dep_length": 8,
+                            "heads": [
+                                "plek"
+                            ]
+                        },
+                        {
+                            "token": "in",
+                            "dep_length": 2,
+                            "heads": [
+                                "stadskastelen"
+                            ]
+                        },
+                        {
+                            "token": "de",
+                            "dep_length": 1,
+                            "heads": [
+                                "stadskastelen"
+                            ]
+                        },
+                        {
+                            "token": "oude",
+                            "dep_length": 0,
+                            "heads": [
+                                "stadskastelen"
+                            ]
+                        },
+                        {
+                            "token": "stadskastelen",
+                            "dep_length": 3,
+                            "heads": [
+                                "dineren"
+                            ]
+                        }
+                    ],
+                    "content_words_per_clause": 7.0,
+                    "content_words": [
+                        "prachtige",
+                        "plek",
+                        "winkelen",
+                        "lunchen",
+                        "dineren",
+                        "oude",
+                        "stadskastelen"
+                    ],
+                    "finite_verbs": [
+                        "is"
+                    ],
+                    "sent_length": 19,
+                    "mean_clause_length": 19.0,
+                    "passives": [],
+                    "n_subordinate_clauses": 3,
+                    "subordinate_clauses": [
+                        "om te winkelen en te lunchen of te dineren in de oude stadskastelen",
+                        "en te lunchen of te dineren in de oude stadskastelen",
+                        "of te dineren in de oude stadskastelen"
+                    ],
+                    "adjectival_modifiers_per_clause": 5.0,
+                    "adjectival_modifiers": [
+                        "prachtige",
+                        "om te winkelen en te lunchen of te dineren in de oude stadskastelen",
+                        "oude"
+                    ],
+                    "coordinated_constituents_per_clause": 0.0,
+                    "coordinated_constituents": [],
+                    "pronouns_first_person": [],
+                    "pronouns_second_person": [],
+                    "pronouns_third_person": [
+                        "het"
+                    ],
+                    "humans": []
+                }
+            ],
+            "contextually_new_words": []
+        }
+    },
+    {
+        "model_version": "3.7.0",
+        "noun_list": "nouns_sem_types_20251118",
+        "readability_analysis": {
+            "document_stats": {
+                "sentence_count": 3,
+                "document_lint_score": 48.20594188658342,
+                "document_difficulty_level": 3,
+                "min_lint_score": 18.511619577887927,
+                "max_lint_score": 63.244028499901944
+            },
+            "sentence_stats": [
+                {
+                    "text": "De Oudegracht is het sfeervolle hart van de stad.",
+                    "score": 18.511619577887927,
+                    "level": 1,
+                    "mean_log_word_frequency": 5.364349123825101,
+                    "top_n_least_freq_words": [
+                        [
+                            "hart",
+                            5.293120582960477
+                        ],
+                        [
+                            "stad",
+                            5.435577664689725
+                        ]
+                    ],
+                    "proportion_concrete_nouns": 0.5,
+                    "concrete_nouns": [
+                        "stad"
+                    ],
+                    "abstract_nouns": [],
+                    "undefined_nouns": [
+                        "hart"
+                    ],
+                    "unknown_nouns": [
+                        "oudegracht"
+                    ],
+                    "max_sdl": 3,
+                    "sdls": [
+                        {
+                            "token": "de",
+                            "dep_length": 0,
+                            "heads": [
+                                "Oudegracht"
+                            ]
+                        },
+                        {
+                            "token": "oudegracht",
+                            "dep_length": 3,
+                            "heads": [
+                                "hart"
+                            ]
+                        },
+                        {
+                            "token": "is",
+                            "dep_length": 2,
+                            "heads": [
+                                "hart"
+                            ]
+                        },
+                        {
+                            "token": "het",
+                            "dep_length": 1,
+                            "heads": [
+                                "hart"
+                            ]
+                        },
+                        {
+                            "token": "sfeervolle",
+                            "dep_length": 0,
+                            "heads": [
+                                "hart"
+                            ]
+                        },
+                        {
+                            "token": "hart",
+                            "dep_length": 0,
+                            "heads": [
+                                "hart"
+                            ]
+                        },
+                        {
+                            "token": "van",
+                            "dep_length": 1,
+                            "heads": [
+                                "stad"
+                            ]
+                        },
+                        {
+                            "token": "de",
+                            "dep_length": 0,
+                            "heads": [
+                                "stad"
+                            ]
+                        },
+                        {
+                            "token": "stad",
+                            "dep_length": 2,
+                            "heads": [
+                                "hart"
+                            ]
+                        }
+                    ],
+                    "content_words_per_clause": 4.0,
+                    "content_words": [
+                        "oudegracht",
+                        "sfeervolle",
+                        "hart",
+                        "stad"
+                    ],
+                    "finite_verbs": [
+                        "is"
+                    ],
+                    "sent_length": 9,
+                    "mean_clause_length": 9.0,
+                    "passives": [],
+                    "n_subordinate_clauses": 0,
+                    "subordinate_clauses": [],
+                    "adjectival_modifiers_per_clause": 2.0,
+                    "adjectival_modifiers": [
+                        "sfeervolle",
+                        "van de stad"
+                    ],
+                    "coordinated_constituents_per_clause": 0.0,
+                    "coordinated_constituents": [],
+                    "pronouns_first_person": [],
+                    "pronouns_second_person": [],
+                    "pronouns_third_person": [],
+                    "humans": []
+                },
+                {
+                    "text": "In de middeleeuwen was het hier een drukte van belang met de aan- en afvoer van goederen.",
+                    "score": 54.27057025531353,
+                    "level": 3,
+                    "mean_log_word_frequency": 3.816720002919252,
+                    "top_n_least_freq_words": [
+                        [
+                            "afvoer",
+                            3.3845344124610364
+                        ],
+                        [
+                            "middeleeuwen",
+                            3.423686536423184
+                        ],
+                        [
+                            "goederen",
+                            3.7985612410265284
+                        ],
+                        [
+                            "drukte",
+                            3.96775458077346
+                        ],
+                        [
+                            "belang",
+                            4.509063243912051
+                        ]
+                    ],
+                    "proportion_concrete_nouns": 0.4,
+                    "concrete_nouns": [
+                        "middeleeuwen",
+                        "afvoer"
+                    ],
+                    "abstract_nouns": [
+                        "drukte",
+                        "belang"
+                    ],
+                    "undefined_nouns": [
+                        "goederen"
+                    ],
+                    "unknown_nouns": [],
+                    "max_sdl": 6,
+                    "sdls": [
+                        {
+                            "token": "in",
+                            "dep_length": 1,
+                            "heads": [
+                                "middeleeuwen"
+                            ]
+                        },
+                        {
+                            "token": "de",
+                            "dep_length": 0,
+                            "heads": [
+                                "middeleeuwen"
+                            ]
+                        },
+                        {
+                            "token": "middeleeuwen",
+                            "dep_length": 4,
+                            "heads": [
+                                "drukte"
+                            ]
+                        },
+                        {
+                            "token": "was",
+                            "dep_length": 3,
+                            "heads": [
+                                "drukte"
+                            ]
+                        },
+                        {
+                            "token": "het",
+                            "dep_length": 2,
+                            "heads": [
+                                "drukte"
+                            ]
+                        },
+                        {
+                            "token": "hier",
+                            "dep_length": 1,
+                            "heads": [
+                                "drukte"
+                            ]
+                        },
+                        {
+                            "token": "een",
+                            "dep_length": 0,
+                            "heads": [
+                                "drukte"
+                            ]
+                        },
+                        {
+                            "token": "drukte",
+                            "dep_length": 0,
+                            "heads": [
+                                "drukte"
+                            ]
+                        },
+                        {
+                            "token": "van",
+                            "dep_length": 0,
+                            "heads": [
+                                "belang"
+                            ]
+                        },
+                        {
+                            "token": "belang",
+                            "dep_length": 1,
+                            "heads": [
+                                "drukte"
+                            ]
+                        },
+                        {
+                            "token": "met",
+                            "dep_length": 1,
+                            "heads": [
+                                "aan-"
+                            ]
+                        },
+                        {
+                            "token": "de",
+                            "dep_length": 0,
+                            "heads": [
+                                "aan-"
+                            ]
+                        },
+                        {
+                            "token": "aan-",
+                            "dep_length": 4,
+                            "heads": [
+                                "drukte"
+                            ]
+                        },
+                        {
+                            "token": "en",
+                            "dep_length": 0,
+                            "heads": [
+                                "afvoer"
+                            ]
+                        },
+                        {
+                            "token": "afvoer",
+                            "dep_length": 6,
+                            "heads": [
+                                "drukte"
+                            ]
+                        },
+                        {
+                            "token": "van",
+                            "dep_length": 0,
+                            "heads": [
+                                "goederen"
+                            ]
+                        },
+                        {
+                            "token": "goederen",
+                            "dep_length": 3,
+                            "heads": [
+                                "aan-"
+                            ]
+                        }
+                    ],
+                    "content_words_per_clause": 5.0,
+                    "content_words": [
+                        "middeleeuwen",
+                        "drukte",
+                        "belang",
+                        "afvoer",
+                        "goederen"
+                    ],
+                    "finite_verbs": [
+                        "was"
+                    ],
+                    "sent_length": 17,
+                    "mean_clause_length": 17.0,
+                    "passives": [],
+                    "n_subordinate_clauses": 0,
+                    "subordinate_clauses": [],
+                    "adjectival_modifiers_per_clause": 4.0,
+                    "adjectival_modifiers": [
+                        "van belang",
+                        "met de aan- en afvoer van goederen",
+                        "van goederen"
+                    ],
+                    "coordinated_constituents_per_clause": 1.0,
+                    "coordinated_constituents": [
+                        "afvoer"
+                    ],
+                    "pronouns_first_person": [],
+                    "pronouns_second_person": [],
+                    "pronouns_third_person": [
+                        "het"
+                    ],
+                    "humans": []
+                },
+                {
+                    "text": "Nu is het een prachtige plek om te winkelen en te lunchen of te dineren in de oude stadskastelen.",
+                    "score": 63.244028499901944,
+                    "level": 4,
+                    "mean_log_word_frequency": 4.149369512903963,
+                    "top_n_least_freq_words": [
+                        [
+                            "stadskastelen",
+                            1.359228547196266
+                        ],
+                        [
+                            "dineren",
+                            3.893254653252401
+                        ],
+                        [
+                            "winkelen",
+                            4.177454440810221
+                        ],
+                        [
+                            "prachtige",
+                            4.7805033384066125
+                        ],
+                        [
+                            "plek",
+                            5.249034299064351
+                        ]
+                    ],
+                    "proportion_concrete_nouns": 0.0,
+                    "concrete_nouns": [],
+                    "abstract_nouns": [],
+                    "undefined_nouns": [
+                        "plek"
+                    ],
+                    "unknown_nouns": [
+                        "stadskastelen"
+                    ],
+                    "max_sdl": 8,
+                    "sdls": [
+                        {
+                            "token": "nu",
+                            "dep_length": 4,
+                            "heads": [
+                                "plek"
+                            ]
+                        },
+                        {
+                            "token": "is",
+                            "dep_length": 3,
+                            "heads": [
+                                "plek"
+                            ]
+                        },
+                        {
+                            "token": "het",
+                            "dep_length": 2,
+                            "heads": [
+                                "plek"
+                            ]
+                        },
+                        {
+                            "token": "een",
+                            "dep_length": 1,
+                            "heads": [
+                                "plek"
+                            ]
+                        },
+                        {
+                            "token": "prachtige",
+                            "dep_length": 0,
+                            "heads": [
+                                "plek"
+                            ]
+                        },
+                        {
+                            "token": "plek",
+                            "dep_length": 0,
+                            "heads": [
+                                "plek"
+                            ]
+                        },
+                        {
+                            "token": "om",
+                            "dep_length": 1,
+                            "heads": [
+                                "winkelen"
+                            ]
+                        },
+                        {
+                            "token": "te",
+                            "dep_length": 0,
+                            "heads": [
+                                "winkelen"
+                            ]
+                        },
+                        {
+                            "token": "winkelen",
+                            "dep_length": 2,
+                            "heads": [
+                                "plek"
+                            ]
+                        },
+                        {
+                            "token": "en",
+                            "dep_length": 1,
+                            "heads": [
+                                "lunchen"
+                            ]
+                        },
+                        {
+                            "token": "te",
+                            "dep_length": 0,
+                            "heads": [
+                                "lunchen"
+                            ]
+                        },
+                        {
+                            "token": "lunchen",
+                            "dep_length": 5,
+                            "heads": [
+                                "plek"
+                            ]
+                        },
+                        {
+                            "token": "of",
+                            "dep_length": 1,
+                            "heads": [
+                                "dineren"
+                            ]
+                        },
+                        {
+                            "token": "te",
+                            "dep_length": 0,
+                            "heads": [
+                                "dineren"
+                            ]
+                        },
+                        {
+                            "token": "dineren",
+                            "dep_length": 8,
+                            "heads": [
+                                "plek"
+                            ]
+                        },
+                        {
+                            "token": "in",
+                            "dep_length": 2,
+                            "heads": [
+                                "stadskastelen"
+                            ]
+                        },
+                        {
+                            "token": "de",
+                            "dep_length": 1,
+                            "heads": [
+                                "stadskastelen"
+                            ]
+                        },
+                        {
+                            "token": "oude",
+                            "dep_length": 0,
+                            "heads": [
+                                "stadskastelen"
+                            ]
+                        },
+                        {
+                            "token": "stadskastelen",
+                            "dep_length": 3,
+                            "heads": [
+                                "dineren"
+                            ]
+                        }
+                    ],
+                    "content_words_per_clause": 7.0,
+                    "content_words": [
+                        "prachtige",
+                        "plek",
+                        "winkelen",
+                        "lunchen",
+                        "dineren",
+                        "oude",
+                        "stadskastelen"
+                    ],
+                    "finite_verbs": [
+                        "is"
+                    ],
+                    "sent_length": 19,
+                    "mean_clause_length": 19.0,
+                    "passives": [],
+                    "n_subordinate_clauses": 3,
+                    "subordinate_clauses": [
+                        "om te winkelen en te lunchen of te dineren in de oude stadskastelen",
+                        "en te lunchen of te dineren in de oude stadskastelen",
+                        "of te dineren in de oude stadskastelen"
+                    ],
+                    "adjectival_modifiers_per_clause": 5.0,
+                    "adjectival_modifiers": [
+                        "prachtige",
+                        "om te winkelen en te lunchen of te dineren in de oude stadskastelen",
+                        "oude"
+                    ],
+                    "coordinated_constituents_per_clause": 0.0,
+                    "coordinated_constituents": [],
+                    "pronouns_first_person": [],
+                    "pronouns_second_person": [],
+                    "pronouns_third_person": [
+                        "het"
+                    ],
+                    "humans": []
+                }
+            ],
+            "contextually_new_words": []
+        }
+    },
+    {
+        "model_version": "3.8.0",
+        "noun_list": "nouns_sem_types_20251118",
+        "readability_analysis": {
+            "document_stats": {
+                "sentence_count": 3,
+                "document_lint_score": 48.81679698164464,
+                "document_difficulty_level": 3,
+                "min_lint_score": 18.1326896773368,
+                "max_lint_score": 63.30997862426477
+            },
+            "sentence_stats": [
+                {
+                    "text": "De Oudegracht is het sfeervolle hart van de stad.",
+                    "score": 18.1326896773368,
+                    "level": 1,
+                    "mean_log_word_frequency": 5.364349123825101,
+                    "top_n_least_freq_words": [
+                        [
+                            "hart",
+                            5.293120582960477
+                        ],
+                        [
+                            "stad",
+                            5.435577664689725
+                        ]
+                    ],
+                    "proportion_concrete_nouns": 0.5,
+                    "concrete_nouns": [
+                        "stad"
+                    ],
+                    "abstract_nouns": [],
+                    "undefined_nouns": [
+                        "hart"
+                    ],
+                    "unknown_nouns": [
+                        "oudegracht"
+                    ],
+                    "max_sdl": 3,
+                    "sdls": [
+                        {
+                            "token": "de",
+                            "dep_length": 0,
+                            "heads": [
+                                "Oudegracht"
+                            ]
+                        },
+                        {
+                            "token": "oudegracht",
+                            "dep_length": 3,
+                            "heads": [
+                                "hart"
+                            ]
+                        },
+                        {
+                            "token": "is",
+                            "dep_length": 2,
+                            "heads": [
+                                "hart"
+                            ]
+                        },
+                        {
+                            "token": "het",
+                            "dep_length": 1,
+                            "heads": [
+                                "hart"
+                            ]
+                        },
+                        {
+                            "token": "sfeervolle",
+                            "dep_length": 0,
+                            "heads": [
+                                "hart"
+                            ]
+                        },
+                        {
+                            "token": "hart",
+                            "dep_length": 0,
+                            "heads": [
+                                "hart"
+                            ]
+                        },
+                        {
+                            "token": "van",
+                            "dep_length": 1,
+                            "heads": [
+                                "stad"
+                            ]
+                        },
+                        {
+                            "token": "de",
+                            "dep_length": 0,
+                            "heads": [
+                                "stad"
+                            ]
+                        },
+                        {
+                            "token": "stad",
+                            "dep_length": 2,
+                            "heads": [
+                                "hart"
+                            ]
+                        }
+                    ],
+                    "content_words_per_clause": 4.0,
+                    "content_words": [
+                        "oudegracht",
+                        "sfeervolle",
+                        "hart",
+                        "stad"
+                    ],
+                    "finite_verbs": [
+                        "is"
+                    ],
+                    "sent_length": 9,
+                    "mean_clause_length": 9.0,
+                    "passives": [],
+                    "n_subordinate_clauses": 0,
+                    "subordinate_clauses": [],
+                    "adjectival_modifiers_per_clause": 2.0,
+                    "adjectival_modifiers": [
+                        "sfeervolle",
+                        "van de stad"
+                    ],
+                    "coordinated_constituents_per_clause": 0.0,
+                    "coordinated_constituents": [],
+                    "pronouns_first_person": [],
+                    "pronouns_second_person": [],
+                    "pronouns_third_person": [],
+                    "humans": []
+                },
+                {
+                    "text": "In de middeleeuwen was het hier een drukte van belang met de aan- en afvoer van goederen.",
+                    "score": 55.342044831166916,
+                    "level": 3,
+                    "mean_log_word_frequency": 3.816720002919252,
+                    "top_n_least_freq_words": [
+                        [
+                            "afvoer",
+                            3.3845344124610364
+                        ],
+                        [
+                            "middeleeuwen",
+                            3.423686536423184
+                        ],
+                        [
+                            "goederen",
+                            3.7985612410265284
+                        ],
+                        [
+                            "drukte",
+                            3.96775458077346
+                        ],
+                        [
+                            "belang",
+                            4.509063243912051
+                        ]
+                    ],
+                    "proportion_concrete_nouns": 0.4,
+                    "concrete_nouns": [
+                        "middeleeuwen",
+                        "afvoer"
+                    ],
+                    "abstract_nouns": [
+                        "drukte",
+                        "belang"
+                    ],
+                    "undefined_nouns": [
+                        "goederen"
+                    ],
+                    "unknown_nouns": [],
+                    "max_sdl": 6,
+                    "sdls": [
+                        {
+                            "token": "in",
+                            "dep_length": 1,
+                            "heads": [
+                                "middeleeuwen"
+                            ]
+                        },
+                        {
+                            "token": "de",
+                            "dep_length": 0,
+                            "heads": [
+                                "middeleeuwen"
+                            ]
+                        },
+                        {
+                            "token": "middeleeuwen",
+                            "dep_length": 4,
+                            "heads": [
+                                "drukte"
+                            ]
+                        },
+                        {
+                            "token": "was",
+                            "dep_length": 3,
+                            "heads": [
+                                "drukte"
+                            ]
+                        },
+                        {
+                            "token": "het",
+                            "dep_length": 2,
+                            "heads": [
+                                "drukte"
+                            ]
+                        },
+                        {
+                            "token": "hier",
+                            "dep_length": 1,
+                            "heads": [
+                                "drukte"
+                            ]
+                        },
+                        {
+                            "token": "een",
+                            "dep_length": 0,
+                            "heads": [
+                                "drukte"
+                            ]
+                        },
+                        {
+                            "token": "drukte",
+                            "dep_length": 0,
+                            "heads": [
+                                "drukte"
+                            ]
+                        },
+                        {
+                            "token": "van",
+                            "dep_length": 0,
+                            "heads": [
+                                "belang"
+                            ]
+                        },
+                        {
+                            "token": "belang",
+                            "dep_length": 1,
+                            "heads": [
+                                "drukte"
+                            ]
+                        },
+                        {
+                            "token": "met",
+                            "dep_length": 1,
+                            "heads": [
+                                "aan-"
+                            ]
+                        },
+                        {
+                            "token": "de",
+                            "dep_length": 0,
+                            "heads": [
+                                "aan-"
+                            ]
+                        },
+                        {
+                            "token": "aan-",
+                            "dep_length": 4,
+                            "heads": [
+                                "drukte"
+                            ]
+                        },
+                        {
+                            "token": "en",
+                            "dep_length": 0,
+                            "heads": [
+                                "afvoer"
+                            ]
+                        },
+                        {
+                            "token": "afvoer",
+                            "dep_length": 6,
+                            "heads": [
+                                "drukte"
+                            ]
+                        },
+                        {
+                            "token": "van",
+                            "dep_length": 0,
+                            "heads": [
+                                "goederen"
+                            ]
+                        },
+                        {
+                            "token": "goederen",
+                            "dep_length": 3,
+                            "heads": [
+                                "aan-"
+                            ]
+                        }
+                    ],
+                    "content_words_per_clause": 5.0,
+                    "content_words": [
+                        "middeleeuwen",
+                        "drukte",
+                        "belang",
+                        "afvoer",
+                        "goederen"
+                    ],
+                    "finite_verbs": [
+                        "was"
+                    ],
+                    "sent_length": 17,
+                    "mean_clause_length": 17.0,
+                    "passives": [],
+                    "n_subordinate_clauses": 0,
+                    "subordinate_clauses": [],
+                    "adjectival_modifiers_per_clause": 4.0,
+                    "adjectival_modifiers": [
+                        "van belang",
+                        "met de aan- en afvoer van goederen",
+                        "van goederen"
+                    ],
+                    "coordinated_constituents_per_clause": 1.0,
+                    "coordinated_constituents": [
+                        "afvoer"
+                    ],
+                    "pronouns_first_person": [],
+                    "pronouns_second_person": [],
+                    "pronouns_third_person": [
+                        "het"
+                    ],
+                    "humans": []
+                },
+                {
+                    "text": "Nu is het een prachtige plek om te winkelen en te lunchen of te dineren in de oude stadskastelen.",
+                    "score": 63.30997862426477,
+                    "level": 4,
+                    "mean_log_word_frequency": 4.149369512903963,
+                    "top_n_least_freq_words": [
+                        [
+                            "stadskastelen",
+                            1.359228547196266
+                        ],
+                        [
+                            "dineren",
+                            3.893254653252401
+                        ],
+                        [
+                            "winkelen",
+                            4.177454440810221
+                        ],
+                        [
+                            "prachtige",
+                            4.7805033384066125
+                        ],
+                        [
+                            "plek",
+                            5.249034299064351
+                        ]
+                    ],
+                    "proportion_concrete_nouns": 0.0,
+                    "concrete_nouns": [],
+                    "abstract_nouns": [],
+                    "undefined_nouns": [
+                        "plek"
+                    ],
+                    "unknown_nouns": [
+                        "stadskastelen"
+                    ],
+                    "max_sdl": 8,
+                    "sdls": [
+                        {
+                            "token": "nu",
+                            "dep_length": 4,
+                            "heads": [
+                                "plek"
+                            ]
+                        },
+                        {
+                            "token": "is",
+                            "dep_length": 3,
+                            "heads": [
+                                "plek"
+                            ]
+                        },
+                        {
+                            "token": "het",
+                            "dep_length": 2,
+                            "heads": [
+                                "plek"
+                            ]
+                        },
+                        {
+                            "token": "een",
+                            "dep_length": 1,
+                            "heads": [
+                                "plek"
+                            ]
+                        },
+                        {
+                            "token": "prachtige",
+                            "dep_length": 0,
+                            "heads": [
+                                "plek"
+                            ]
+                        },
+                        {
+                            "token": "plek",
+                            "dep_length": 0,
+                            "heads": [
+                                "plek"
+                            ]
+                        },
+                        {
+                            "token": "om",
+                            "dep_length": 1,
+                            "heads": [
+                                "winkelen"
+                            ]
+                        },
+                        {
+                            "token": "te",
+                            "dep_length": 0,
+                            "heads": [
+                                "winkelen"
+                            ]
+                        },
+                        {
+                            "token": "winkelen",
+                            "dep_length": 2,
+                            "heads": [
+                                "plek"
+                            ]
+                        },
+                        {
+                            "token": "en",
+                            "dep_length": 1,
+                            "heads": [
+                                "lunchen"
+                            ]
+                        },
+                        {
+                            "token": "te",
+                            "dep_length": 0,
+                            "heads": [
+                                "lunchen"
+                            ]
+                        },
+                        {
+                            "token": "lunchen",
+                            "dep_length": 5,
+                            "heads": [
+                                "plek"
+                            ]
+                        },
+                        {
+                            "token": "of",
+                            "dep_length": 1,
+                            "heads": [
+                                "dineren"
+                            ]
+                        },
+                        {
+                            "token": "te",
+                            "dep_length": 0,
+                            "heads": [
+                                "dineren"
+                            ]
+                        },
+                        {
+                            "token": "dineren",
+                            "dep_length": 8,
+                            "heads": [
+                                "plek"
+                            ]
+                        },
+                        {
+                            "token": "in",
+                            "dep_length": 2,
+                            "heads": [
+                                "stadskastelen"
+                            ]
+                        },
+                        {
+                            "token": "de",
+                            "dep_length": 1,
+                            "heads": [
+                                "stadskastelen"
+                            ]
+                        },
+                        {
+                            "token": "oude",
+                            "dep_length": 0,
+                            "heads": [
+                                "stadskastelen"
+                            ]
+                        },
+                        {
+                            "token": "stadskastelen",
+                            "dep_length": 3,
+                            "heads": [
+                                "dineren"
+                            ]
+                        }
+                    ],
+                    "content_words_per_clause": 7.0,
+                    "content_words": [
+                        "prachtige",
+                        "plek",
+                        "winkelen",
+                        "lunchen",
+                        "dineren",
+                        "oude",
+                        "stadskastelen"
+                    ],
+                    "finite_verbs": [
+                        "is"
+                    ],
+                    "sent_length": 19,
+                    "mean_clause_length": 19.0,
+                    "passives": [],
+                    "n_subordinate_clauses": 3,
+                    "subordinate_clauses": [
+                        "om te winkelen en te lunchen of te dineren in de oude stadskastelen",
+                        "en te lunchen of te dineren in de oude stadskastelen",
+                        "of te dineren in de oude stadskastelen"
+                    ],
+                    "adjectival_modifiers_per_clause": 5.0,
+                    "adjectival_modifiers": [
+                        "prachtige",
+                        "om te winkelen en te lunchen of te dineren in de oude stadskastelen",
+                        "oude"
+                    ],
+                    "coordinated_constituents_per_clause": 0.0,
+                    "coordinated_constituents": [],
+                    "pronouns_first_person": [],
+                    "pronouns_second_person": [],
+                    "pronouns_third_person": [
+                        "het"
+                    ],
+                    "humans": []
+                }
+            ],
+            "contextually_new_words": []
+        }
+    }
+]
