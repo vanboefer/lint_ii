@@ -31,7 +31,7 @@
 **LiNT-II** is a new implementation of the original [LiNT tool](#original-lint). The main differences between **LiNT** and **LiNT-II** are:
 
 - The **NLP tools** used to extract linguistic features from the text. LiNT has [T-Scan](https://github.com/CentreForDigitalHumanities/tscan) under the hood, while LiNT-II uses [spaCy](https://spacy.io/).
-- The **coefficients** (weights) used in the formula. Since the features are calculated differently, [a new linear regression model was fitted on the original reading comprehension data from LiNT](https://github.com/vanboefer/lint_ii/tree/main/regression_data_and_results). This resulted in new coefficients. The performance of the LiNT-II model is the same as the original LiNT: **adjusted R<sup>2</sup> = 0.74**, meaning that the model explains 74% of the variance in the comprehension data.
+- The **coefficients** (weights) used in the formula. Since the features are calculated differently, [a new linear regression model was fitted on the original reading comprehension data from LiNT](./regression_data_and_results). This resulted in new coefficients. The performance of the LiNT-II model is the same as the original LiNT: **adjusted R<sup>2</sup> = 0.74**, meaning that the model explains 74% of the variance in the comprehension data.
 
 For detailed information, please refer to [What is LiNT-II?](#what-is-lint-ii) and [LiNT-II documentation](https://vanboefer.github.io/lint_ii/).
 
@@ -46,11 +46,11 @@ For detailed information, please refer to [What is LiNT-II?](#what-is-lint-ii) a
 pip install lint_ii
 python -m spacy download nl_core_news_lg
 ```
-<sup>[1]</sup> **Python 3.11** will trigger installation of **spaCy 3.7**, which is the recommended version for LiNT-II. For more details about this, see [here](https://github.com/vanboefer/lint_ii/tree/main/regression_data_and_results).
+<sup>[1]</sup> **Python 3.11** will trigger installation of **spaCy 3.7**, which is the recommended version for LiNT-II. For more details about this, see [here](./regression_data_and_results).
 
 ### Support for other Python versions
 
-LiNT-II also supports Python 3.12 and 3.13, which install spaCy 3.8. Note that this is not the recommended configuration; for more details, see [here](https://github.com/vanboefer/lint_ii/tree/main/regression_data_and_results).
+LiNT-II also supports Python 3.12 and 3.13, which install spaCy 3.8. Note that this is not the recommended configuration; for more details, see [here](./regression_data_and_results).
 
 ## Usage
 
@@ -116,7 +116,7 @@ print(frequencies)
 {'hart': 5.293120582960477, 'stad': 5.435577664689725, 'middeleeuwen': 3.423686536423184, 'drukte': 3.96775458077346, 'belang': 4.509063243912051, 'afvoer': 3.3845344124610364, 'goederen': 3.7985612410265284, 'prachtige': 4.7805033384066125, 'plek': 5.249034299064351, 'winkelen': 4.177454440810221, 'dineren': 3.893254653252401, 'oude': 5.436741798693928, 'stadskastelen': 1.359228547196266}
 ```
 
-For a list of available properties, refer to the documentation in [`readability_analysis.py`](https://github.com/vanboefer/lint_ii/blob/main/src/lint_ii/core/readability_analysis.py), [`sentence_analysis.py`](https://github.com/vanboefer/lint_ii/blob/main/src/lint_ii/core/sentence_analysis.py), and [`word_features.py`](https://github.com/vanboefer/lint_ii/blob/main/src/lint_ii/core/word_features.py).
+For a list of available properties, refer to the documentation in [`readability_analysis.py`](./src/lint_ii/core/readability_analysis.py), [`sentence_analysis.py`](./src/lint_ii/core/sentence_analysis.py), and [`word_features.py`](./src/lint_ii/core/word_features.py).
 
 
 ### Get dictionary with detailed analysis
@@ -205,7 +205,7 @@ Feature | Description
 
 #### Definitions
 
-- ***Content words*** are words that possess semantic content and contribute to the meaning of the sentence. We consider a word as a content word if it belongs to one of the following [part-of-speech (POS)](https://universaldependencies.org/u/pos/): nouns (NOUN), proper nouns (PROPN), lexical verbs (VERB), adjectives (ADJ), or if it's a manner adverb (based on a [custom list](https://github.com/vanboefer/lint_ii/blob/main/src/lint_ii/linguistic_data/data/manner_adverbs_20251017.parquet)).
+- ***Content words*** are words that possess semantic content and contribute to the meaning of the sentence. We consider a word as a content word if it belongs to one of the following [part-of-speech (POS)](https://universaldependencies.org/u/pos/): nouns (NOUN), proper nouns (PROPN), lexical verbs (VERB), adjectives (ADJ), or if it's a manner adverb (based on a [custom list](./src/lint_ii/linguistic_data/data/manner_adverbs_20251017.parquet)).
 - ***Clause***: A clause is a group of words that contains a subject and a verb, functioning as a part of a sentence. In this library, the number of clauses is determined by the number of finite verbs (= verbs that show tense) in the sentence.
 
 ### LiNT-II score
@@ -224,7 +224,7 @@ LiNT-II score =
   )
 ```
 
-The formula's coefficients were estimated using a linear regression model fitted on empirical reading comprehension data from high school students. For more information about the regression analysis, see [here](https://github.com/vanboefer/lint_ii/tree/main/regression_data_and_results).
+The formula's coefficients were estimated using a linear regression model fitted on empirical reading comprehension data from high school students. For more information about the regression analysis, see [here](./regression_data_and_results).
 
 ### Difficulty levels
 
@@ -260,7 +260,7 @@ The feature **contextually new words** is available on the `ReadabilityAnalysis`
 ## Changelog
 
 #### New in 0.1.3
-- LiNT-II now supports Python 3.12 and Python 3.13; these versions install spaCy 3.8. We recommend using Python 3.11 and spaCy 3.7, if possible; see [here](https://github.com/vanboefer/lint_ii/tree/main/regression_data_and_results).
+- LiNT-II now supports Python 3.12 and Python 3.13; these versions install spaCy 3.8. We recommend using Python 3.11 and spaCy 3.7, if possible; see [here](./regression_data_and_results).
 
 #### New in 0.1.2
 - Added 5 new linguistic features (not used of the formula); see [here](#additional-features).
