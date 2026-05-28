@@ -138,10 +138,20 @@ class ReadabilityAnalysis(LintIIVisualizer):
         from lint_ii.linguistic_data.nlp_model import NLP_MODEL
         clean_text = preprocess_text(text)
         doc = NLP_MODEL(clean_text)
-        sentences = [
-            SentenceAnalysis(sent)
-            for sent in doc.sents
-        ]
+        raw_sents = list(doc.sents)
+        sentence_final = {'.', '!', '?'}
+        merged = []
+        i = 0
+        while i < len(raw_sents):
+            sent = raw_sents[i]
+            real_toks = [t for t in sent if not t.is_punct and not t.is_space]
+            if len(real_toks) <= 2 and sent[-1].text not in sentence_final and i + 1 < len(raw_sents):
+                merged.append(doc[sent.start:raw_sents[i + 1].end])
+                i += 2
+            else:
+                merged.append(sent)
+                i += 1
+        sentences = [SentenceAnalysis(span) for span in merged]
         return cls(sentences)
 
     @property

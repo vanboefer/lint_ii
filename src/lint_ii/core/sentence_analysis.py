@@ -25,7 +25,7 @@ class SentenceAnalysisDict(TypedDict):
     mean_log_word_frequency: float | None
     max_sdl: int | None
     proportion_of_concrete_nouns: float | None
-    content_words_per_clause: float | None
+    content_words_per_clause: float
 
 
 class SentenceAnalysis:
@@ -72,8 +72,8 @@ class SentenceAnalysis:
         All finite verbs (verbs showing tense) in the sentence.
     content_words : list[WordFeatures]
         All content words in the sentence.
-    content_words_per_clause : float | None
-        Number of content words per clause. Returns None if there are no finite verbs in the sentence (i.e. no clause). Cached property.
+    content_words_per_clause : float
+        Number of content words per clause. Treats the whole sentence as one clause when no finite verbs are detected. Cached property.
     lint : LintScorer
         LintScorer object that contains the score (lint.score) and the difficulty level (lint.level) for the sentence. Cached property.
     sent_length : int
@@ -302,14 +302,13 @@ class SentenceAnalysis:
         ]
 
     @cached_property
-    def content_words_per_clause(self) -> float | None:
+    def content_words_per_clause(self) -> float:
         """
         Number of content words per clause.
-        Returns None if there are no finite verbs in the sentence (i.e. no clause).
+        If no finite verbs are detected, treats the whole sentence as one clause.
         """
-        if not self.finite_verbs:
-            return None
-        return len(self.content_words) / len(self.finite_verbs)
+        n_clauses = len(self.finite_verbs) or 1
+        return len(self.content_words) / n_clauses
 
     @cached_property
     def lint(self) -> LintScorer:
