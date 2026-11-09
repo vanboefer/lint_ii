@@ -16,12 +16,13 @@ exclude = [
 
 [project]
 name = "lint_ii"
-version = "0.1.3"
+version = "0.1.4"
 description = "LiNT-II is a readability assessment tool for Dutch."
 authors = [
     {name = "Jenia Kim"}
 ]
-license = {text = "EUPL"}
+license = "EUPL-1.2 AND CC-BY-NC-SA-4.0 AND LicenseRef-RBN-derived"
+license-files = ["LICENSE", "src/lint_ii/linguistic_data/data/DATA_LICENSES.md"]
 keywords = ["readability", "dutch", "nlp"]
 readme = "README.md"
 requires-python = ">=3.11,<3.14"

@@ -20,8 +20,9 @@
     - [LiNT-II score](#lint-ii-score)
     - [Difficulty levels](#difficulty-levels)
     - [Additional features](#additional-features)
-5. [Changelog (releases)](#changelog)
-6. [References and Credits](#references-and-credits)
+5. [Data and Licensing](#data-and-licensing)
+6. [Changelog (releases)](#changelog)
+7. [References and Credits](#references-and-credits)
 
 ## Introduction
 
@@ -36,6 +37,8 @@
 - The **coefficients** (weights) used in the formula. Since the features are calculated differently, [a new linear regression model was fitted on the original reading comprehension data from LiNT](./regression_data_and_results). This resulted in new coefficients. The performance of the LiNT-II model is the same as the original LiNT: **adjusted R<sup>2</sup> = 0.74**, meaning that the model explains 74% of the variance in the comprehension data.
 
 For detailed information, please refer to [What is LiNT-II?](#what-is-lint-ii) and [LiNT-II documentation](https://vanboefer.github.io/lint_ii/).
+
+> ⚠️ **Licensing:** LiNT-II code is licensed under EUPL-1.2, but the bundled linguistic data (SUBTLEX-NL, noun list) is **not licensed for commercial use**. See [Data and Licensing](#data-and-licensing).
 
 ## Installation
 
@@ -259,7 +262,41 @@ Feature | Description | Release
 
 The feature **contextually new words** is available on the `ReadabilityAnalysis` level. The other 8 additional features are available on a `SentenceAnalysis` level.
 
+## Data and Licensing
+
+LiNT-II **code** is licensed under the [EUPL-1.2](LICENSE).
+
+The package also contains **linguistic data files based on third-party resources**. These files are **not covered by the EUPL** and are subject to their own terms, which **do not allow commercial use** without permission from the rights holders.
+
+| Data | Files | Source | Terms |
+| --- | --- | --- | --- |
+| Word frequencies | `subtlex_wordfreq.parquet` | SUBTLEX-NL | CC BY-NC-SA 4.0 |
+| Noun list (semantic types) | `nouns_sem_types_*.parquet` | Partly based on the Referentiebestand Nederlands (RBN) | See below |
+| Other data | `manner_adverbs_*.parquet`, `measurement_units.parquet`, `subtlex_wordfreq_skiplist.parquet` | LiNT-II authors | EUPL-1.2 |
+
+### SUBTLEX-NL
+
+The word frequencies are derived from SUBTLEX-NL (Keuleers, Brysbaert & New, 2010), licensed under [CC BY-NC-SA 4.0](https://creativecommons.org/licenses/by-nc-sa/4.0/). These files are distributed under the same licence. Commercial use requires permission from the SUBTLEX-NL authors (Marc Brysbaert, Ghent University).
+
+> Keuleers, E., Brysbaert, M., & New, B. (2010). SUBTLEX-NL: A new measure for Dutch word frequency based on film subtitles. *Behavior Research Methods, 42*(3), 643–650. https://doi.org/10.3758/BRM.42.3.643
+
+### Noun list
+
+The noun list contains 92,757 nouns with their semantic type. It was originally based on the
+Referentiebestand Nederlands (RBN), and has since been substantially extended and revised by the LiNT authors: 38,477 nouns also occur in the RBN, of which 23,240 have the same semantic type as in the RBN.
+
+The RBN is made available by the Instituut voor de Nederlandse Taal (INT) under a non-commercial licence. We are in contact with the INT about the terms for distributing this list. **Do not use the noun list for commercial purposes**; for commercial use, please contact the [INT](https://ivdnt.org).
+
+> Referentiebestand Nederlands - RBN (Version 2.0.1) (2014) [Data set]. Available at the Dutch Language Institute: http://hdl.handle.net/10032/tm-a2-n2
+
+### Commercial use
+
+LiNT-II score uses both word frequency and proportion of concrete nouns, and the formula's coefficients were fitted on these specific data files. Replacing the files changes the scores. **LiNT-II can therefore currently not be used for commercial purposes without permission from both rights holders.**
+
 ## Changelog
+
+#### New in 0.1.4
+- Clarified licensing of bundled data (SUBTLEX-NL, RBN-based noun list); no functional changes.
 
 #### New in 0.1.3
 - LiNT-II now supports Python 3.12 and Python 3.13; these versions install spaCy 3.8. We recommend using Python 3.11 and spaCy 3.7, if possible; see [here](./regression_data_and_results).
@@ -286,7 +323,7 @@ If you use this library, please cite as follows:
   title = {{LiNT-II: readability assessment for Dutch}},
   year = {2025},
   url = {https://github.com/vanboefer/lint_ii},
-  version = {0.1.3},
+  version = {0.1.4},
   note = {Python package}
 }
 ```
